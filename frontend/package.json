@@ -21,12 +21,16 @@
     "lint": "eslint ./src/",
     "build:bundle-profile": "webpack --profile --json > stats.json",
     "bundle-profile:analyze": "yarn build:bundle-profile && webpack-bundle-analyzer ./stats.json",
-    "clean": "yarn rimraf dist"
+    "clean": "yarn rimraf dist",
+    "clean-static": "yarn rimraf ../backend/src/main/resources/static/*",
+    "move-static": "mkdir -p ../backend/src/main/resources/static && mv dist/* ../backend/src/main/resources/static",
+    "postbuild": "yarn run clean-static && yarn run move-static"
   },
   "dependencies": {
     "@patternfly/react-core": "^3.140.11",
     "@patternfly/react-icons": "^3.15.4",
     "@patternfly/react-styles": "^3.7.4",
+    "axios": "^0.19.2",
     "prop-types": "^15.7.2",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
