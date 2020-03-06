@@ -5,36 +5,27 @@ import java.util.UUID;
 
 public class Player {
 
-    private UUID id;
-    private String firstName;
-    private String lastName;
+    private Integer id;
+    private String name;
     private Date birthDate;
-    private Position position;
-    private Double height;
-    private Double weight;
+    private String position;
+    private String height;
+    private Integer weight;
 
-    public UUID getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getName() {
+        return name;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Date getBirthDate() {
@@ -45,27 +36,27 @@ public class Player {
         this.birthDate = birthDate;
     }
 
-    public Position getPosition() {
+    public String getPosition() {
         return position;
     }
 
-    public void setPosition(Position position) {
+    public void setPosition(String position) {
         this.position = position;
     }
 
-    public Double getHeight() {
+    public String getHeight() {
         return height;
     }
 
-    public void setHeight(Double height) {
+    public void setHeight(String height) {
         this.height = height;
     }
 
-    public Double getWeight() {
+    public Integer getWeight() {
         return weight;
     }
 
-    public void setWeight(Double weight) {
+    public void setWeight(Integer weight) {
         this.weight = weight;
     }
 

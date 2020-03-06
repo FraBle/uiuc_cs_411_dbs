@@ -15,7 +15,8 @@ The following guides illustrate how to use some features concretely:
 ### Start the application
 ```mvn spring-boot:run```
 
-* [Fetch player by ID example](http://localhost:8080/player/79085b3a-59fd-11ea-82b4-0242ac130003)
+* [Fetch all players with pagination and sort](http://localhost:8080/player?order=name&pageSize=10&page=1)
+* [Fetch player by ID example](http://localhost:8080/player/467)
 
 ### Docker
 - Build the image: `./mvnw spring-boot:build-image`
