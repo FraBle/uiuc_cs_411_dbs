@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  app:
+    image: us.gcr.io/cs-411-data-gssn-kat/nbastats:latest
+    depends_on:
+    - cloud-sql-proxy
+    environment:
+      DB_HOST: cloud-sql-proxy
+      DB_USER: nba-stats-backend
+      DB_PASS: "${DB_PASS}"
+    ports:
+    - 8080:8080
+  cloud-sql-proxy:
+    image: gcr.io/cloudsql-docker/gce-proxy:1.16
+    command: /cloud_sql_proxy -instances=cs-411-data-gssn-kat:us-west1:nbastats-db=tcp:0.0.0.0:3306 -credential_file=/config
+    volumes:
+    - ./local-db.json:/config
+    ports:
+    - 3306:3306

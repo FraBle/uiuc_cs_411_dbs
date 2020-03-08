@@ -15,8 +15,11 @@ The following guides illustrate how to use some features concretely:
 ### Start the application
 ```mvn spring-boot:run```
 
-* [Fetch all players with pagination and sort](http://localhost:8080/player?order=name&pageSize=10&page=1)
-* [Fetch player by ID example](http://localhost:8080/player/467)
+### API
+###### Players
+* [Fetch all players with pagination and sort](http://localhost:8080/api/player?order=name&pageSize=10&page=1)
+* [Fetch player by ID example](http://localhost:8080/api/player/467)
+* [Count all players](http://localhost:8080/api/player/count)
 
 ### Docker
 - Build the image: `./mvnw spring-boot:build-image`

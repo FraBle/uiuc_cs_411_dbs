@@ -1,7 +1,6 @@
 package edu.uiuc.cs411.project.nba.stats.domain;
 
 import java.util.Date;
-import java.util.UUID;
 
 public class Player {
 

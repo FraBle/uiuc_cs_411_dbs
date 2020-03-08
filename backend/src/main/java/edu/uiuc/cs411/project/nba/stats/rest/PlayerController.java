@@ -6,13 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.UUID;
 
-@RestController
+@RestController("/player")
 public class PlayerController {
 
     private final PlayerMapper playerMapper;
@@ -22,12 +20,12 @@ public class PlayerController {
         this.playerMapper = playerMapper;
     }
 
-    @GetMapping("/player/count")
+    @GetMapping("/count")
     public Long count() {
         return playerMapper.count();
     }
 
-    @GetMapping("/player/{id}")
+    @GetMapping("/{id}")
     public Player fetchPlayerById(@PathVariable("id") String id) {
         return playerMapper.getPlayerById(Integer.parseInt(id));
     }
@@ -45,3 +43,4 @@ public class PlayerController {
     }
 
 }
+
