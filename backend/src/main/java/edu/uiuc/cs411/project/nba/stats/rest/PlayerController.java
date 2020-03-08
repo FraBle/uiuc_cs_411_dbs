@@ -24,17 +24,17 @@ public class PlayerController {
         this.playerMapper = playerMapper;
     }
 
-    @GetMapping("/player/count")
+    @GetMapping("/api/player/count")
     public Long count() {
         return playerMapper.count();
     }
 
-    @GetMapping("/player/{id}")
+    @GetMapping("/api/player/{id}")
     public Player fetchPlayerById(@PathVariable("id") String id) {
         return playerMapper.getPlayerById(Integer.parseInt(id));
     }
 
-    @GetMapping("/player")
+    @GetMapping("/api/player")
     public List<Player> fetchAllPlayers(
             @RequestParam(defaultValue = "1") String page,
             @RequestParam(defaultValue = "50") String pageSize,
