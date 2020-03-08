@@ -14,17 +14,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = PersistenceConfig.class)
 public class PlayerMapperTest {
- 
+
     @Autowired
     PlayerMapper playerMapper;
- 
+
     @Test
     public void whenRecordsInDatabase_shouldReturnPlayerWithGivenId() {
-        Player player = playerMapper.getPlayerById(1);
- 
+        Player player = playerMapper.getPlayerById(203932);
+
         assertThat(player).isNotNull();
-        assertThat(player.getName()).isEqualTo("Michael Jordan");
-        assertThat(player.getPosition()).isEqualTo("F-G");
+        assertThat(player.getName()).isEqualTo("Aaron Gordon");
+        assertThat(player.getPosition()).isEqualTo("F");
     }
 
 }
