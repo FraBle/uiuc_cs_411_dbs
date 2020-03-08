@@ -33,6 +33,7 @@
     "@patternfly/react-styles": "^3.7.4",
     "@patternfly/react-table": "^2.27.11",
     "axios": "^0.19.2",
+    "moment": "^2.24.0",
     "prop-types": "^15.7.2",
     "react": "^16.13.0",
     "react-dom": "^16.13.0"

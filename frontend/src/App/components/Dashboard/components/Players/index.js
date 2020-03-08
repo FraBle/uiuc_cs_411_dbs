@@ -1,30 +1,54 @@
 import React from 'react';
 import {
   Bullseye,
+  Button,
+  DataToolbar,
+  DataToolbarContent,
+  DataToolbarGroup,
+  DataToolbarItem,
   EmptyState,
   EmptyStateBody,
   EmptyStateIcon,
   EmptyStateVariant,
+  FlexModifiers,
   PageSection,
   PageSectionVariants,
   Pagination,
+  Select,
+  SelectOption,
+  SelectVariant,
   Text,
   TextContent,
   Title,
 } from '@patternfly/react-core';
-import { ExclamationCircleIcon } from '@patternfly/react-icons';
+import { ExclamationCircleIcon, SortAlphaDownIcon, SortAlphaUpIcon } from '@patternfly/react-icons';
 import { global_danger_color_200 as globalDangerColor200 } from '@patternfly/react-tokens';
 import { Table, TableHeader, TableBody } from '@patternfly/react-table';
 import { Spinner } from '@patternfly/react-core';
+import moment from 'moment';
 
 const initialState = {
-  res: [],
+  players: [],
   perPage: 0,
   total: 0,
   page: 0,
   error: null,
   loading: true,
+  sortIsExpanded: false,
+  sortSelected: null,
 };
+const cells = ['ID', 'Name', 'Birthdate', 'Position', 'Height', 'Weight'];
+const filterOptions = [
+  {
+    value: 'Sort By',
+    disabled: false,
+    isPlaceholder: true,
+  },
+  ...cells.map(cell => ({
+    value: cell,
+    disabled: false,
+  }))
+];
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -39,8 +63,8 @@ const reducer = (state, action) => {
         ...state,
         loading: false,
         error: null,
-        total: 100,
-        res: action.payload.response,
+        total: action.payload.total,
+        players: action.payload.players,
         perPage: action.payload.perPage,
         page: action.payload.page
       };
@@ -54,6 +78,17 @@ const reducer = (state, action) => {
         page: 0,
         total: 0
       };
+    case 'SORT_PLAYERS_TOGGLE':
+      return {
+        ...state,
+        sortIsExpanded: action.payload.isExpanded
+      };
+    case 'SORT_PLAYERS_SELECT':
+      return {
+        ...state,
+        sortSelected: action.payload.selection,
+        sortIsExpanded: false
+      };
     default:
       return state;
   }
@@ -66,29 +101,38 @@ const Players = () => {
     dispatch({
       type: 'FETCH_PLAYERS_REQUEST'
     });
-    fetchData(data.page || 1, data.perPage || 20);
+    fetchData(data.page || 1, data.perPage || 20, 'name');
   }, []);
 
-  const fetchData = (page, perPage) => {
-    fetch(`https://jsonplaceholder.typicode.com/posts?_page=${page}&_limit=${perPage}`)
-      .then(resp => resp.json())
-      .then(respJson => dispatch({
-        type: "FETCH_PLAYERS_SUCCESS",
-        payload: {
-          response: respJson,
-          perPage,
-          page,
-          loading: false,
-          total: 100,
-        }
-      }))
-      .catch(error => dispatch({
-        type: "FETCH_PLAYERS_FAILURE",
-        payload: {
-          error,
-        }
-      }));
-  }
+  const fetchData = (page, perPage, order) => {
+    Promise.all([
+      fetch(
+        `${BACKEND}/api/player?order=name&pageSize=${perPage}&page=${page}&order=${order ? order.toLowerCase() : 'name'}`
+      ),
+      fetch(`${BACKEND}/api/player/count`)
+    ])
+      .then(([players, total]) => Promise.all([players.json(), total.json()]))
+      .then(([playersJson, totalJson]) =>
+        dispatch({
+          type: 'FETCH_PLAYERS_SUCCESS',
+          payload: {
+            players: playersJson,
+            total: totalJson,
+            loading: false,
+            perPage,
+            page
+          }
+        })
+      )
+      .catch(error =>
+        dispatch({
+          type: 'FETCH_PLAYERS_FAILURE',
+          payload: {
+            error
+          }
+        })
+      );
+  };
 
   const renderPagination = (variant = 'top') => {
     return (
@@ -96,13 +140,31 @@ const Players = () => {
         itemCount={data.total}
         page={data.page}
         perPage={data.perPage}
-        onSetPage={(_evt, value) => fetchData(value, data.perPage)}
-        onPerPageSelect={(_evt, value) => fetchData(1, value)}
+        onSetPage={(_evt, value) => fetchData(value, data.perPage, data.sortSelected)}
+        onPerPageSelect={(_evt, value) => fetchData(1, value, data.sortSelected)}
         variant={variant}
       />
     );
   }
 
+  const onSortToggle = isExpanded => dispatch({
+    type: 'SORT_PLAYERS_TOGGLE',
+    payload: {
+      isExpanded
+    }
+  });
+
+  const onSortSelect = (event, selection) => {
+    dispatch({
+      type: 'SORT_PLAYERS_SELECT',
+      payload: {
+        isExpanded: false,
+        selection
+      }
+    });
+    if (selection === 'Sort By') return;
+    fetchData(1, data.perPage, selection);
+  }
 
   if (data.error) {
     const noResultsRows = [
@@ -131,7 +193,7 @@ const Players = () => {
 
     return (
       <React.Fragment>
-        <Table cells={['Title', 'Body']} rows={noResultsRows} aria-label="Pagination Table Demo">
+        <Table cells={cells} rows={noResultsRows} aria-label="Pagination Table Demo">
           <TableHeader />
           <TableBody />
         </Table>
@@ -164,19 +226,54 @@ const Players = () => {
         </TextContent>
       </PageSection>
       <PageSection>
-        {renderPagination()}
+        <DataToolbar id="players-data-toolbar" className="pf-u-justify-content-space-between">
+          <DataToolbarContent>
+            <DataToolbarGroup variant="players-sort-group">
+              <DataToolbarItem>
+                <Select
+                  variant={SelectVariant.single}
+                  aria-label="Sort By"
+                  onToggle={onSortToggle}
+                  onSelect={onSortSelect}
+                  selections={data.sortSelected}
+                  isExpanded={data.sortIsExpanded}
+                >
+                  {filterOptions.map((option, index) => (
+                    <SelectOption isDisabled={option.disabled} key={index} value={option.value} />
+                  ))}
+                </Select>
+              </DataToolbarItem>
+              {/* <DataToolbarItem>
+                <Button variant="plain" aria-label="Sort A-Z">
+                  <SortAlphaDownIcon />
+                </Button>
+              </DataToolbarItem> */}
+            </DataToolbarGroup>
+            <DataToolbarItem breakpointMods={[{ modifier: FlexModifiers['align-right'] }]}>
+              {renderPagination()}
+            </DataToolbarItem>
+          </DataToolbarContent>
+        </DataToolbar>
+
         {!data.loading && (
           <Table
-            cells={['Title', 'Body']}
-            rows={data.res.map(post => [post.title, post.body])}
-            aria-label="Pagination Table Demo"
+            cells={cells}
+            rows={data.players.map(player => [
+              player.id,
+              player.name,
+              moment(player.birthDate).format('ll'),
+              player.position,
+              `${player.height.split('-')[0]}' ${player.height.split('-')[1]}"`,
+              `${player.weight} lbs`
+            ])}
+            aria-label="Players Overview Table"
           >
             <TableHeader />
             <TableBody />
           </Table>
         )}
         {data.loading && (
-          <Table cells={['Title', 'Body']} rows={loadingRows} aria-label="Pagination Table Demo">
+          <Table cells={cells} rows={loadingRows} aria-label="Players Overview Table">
             <TableHeader />
             <TableBody />
           </Table>

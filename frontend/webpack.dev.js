@@ -1,4 +1,5 @@
 const merge = require('webpack-merge');
+const webpack = require('webpack');
 const common = require('./webpack.common.js');
 
 const HOST = process.env.HOST || 'localhost';
@@ -6,7 +7,7 @@ const PORT = process.env.PORT || '9000';
 
 module.exports = merge(common, {
   mode: 'development',
-  devtool: 'inline-source-map',
+  devtool: 'inline-cheap-module-source-map',
   devServer: {
     contentBase: './dist',
     host: HOST,
@@ -25,5 +26,10 @@ module.exports = merge(common, {
         use: ['style-loader', 'css-loader']
       }
     ]
-  }
+  },
+  plugins: [
+    new webpack.DefinePlugin({
+      BACKEND: JSON.stringify('http://localhost:8080')
+    })
+  ]
 });
