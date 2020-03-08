@@ -20,11 +20,13 @@ public class PlayerMapperTest {
  
     @Test
     public void whenRecordsInDatabase_shouldReturnPlayerWithGivenId() {
-        Player player = playerMapper.getPlayerById(1);
+        Player player = playerMapper.getPlayerById(467);
  
         assertThat(player).isNotNull();
-        assertThat(player.getName()).isEqualTo("Michael Jordan");
-        assertThat(player.getPosition()).isEqualTo("F-G");
+        assertThat(player.getName()).isEqualTo("Jason Kidd");
+        assertThat(player.getPosition()).isEqualTo("G");
+        assertThat(player.getHeight()).isEqualTo("6-4");
+        assertThat(player.getWeight()).isEqualTo(205);
     }
 
 }
