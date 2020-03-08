@@ -14,4 +14,7 @@ public interface PlayerMapper {
     @Select("SELECT * FROM Player ORDER BY ${order} LIMIT ${pageSize} OFFSET ${offset}")
     List<Player> fetchAll(@Param("pageSize") int pageSize, @Param("offset") int offset, @Param("order") String order);
 
+    @Select("SELECT COUNT(*) FROM Player")
+    Long count();
+
 }

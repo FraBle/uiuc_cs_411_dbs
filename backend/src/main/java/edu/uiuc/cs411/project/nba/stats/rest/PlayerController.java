@@ -22,6 +22,11 @@ public class PlayerController {
         this.playerMapper = playerMapper;
     }
 
+    @GetMapping("/player/count")
+    public Long count() {
+        return playerMapper.count();
+    }
+
     @GetMapping("/player/{id}")
     public Player fetchPlayerById(@PathVariable("id") String id) {
         return playerMapper.getPlayerById(Integer.parseInt(id));
