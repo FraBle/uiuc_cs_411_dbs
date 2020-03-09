@@ -113,6 +113,9 @@
 					<image>
 						<name>${container.name}</name>
 					</image>
+					<profiles>
+						<profile>prod</profile>
+					</profiles>
 				</configuration>
 			</plugin>
 		</plugins>

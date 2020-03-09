@@ -7,12 +7,20 @@ import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import javax.sql.DataSource;
 import java.util.Optional;
 
+/**
+ * This is our Production Persistence Mode
+ * To run the app in the docker container or in the GCP
+ *
+ * Database will use the real MYSQL from Google Cloud SQL
+ */
 @Configuration
 @MapperScan("edu.uiuc.cs411.project.nba.stats")
+@Profile("prod")
 public class PersistenceConfig {
 
     private static final String HOST = "DB_HOST";

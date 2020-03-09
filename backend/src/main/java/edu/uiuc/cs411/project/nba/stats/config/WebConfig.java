@@ -8,8 +8,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig {
 
-    public static final String EVERYTHING = "/**";
-    public static final String LOCALHOST = "http://localhost:9000";
+    private static final String EVERYTHING = "/**";
+    private static final String LOCALHOST = "http://localhost:9000";
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {

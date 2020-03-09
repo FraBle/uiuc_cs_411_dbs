@@ -6,6 +6,7 @@ services:
     depends_on:
     - cloud-sql-proxy
     environment:
+      APP_ENVIRONMENT: prod
       DB_HOST: cloud-sql-proxy
       DB_USER: nba-stats-backend
       DB_PASS: "${DB_PASS}"

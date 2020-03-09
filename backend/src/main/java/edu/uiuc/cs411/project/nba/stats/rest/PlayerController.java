@@ -34,12 +34,15 @@ public class PlayerController {
     public List<Player> fetchAllPlayers(
             @RequestParam(defaultValue = "1") String page,
             @RequestParam(defaultValue = "50") String pageSize,
-            @RequestParam(defaultValue = "id") String order) {
+            @RequestParam(defaultValue = "id") String order,
+            @RequestParam(defaultValue = "ASC") String orderType
+    ) {
         int pageAsInteger = Integer.parseInt(page);
         int pageSizeAsInteger = Integer.parseInt(pageSize);
-        int offset = pageAsInteger == 1 ? 1 : (pageAsInteger - 1) * pageSizeAsInteger;
+        int offset = pageAsInteger == 1 ? 0 : (pageAsInteger - 1) * pageSizeAsInteger;
+        String orderTypeValue = "DESC".equalsIgnoreCase(orderType) ? "DESC" : "ASC";
 
-        return playerMapper.fetchAll(pageSizeAsInteger, offset, order);
+        return playerMapper.fetchAll(pageSizeAsInteger, offset, order, orderTypeValue);
     }
 
 }
