@@ -36,6 +36,7 @@ const initialState = {
   loading: true,
   sortIsExpanded: false,
   sortSelected: null,
+  sortOrder: 'ASC',
 };
 const cells = ['ID', 'Name', 'Birthdate', 'Position', 'Height', 'Weight'];
 const filterOptions = [
@@ -89,6 +90,11 @@ const reducer = (state, action) => {
         sortSelected: action.payload.selection,
         sortIsExpanded: false
       };
+    case 'SORT_PLAYERS_ORDER_TOGGLE':
+      return {
+        ...state,
+        sortOrder: action.payload.sortOrder
+      };
     default:
       return state;
   }
@@ -101,13 +107,20 @@ const Players = () => {
     dispatch({
       type: 'FETCH_PLAYERS_REQUEST'
     });
-    fetchData(data.page || 1, data.perPage || 20, 'name');
+    fetchData(
+      data.page || 1,
+      data.perPage || 20,
+      data.sortSelected || 'id',
+      data.sortOrder || 'ASC'
+    );
   }, []);
 
-  const fetchData = (page, perPage, order) => {
+  const fetchData = (page, perPage, order, orderType) => {
     Promise.all([
       fetch(
-        `${BACKEND}/api/player?order=name&pageSize=${perPage}&page=${page}&order=${order ? order.toLowerCase() : 'name'}`
+        `${BACKEND}/api/player?pageSize=${perPage}&page=${page}&order=${
+          order ? order.toLowerCase() : 'id'
+        }&orderType=${orderType}`
       ),
       fetch(`${BACKEND}/api/player/count`)
     ])
@@ -140,8 +153,8 @@ const Players = () => {
         itemCount={data.total}
         page={data.page}
         perPage={data.perPage}
-        onSetPage={(_evt, value) => fetchData(value, data.perPage, data.sortSelected)}
-        onPerPageSelect={(_evt, value) => fetchData(1, value, data.sortSelected)}
+        onSetPage={(_evt, value) => fetchData(value, data.perPage, data.sortSelected, data.sortOrder)}
+        onPerPageSelect={(_evt, value) => fetchData(1, value, data.sortSelected, data.sortOrder)}
         variant={variant}
       />
     );
@@ -155,6 +168,7 @@ const Players = () => {
   });
 
   const onSortSelect = (event, selection) => {
+    if (selection === 'Sort By') selection = data.sortSelected;
     dispatch({
       type: 'SORT_PLAYERS_SELECT',
       payload: {
@@ -162,9 +176,24 @@ const Players = () => {
         selection
       }
     });
-    if (selection === 'Sort By') return;
-    fetchData(1, data.perPage, selection);
+    fetchData(1, data.perPage, selection, data.sortOrder);
   }
+
+  const onSortOrderToggle = () => {
+    let sortOrder;
+    if (data.sortOrder === 'ASC') {
+      sortOrder = 'DESC';
+    } else {
+      sortOrder = 'ASC';
+    }
+    dispatch({
+      type: 'SORT_PLAYERS_ORDER_TOGGLE',
+      payload: {
+        sortOrder
+      }
+    });
+    fetchData(1, data.perPage, data.sortSelected, sortOrder);
+  };
 
   if (data.error) {
     const noResultsRows = [
@@ -243,11 +272,11 @@ const Players = () => {
                   ))}
                 </Select>
               </DataToolbarItem>
-              {/* <DataToolbarItem>
-                <Button variant="plain" aria-label="Sort A-Z">
-                  <SortAlphaDownIcon />
+              <DataToolbarItem>
+                <Button variant="plain" aria-label="Sort A-Z" onClick={onSortOrderToggle}>
+                  {data.sortOrder === 'ASC' ? <SortAlphaDownIcon /> : <SortAlphaUpIcon />}
                 </Button>
-              </DataToolbarItem> */}
+              </DataToolbarItem>
             </DataToolbarGroup>
             <DataToolbarItem breakpointMods={[{ modifier: FlexModifiers['align-right'] }]}>
               {renderPagination()}
