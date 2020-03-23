@@ -1,13 +1,13 @@
 import React from 'react';
 import { LoginFooterItem, LoginForm, LoginMainFooterBandItem, LoginPage, ListItem } from '@patternfly/react-core';
 import { ExclamationCircleIcon } from '@patternfly/react-icons';
-import { UserContext } from '../App';
+import { AuthContext } from '../../../App';
 import SignUp from './SignUp';
 import ForgotCredentials from './ForgotCredentials';
-import Background from './background.jpg';
-import Logo from './logo.png';
+import Background from '../../resources/background.jpg';
+import Logo from '../../resources/logo.png';
 
-export default Login = () => {
+const Login = () => {
   const { dispatch } = React.useContext(AuthContext);
   const initialState = {
     showHelperText: false,
@@ -43,12 +43,18 @@ export default Login = () => {
       isValidPassword: !!data.passwordValue,
       showHelperText: !data.emailValue || !data.passwordValue
     });
-    axios.get(`https://jsonplaceholder.typicode.com/users`)
+    if (!data.isValidEmail || !data.isValidPassword) return;
+    fetch(`https://jsonplaceholder.typicode.com/users`)
       .then(res => {
-        const persons = res.data;
+        if (res.ok) {
+          return res.json();
+        }
+        throw res;
+      })
+      .then(resJson => {
         dispatch({
           type: 'LOGIN',
-          payload: persons[0]
+          payload: resJson[0]
         });
       })
       .catch(error => {
@@ -56,7 +62,7 @@ export default Login = () => {
           ...data,
           isValidEmail: false,
           isValidPassword: false,
-          showHelperText: true,
+          showHelperText: true
         });
       });
   };
@@ -147,6 +153,8 @@ export default Login = () => {
     </LoginPage>
   );
 };
+
+export default Login;
 
 // export default class Login extends React.Component {
 //   constructor(props) {

@@ -38,7 +38,7 @@ const initialState = {
   sortSelected: null,
   sortOrder: 'ASC',
 };
-const cells = ['ID', 'Name', 'Birthdate', 'Position', 'Height', 'Weight'];
+const cells = ['Player ID', 'Name', 'Birthdate', 'Position', 'Height', 'Weight'];
 const filterOptions = [
   {
     value: 'Sort By',
@@ -169,6 +169,7 @@ const Players = () => {
 
   const onSortSelect = (event, selection) => {
     if (selection === 'Sort By') selection = data.sortSelected;
+    if (selection === 'Player ID') selection = 'id';
     dispatch({
       type: 'SORT_PLAYERS_SELECT',
       payload: {
@@ -234,6 +235,7 @@ const Players = () => {
     heightAuto: true,
     cells: [
       {
+        id: 1,
         props: { colSpan: 8 },
         title: (
           <Bullseye>

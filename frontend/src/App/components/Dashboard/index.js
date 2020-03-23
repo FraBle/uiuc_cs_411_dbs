@@ -31,8 +31,10 @@ import { BellIcon, CogIcon } from '@patternfly/react-icons';
 import imgBrand from '../../resources/logo.png';
 // import imgAvatar from '../../resources/avatar.svg';
 import Players from './components/Players';
+import { AuthContext } from "../../../App";
 
 const Dashboard = () => {
+  const { state: authState, dispatch } = React.useContext(AuthContext);
   const initialState = {
     isDropdownOpen: false,
     isKebabDropdownOpen: false,
@@ -79,6 +81,12 @@ const Dashboard = () => {
     });
   };
 
+  const onLogout = () => {
+    dispatch({
+      type: 'LOGOUT'
+    });
+  }
+
   const PageNav = (
     <Nav onSelect={onNavSelect} aria-label="Nav" theme="dark">
       <NavList>
@@ -109,7 +117,9 @@ const Dashboard = () => {
   const userDropdownItems = [
     <DropdownItem component="button">Profile</DropdownItem>,
     <DropdownSeparator />,
-    <DropdownItem component="button">More</DropdownItem>
+    <DropdownItem component="button" onClick={onLogout}>
+      Logout
+    </DropdownItem>
   ];
 
   const PageToolbar = (
@@ -121,7 +131,7 @@ const Dashboard = () => {
             position="right"
             onSelect={onDropdownSelect}
             isOpen={data.isDropdownOpen}
-            toggle={<DropdownToggle onToggle={onDropdownToggle}>User</DropdownToggle>}
+            toggle={<DropdownToggle onToggle={onDropdownToggle}>{authState.user}</DropdownToggle>}
             dropdownItems={userDropdownItems}
           />
         </ToolbarItem>
