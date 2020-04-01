@@ -9,3 +9,11 @@ CREATE TABLE `Player` (
   `Weight` INT NOT NULL,
   `College` INT
 );
+
+DROP TABLE User IF EXISTS;
+
+CREATE TABLE `User` (
+    `Username` VARCHAR(50) PRIMARY KEY,
+    `Email` VARCHAR(75) NOT NULL,
+    `Password` VARCHAR(150) NOT NULL,
+);
