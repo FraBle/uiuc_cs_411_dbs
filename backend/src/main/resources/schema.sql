@@ -17,3 +17,11 @@ CREATE TABLE `User` (
     `Email` VARCHAR(75) NOT NULL,
     `Password` VARCHAR(150) NOT NULL,
 );
+
+DROP TABLE FavoritesPlayer IF EXISTS;
+
+CREATE TABLE `FavoritesPlayer` (
+    `Player` INT NOT NULL,
+    `Username` VARCHAR(50) NOT NULL,
+    PRIMARY KEY(`Player`, `Username`)
+);
