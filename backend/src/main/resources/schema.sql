@@ -25,3 +25,11 @@ CREATE TABLE `FavoritesPlayer` (
     `Username` VARCHAR(50) NOT NULL,
     PRIMARY KEY(`Player`, `Username`)
 );
+
+DROP TABLE FavoritesFranchise IF EXISTS;
+
+CREATE TABLE `FavoritesFranchise` (
+    `Franchise` INT NOT NULL,
+    `Username` VARCHAR(50) NOT NULL,
+    PRIMARY KEY(`Franchise`, `Username`)
+);

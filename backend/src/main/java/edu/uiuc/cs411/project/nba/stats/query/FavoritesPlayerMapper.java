@@ -13,7 +13,7 @@ public interface FavoritesPlayerMapper {
             "Player = #{playerId})")
     boolean isFavorited(String username, int playerId);
 
-    @Insert("INSERT INTO FavoritesPlayer(Player, Username) VALUES(#{playerId}, #{username})")
+    @Insert("INSERT IGNORE INTO FavoritesPlayer(Player, Username) VALUES(#{playerId}, #{username})")
     void makeFavorite(String username, int playerId);
 
     @Delete("DELETE FROM FavoritesPlayer WHERE Username = #{username} AND Player = #{playerId}")

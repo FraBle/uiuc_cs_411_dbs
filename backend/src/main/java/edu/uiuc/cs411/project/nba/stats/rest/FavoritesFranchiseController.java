@@ -1,6 +1,6 @@
 package edu.uiuc.cs411.project.nba.stats.rest;
 
-import edu.uiuc.cs411.project.nba.stats.query.FavoritesPlayerMapper;
+import edu.uiuc.cs411.project.nba.stats.query.FavoritesFranchiseMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -8,17 +8,17 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/user/")
-public class FavoritesPlayerController {
+public class FavoritesFranchiseController {
 
-    private final FavoritesPlayerMapper favoritesPlayerMapper;
+    private final FavoritesFranchiseMapper favoritesFranchiseMapper;
 
     @Autowired
-    public FavoritesPlayerController(FavoritesPlayerMapper favoritesPlayerMapper) {
-        this.favoritesPlayerMapper = favoritesPlayerMapper;
+    public FavoritesFranchiseController(FavoritesFranchiseMapper favoritesFranchiseMapper) {
+        this.favoritesFranchiseMapper = favoritesFranchiseMapper;
     }
 
-    @GetMapping("/{username}/favorite/player/")
-    public List<Integer> favoritePlayerIdsByUsername(@PathVariable("username") String username,
+    @GetMapping("/{username}/favorite/Franchise/")
+    public List<Integer> favoriteFranchiseIdsByUsername(@PathVariable("username") String username,
                                            @RequestParam(defaultValue = "1") String page,
                                            @RequestParam(defaultValue = "50") String pageSize,
                                            @RequestParam(defaultValue = "id") String order,
@@ -28,6 +28,7 @@ public class FavoritesPlayerController {
         int offset = pageAsInteger == 1 ? 0 : (pageAsInteger - 1) * pageSizeAsInteger;
         String orderTypeValue = "DESC".equalsIgnoreCase(orderType) ? "DESC" : "ASC";
 
-        return favoritesPlayerMapper.playerIdsByUsername(username, pageSizeAsInteger, offset, order, orderTypeValue);
+        return favoritesFranchiseMapper.franchiseIdsByUsername(username, pageSizeAsInteger,
+                offset, order, orderTypeValue);
     }
 }
