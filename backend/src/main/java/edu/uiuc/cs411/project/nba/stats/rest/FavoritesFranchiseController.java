@@ -17,7 +17,7 @@ public class FavoritesFranchiseController {
         this.favoritesFranchiseMapper = favoritesFranchiseMapper;
     }
 
-    @GetMapping("/{username}/favorite/Franchise/")
+    @GetMapping("/{username}/favorite/franchise/")
     public List<Integer> favoriteFranchiseIdsByUsername(@PathVariable("username") String username,
                                            @RequestParam(defaultValue = "1") String page,
                                            @RequestParam(defaultValue = "50") String pageSize,
@@ -30,5 +30,17 @@ public class FavoritesFranchiseController {
 
         return favoritesFranchiseMapper.franchiseIdsByUsername(username, pageSizeAsInteger,
                 offset, order, orderTypeValue);
+    }
+
+    @PutMapping("/{username}/favorite/franchise/{franchiseId}")
+    void makeFavorite(@PathVariable("username") String username,
+                      @PathVariable("franchiseId") int franchiseId) {
+        favoritesFranchiseMapper.makeFavorite(username, franchiseId);
+    }
+
+    @DeleteMapping("/{username}/favorite/franchise/{franchiseId}")
+    void deleteFavorite(@PathVariable("username") String username,
+                        @PathVariable("franchiseId") int franchiseId) {
+        favoritesFranchiseMapper.deleteFavorite(username, franchiseId);
     }
 }

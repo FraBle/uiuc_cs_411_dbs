@@ -30,4 +30,16 @@ public class FavoritesPlayerController {
 
         return favoritesPlayerMapper.playerIdsByUsername(username, pageSizeAsInteger, offset, order, orderTypeValue);
     }
+
+    @PutMapping("/{username}/favorite/player/{playerId}")
+    void makeFavorite(@PathVariable("username") String username,
+                                      @PathVariable("playerId") int playerId) {
+        favoritesPlayerMapper.makeFavorite(username, playerId);
+    }
+
+    @DeleteMapping("/{username}/favorite/player/{playerId}")
+    void deleteFavorite(@PathVariable("username") String username,
+                      @PathVariable("playerId") int playerId) {
+        favoritesPlayerMapper.deleteFavorite(username, playerId);
+    }
 }
