@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/user/")
+@RequestMapping("/api/user")
 public class FavoritesFranchiseController {
 
     private final FavoritesFranchiseMapper favoritesFranchiseMapper;
@@ -21,7 +21,7 @@ public class FavoritesFranchiseController {
     public List<Integer> favoriteFranchiseIdsByUsername(@PathVariable("username") String username,
                                            @RequestParam(defaultValue = "1") String page,
                                            @RequestParam(defaultValue = "50") String pageSize,
-                                           @RequestParam(defaultValue = "id") String order,
+                                           @RequestParam(defaultValue = "Franchise") String order,
                                            @RequestParam(defaultValue = "ASC") String orderType) {
         int pageAsInteger = Integer.parseInt(page);
         int pageSizeAsInteger = Integer.parseInt(pageSize);
