@@ -18,4 +18,6 @@ public interface UserMapper {
     @Insert("INSERT INTO User(username, email, password) VALUES(#{username}, #{email}, #{password})")
     void save(User user);
 
+    @Select("SELECT COUNT(*) FROM User")
+    Long count();
 }
