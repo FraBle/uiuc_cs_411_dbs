@@ -14,7 +14,7 @@
 	<description>UIUC CS411 Project</description>
 
 	<properties>
-		<java.version>1.8</java.version>
+		<java.version>11</java.version>
 		<node.version>v13.8.0</node.version>
 		<yarn.version>v1.22.0</yarn.version>
 		<frontend-maven-plugin.version>1.9.1</frontend-maven-plugin.version>
