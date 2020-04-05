@@ -53987,14 +53987,10 @@ var SignUp_SignUp = function SignUp(props) {
     if (!data.isValidUsername || !data.isValidEmail || !data.isValidPassword) return;
     fetch("".concat("", "/api/auth/signup"), {
       method: 'POST',
-      // mode: 'cors', // no-cors, *cors, same-origin
-      // cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-      // credentials: 'same-origin', // include, *same-origin, omit
       headers: {
+        Accept: 'application/json',
         'Content-Type': 'application/json'
       },
-      redirect: 'follow',
-      // referrerPolicy: 'no-referrer', // no-referrer, *client
       body: JSON.stringify({
         username: data.usernameValue,
         email: data.emailValue,
@@ -54287,14 +54283,9 @@ var components_Login_Login = function Login() {
     if (!data.isValidUsername || !data.isValidPassword) return;
     fetch("".concat("", "/api/auth/signin"), {
       method: 'POST',
-      // mode: 'cors', // no-cors, *cors, same-origin
-      // cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-      // credentials: 'same-origin', // include, *same-origin, omit
       headers: {
         'Content-Type': 'application/json'
       },
-      redirect: 'follow',
-      // referrerPolicy: 'no-referrer', // no-referrer, *client
       body: JSON.stringify({
         username: data.usernameValue,
         password: data.passwordValue
