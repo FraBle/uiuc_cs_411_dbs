@@ -6,10 +6,15 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 public interface TableMapper {
-    @Select("SELECT '${tableName}', COUNT(*) FROM ${tableName}")
-    Table getTableByName(String tableName);
+    @Select("SELECT TABLE_NAME, TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '${tableName}'")
+    Table getTableByNameMySql(String tableName);
 
-    // Only works in MySql, not in H2
-    @Select("SELECT TABLE_NAME, TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES")
-    List<Table> fetchAll();
+    @Select("SELECT TABLE_NAME, ROW_COUNT_ESTIMATE FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '${tableName}'")
+    Table getTableByNameH2(String tableName);
+
+    @Select("SELECT TABLE_NAME, TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'")
+    List<Table> fetchAllMySql();
+
+    @Select("SELECT TABLE_NAME, ROW_COUNT_ESTIMATE FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'TABLE'")
+    List<Table> fetchAllH2();
 }

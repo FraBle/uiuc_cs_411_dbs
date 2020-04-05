@@ -22,7 +22,7 @@ public class TableMapperTest {
 
     @Test
     public void whenRecordsInDatabase_shouldReturnTableWithGivenName() {
-        final Table table = tableMapper.getTableByName("Player");
+        final Table table = tableMapper.getTableByNameH2("PLAYER");
 
         assertThat(table).isNotNull();
         assertThat(table.getName()).isEqualTo("Player");
