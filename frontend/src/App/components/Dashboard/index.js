@@ -131,7 +131,7 @@ const Dashboard = () => {
             position="right"
             onSelect={onDropdownSelect}
             isOpen={data.isDropdownOpen}
-            toggle={<DropdownToggle onToggle={onDropdownToggle}>{authState.user}</DropdownToggle>}
+            toggle={<DropdownToggle onToggle={onDropdownToggle}>{authState.username}</DropdownToggle>}
             dropdownItems={userDropdownItems}
           />
         </ToolbarItem>

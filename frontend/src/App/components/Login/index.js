@@ -1,5 +1,15 @@
 import React from 'react';
-import { LoginFooterItem, LoginForm, LoginMainFooterBandItem, LoginPage, ListItem } from '@patternfly/react-core';
+import {
+  Alert,
+  AlertGroup,
+  AlertActionCloseButton,
+  AlertVariant,
+  LoginFooterItem,
+  LoginForm,
+  LoginMainFooterBandItem,
+  LoginPage,
+  ListItem
+} from '@patternfly/react-core';
 import { ExclamationCircleIcon } from '@patternfly/react-icons';
 import { AuthContext } from '../../../App';
 import SignUp from './SignUp';
@@ -8,23 +18,24 @@ import Background from '../../resources/background.jpg';
 import Logo from '../../resources/logo.png';
 
 const Login = () => {
-  const { dispatch } = React.useContext(AuthContext);
+  const { state: authState, dispatch } = React.useContext(AuthContext);
   const initialState = {
     showHelperText: false,
-    emailValue: '',
-    isValidEmail: true,
+    usernameValue: '',
+    isValidUsername: true,
     passwordValue: '',
     isValidPassword: true,
     isRememberMeChecked: false,
     isSignUpModalOpen: false,
-    isForgotCredentialsModalOpen: false
+    isForgotCredentialsModalOpen: false,
+    alerts: []
   };
   const [data, setData] = React.useState(initialState);
 
-  const handleEmailChange = value => {
+  const handleUsernameChange = value => {
     setData({
       ...data,
-      emailValue: value
+      usernameValue: value
     });
   };
 
@@ -39,12 +50,26 @@ const Login = () => {
     event.preventDefault();
     setData({
       ...data,
-      isValidEmail: !!data.emailValue,
+      isValidUsername: !!data.usernameValue,
       isValidPassword: !!data.passwordValue,
-      showHelperText: !data.emailValue || !data.passwordValue
+      showHelperText: !data.usernameValue || !data.passwordValue
     });
-    if (!data.isValidEmail || !data.isValidPassword) return;
-    fetch(`https://jsonplaceholder.typicode.com/users`)
+    if (!data.isValidUsername || !data.isValidPassword) return;
+    fetch(`${BACKEND}/api/auth/signin`, {
+      method: 'POST',
+      // mode: 'cors', // no-cors, *cors, same-origin
+      // cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+      // credentials: 'same-origin', // include, *same-origin, omit
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      redirect: 'follow',
+      // referrerPolicy: 'no-referrer', // no-referrer, *client
+      body: JSON.stringify({
+        username: data.usernameValue,
+        password: data.passwordValue
+      })
+    })
       .then(res => {
         if (res.ok) {
           return res.json();
@@ -54,23 +79,24 @@ const Login = () => {
       .then(resJson => {
         dispatch({
           type: 'LOGIN',
-          payload: resJson[0]
+          payload: resJson
         });
       })
       .catch(error => {
         setData({
           ...data,
-          isValidEmail: false,
+          isValidUsername: false,
           isValidPassword: false,
           showHelperText: true
         });
       });
   };
 
-  const toggleSignUpModal = () => {
+  const toggleSignUpModal = (success) => {
     setData({
       ...data,
-      isSignUpModalOpen: !data.isSignUpModalOpen
+      isSignUpModalOpen: !data.isSignUpModalOpen,
+      alerts: success ? [...data.alerts, { title: 'Successfully Signed Up! 🚀', variant: 'success', key: new Date().getTime() }] : data.alerts
     });
   };
 
@@ -91,7 +117,7 @@ const Login = () => {
   const signUpForAccountMessage = (
     <LoginMainFooterBandItem>
       Need an account?{' '}
-      <a href="#" onClick={toggleSignUpModal}>
+      <a href="#" onClick={() => toggleSignUpModal(false)}>
         Sign up.
       </a>
     </LoginMainFooterBandItem>
@@ -121,6 +147,20 @@ const Login = () => {
     </React.Fragment>
   );
 
+  const addAlert = (title, variant) => {
+    setData({
+      ...data,
+      alerts: [...data.alerts, {title, variant, key: new Date().getTime()}]
+    });
+  }
+
+  const removeAlert = (key) => {
+    setData({
+      ...data,
+      alerts: [...data.alerts.filter(el => el.key !== key)]
+    });
+  };
+
   return (
     <LoginPage
       footerListVariants="inline"
@@ -133,17 +173,34 @@ const Login = () => {
       loginTitle="Log in to your account"
       loginSubtitle="Let The Game Begin!"
       signUpForAccountMessage={signUpForAccountMessage}
-      forgotCredentials={forgotCredentials}
+      // forgotCredentials={forgotCredentials}
     >
       <SignUp open={data.isSignUpModalOpen} handler={toggleSignUpModal} />
-      <ForgotCredentials open={data.isForgotCredentialsModalOpen} handler={toggleForgotCredentialsModal} />
+      {/* <ForgotCredentials open={data.isForgotCredentialsModalOpen} handler={toggleForgotCredentialsModal} /> */}
+      <AlertGroup isToast>
+        {data.alerts.map(({ key, variant, title }) => (
+          <Alert
+            isLiveRegion
+            variant={AlertVariant[variant]}
+            title={title}
+            action={
+              <AlertActionCloseButton
+                title={title}
+                variantLabel={`${variant} alert`}
+                onClose={() => removeAlert(key)}
+              />
+            }
+            key={key}
+          />
+        ))}
+      </AlertGroup>
       <LoginForm
         showHelperText={data.showHelperText}
         helperText={helperText}
-        usernameLabel="Email"
-        usernameValue={data.emailValue}
-        onChangeUsername={handleEmailChange}
-        isValidUsername={data.isValidEmail}
+        usernameLabel="Username"
+        usernameValue={data.usernameValue}
+        onChangeUsername={handleUsernameChange}
+        isValidUsername={data.isValidUsername}
         passwordLabel="Password"
         passwordValue={data.passwordValue}
         onChangePassword={handlePasswordChange}
@@ -155,119 +212,3 @@ const Login = () => {
 };
 
 export default Login;
-
-// export default class Login extends React.Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = {
-//       showHelperText: false,
-//       emailValue: '',
-//       isValidEmail: true,
-//       passwordValue: '',
-//       isValidPassword: true,
-//       isRememberMeChecked: false,
-//       isSignUpModalOpen: false,
-//       isForgotCredentialsModalOpen: false,
-//     };
-
-//     this.handleEmailChange = value => {
-//       this.setState({ emailValue: value });
-//     };
-
-//     this.handlePasswordChange = passwordValue => {
-//       this.setState({ passwordValue });
-//     };
-
-//     this.onLoginButtonClick = event => {
-//       event.preventDefault();
-//       this.setState({ isValidEmail: !!this.state.emailValue });
-//       this.setState({ isValidPassword: !!this.state.passwordValue });
-//       this.setState({ showHelperText: !this.state.emailValue || !this.state.passwordValue });
-//     };
-
-//     this.toggleSignUpModal = () => {
-//       this.setState(({ isSignUpModalOpen }) => ({
-//         isSignUpModalOpen: !isSignUpModalOpen
-//       }));
-//     };
-
-//     this.toggleForgotCredentialsModal = () => {
-//       this.setState(({ isForgotCredentialsModalOpen }) => ({
-//         isForgotCredentialsModalOpen: !isForgotCredentialsModalOpen
-//       }));
-//     };
-//   }
-
-//   render() {
-//     const helperText = (
-//       <React.Fragment>
-//         <ExclamationCircleIcon />
-//         &nbsp;Invalid login credentials.
-//       </React.Fragment>
-//     );
-
-//     const signUpForAccountMessage = (
-//       <LoginMainFooterBandItem>
-//         Need an account?{' '}
-//         <a href="#" onClick={this.toggleSignUpModal}>
-//           Sign up.
-//         </a>
-//       </LoginMainFooterBandItem>
-//     );
-//     const forgotCredentials = (
-//       <LoginMainFooterBandItem>
-//         <a href="#" onClick={this.toggleForgotCredentialsModal}>
-//           Forgot Password?
-//         </a>
-//       </LoginMainFooterBandItem>
-//     );
-
-//     const listItem = (
-//       <React.Fragment>
-//         <ListItem>
-//           <LoginFooterItem href="https://github.com/FraBle/uiuc_cs_411_dbs" target_="_blank">
-//             GitHub
-//           </LoginFooterItem>
-//         </ListItem>
-//         <ListItem>
-//           <LoginFooterItem href="https://www.kaggle.com/nathanlauga/nba-games" target_="_blank">
-//             Data Set
-//           </LoginFooterItem>
-//         </ListItem>
-//         <ListItem>Crafted with ❤ in the Golden State</ListItem>
-//       </React.Fragment>
-//     );
-
-//     return (
-//       <LoginPage
-//         footerListVariants="inline"
-//         brandImgSrc={Logo}
-//         brandImgAlt="UIUC logo"
-//         backgroundImgSrc={Background}
-//         backgroundImgAlt="Images"
-//         footerListItems={listItem}
-//         textContent="Our project aims to make the consumption of NBA statistics interactive, easy and fun by combining multiple data sets from Kaggle with public information (e.g. from Wikidata) to create a holistic search interface that visualizes the insights a user might ask about NBA franchises, games, and players through natural language and filter selections."
-//         loginTitle="Log in to your account"
-//         loginSubtitle="Let The Game Begin!"
-//         signUpForAccountMessage={signUpForAccountMessage}
-//         forgotCredentials={forgotCredentials}
-//       >
-//         <SignUp open={this.state.isSignUpModalOpen} handler={this.toggleSignUpModal} />
-//         <ForgotCredentials open={this.state.isForgotCredentialsModalOpen} handler={this.toggleForgotCredentialsModal} />
-//         <LoginForm
-//           showHelperText={this.state.showHelperText}
-//           helperText={helperText}
-//           usernameLabel="Email"
-//           usernameValue={this.state.emailValue}
-//           onChangeUsername={this.handleEmailChange}
-//           isValidUsername={this.state.isValidEmail}
-//           passwordLabel="Password"
-//           passwordValue={this.state.passwordValue}
-//           onChangePassword={this.handlePasswordChange}
-//           isValidPassword={this.state.isValidPassword}
-//           onLoginButtonClick={this.onLoginButtonClick}
-//         />
-//       </LoginPage>
-//     );
-//   }
-// }

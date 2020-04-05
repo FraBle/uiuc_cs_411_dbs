@@ -26,6 +26,7 @@ import { global_danger_color_200 as globalDangerColor200 } from '@patternfly/rea
 import { Table, TableHeader, TableBody } from '@patternfly/react-table';
 import { Spinner } from '@patternfly/react-core';
 import moment from 'moment';
+import { AuthContext } from '../../../../../App';
 
 const initialState = {
   players: [],
@@ -100,7 +101,7 @@ const reducer = (state, action) => {
   }
 };
 const Players = () => {
-
+  const { state: authState, dispatch: authDispatch } = React.useContext(AuthContext);
   const [data, dispatch] = React.useReducer(reducer, initialState);
 
   React.useEffect(() => {
@@ -120,9 +121,18 @@ const Players = () => {
       fetch(
         `${BACKEND}/api/player?pageSize=${perPage}&page=${page}&order=${
           order ? order.toLowerCase() : 'id'
-        }&orderType=${orderType}`
+        }&orderType=${orderType}`,
+        {
+          headers: {
+            Authorization: `Bearer ${authState.token}`
+          }
+        }
       ),
-      fetch(`${BACKEND}/api/player/count`)
+      fetch(`${BACKEND}/api/player/count`, {
+        headers: {
+          Authorization: `Bearer ${authState.token}`
+        }
+      })
     ])
       .then(([players, total]) => Promise.all([players.json(), total.json()]))
       .then(([playersJson, totalJson]) =>
