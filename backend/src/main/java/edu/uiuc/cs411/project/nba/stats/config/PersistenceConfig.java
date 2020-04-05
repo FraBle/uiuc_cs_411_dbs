@@ -24,7 +24,7 @@ import java.util.Optional;
 public class PersistenceConfig {
 
     private static final String HOST_ENV_VARIABLE = "DB_HOST";
-    private static final String HOST_DEFAULT_VALUE = "localhost";
+    private static final String HOST_DEFAULT_VALUE = "";
     private static final String HOST_VALUE = getEnvironmentVariableOrDefault(HOST_ENV_VARIABLE, HOST_DEFAULT_VALUE);
 
     private static final String NAME_ENV_VARIABLE = "DB_NAME";
