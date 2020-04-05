@@ -9,8 +9,7 @@ import java.util.List;
 
 public interface FavoritesPlayerMapper {
 
-    @Select("SELECT EXISTS(SELECT 1 FROM FavoritesPlayer WHERE Username = #{username} AND " +
-            "Player = #{playerId})")
+    @Select("SELECT EXISTS(SELECT 1 FROM FavoritesPlayer WHERE Username = #{username} AND Player = #{playerId})")
     boolean isFavorited(String username, int playerId);
 
     @Insert("INSERT IGNORE INTO FavoritesPlayer(Player, Username) VALUES(#{playerId}, #{username})")
@@ -19,9 +18,7 @@ public interface FavoritesPlayerMapper {
     @Delete("DELETE FROM FavoritesPlayer WHERE Username = #{username} AND Player = #{playerId}")
     void deleteFavorite(String username, int playerId);
 
-    @Select("SELECT Player FROM FavoritesPlayer WHERE Username = #{username} ORDER BY ${order} " +
-            "${orderType} LIMIT ${pageSize} " +
-            "OFFSET ${offset} ")
+    @Select("SELECT Player FROM FavoritesPlayer WHERE Username = #{username} ORDER BY ${order} ${orderType} LIMIT ${pageSize} OFFSET ${offset} ")
     List<Integer> playerIdsByUsername(
                           String username,
                           @Param("pageSize") int pageSize,
