@@ -24,8 +24,8 @@ public class PlayerMapperTest {
 
     @Test
     public void whenRecordsInDatabase_shouldReturnPlayerWithGivenId() {
-        final Player player = playerMapper.getPlayerById(1);
- 
+        final Player player = playerMapper.getPlayerById(1, null);
+
         assertThat(player).isNotNull();
         assertThat(player.getName()).isEqualTo("Michael Jordan");
         assertThat(player.getPosition()).isEqualTo("F-G");
@@ -42,7 +42,7 @@ public class PlayerMapperTest {
 
     @Test
     public void sort_players_by_name() {
-        List<Player> players = playerMapper.fetchAll(5, 0, "Name", "ASC");
+        List<Player> players = playerMapper.fetchAll(5, 0, "Name", "ASC", null);
         assertThat(players.size()).isEqualTo(5);
 
         assertThat(players.get(0).getName()).isEqualTo("Kevin Durant");
@@ -54,7 +54,7 @@ public class PlayerMapperTest {
 
     @Test
     public void sort_players_by_name_desc() {
-        List<Player> players = playerMapper.fetchAll(5, 0, "Name", "DESC");
+        List<Player> players = playerMapper.fetchAll(5, 0, "Name", "DESC", null);
         assertThat(players.size()).isEqualTo(5);
 
         assertThat(players.get(0).getName()).isEqualTo("Stephen Curry");
@@ -66,13 +66,13 @@ public class PlayerMapperTest {
 
     @Test
     public void pagination_test() {
-        List<Player> players = playerMapper.fetchAll(3, 0, "Name", "ASC");
+        List<Player> players = playerMapper.fetchAll(3, 0, "Name", "ASC", null);
         assertThat(players.size()).isEqualTo(3);
         assertThat(players.get(0).getName()).isEqualTo("Kevin Durant");
         assertThat(players.get(1).getName()).isEqualTo("Kobe Bryant");
         assertThat(players.get(2).getName()).isEqualTo("LeBron James");
 
-        players = playerMapper.fetchAll(3, 3, "Name", "ASC");
+        players = playerMapper.fetchAll(3, 3, "Name", "ASC", null);
         assertThat(players.size()).isEqualTo(2);
         assertThat(players.get(0).getName()).isEqualTo("Michael Jordan");
         assertThat(players.get(1).getName()).isEqualTo("Stephen Curry");

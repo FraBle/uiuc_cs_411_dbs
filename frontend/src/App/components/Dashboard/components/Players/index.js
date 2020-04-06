@@ -21,7 +21,7 @@ import {
   TextContent,
   Title,
 } from '@patternfly/react-core';
-import { ExclamationCircleIcon, SortAlphaDownIcon, SortAlphaUpIcon } from '@patternfly/react-icons';
+import { ExclamationCircleIcon, SortAlphaDownIcon, SortAlphaUpIcon, StarIcon, OutlinedStarIcon } from '@patternfly/react-icons';
 import { global_danger_color_200 as globalDangerColor200 } from '@patternfly/react-tokens';
 import { Table, TableHeader, TableBody } from '@patternfly/react-table';
 import { Spinner } from '@patternfly/react-core';
@@ -39,7 +39,7 @@ const initialState = {
   sortSelected: null,
   sortOrder: 'ASC',
 };
-const cells = ['Player ID', 'Name', 'Birthdate', 'Position', 'Height', 'Weight'];
+const cells = ['Favorite', 'Player ID', 'Name', 'Birthdate', 'Position', 'Height', 'Weight'];
 const filterOptions = [
   {
     value: 'Sort By',
@@ -180,6 +180,7 @@ const Players = () => {
   const onSortSelect = (event, selection) => {
     if (selection === 'Sort By') selection = data.sortSelected;
     if (selection === 'Player ID') selection = 'id';
+    if (selection === 'Favorite') selection = 'isFavorite';
     dispatch({
       type: 'SORT_PLAYERS_SELECT',
       payload: {
@@ -300,6 +301,9 @@ const Players = () => {
           <Table
             cells={cells}
             rows={data.players.map(player => [
+              (<div><Button variant="plain" aria-label="Favorite">
+                {player.isFavorite ? <StarIcon /> : <OutlinedStarIcon />}
+              </Button></div>),
               player.id,
               player.name,
               moment(player.birthDate).format('ll'),
