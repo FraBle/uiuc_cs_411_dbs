@@ -26,6 +26,7 @@ public class DevPersistenceConfig {
     public DataSource dataSource() {
         return new EmbeddedDatabaseBuilder()
                 .setType(EmbeddedDatabaseType.H2)
+                .setName("testdb;MODE=MYSQL")
                 .addScript("schema.sql")
                 .addScript("data.sql")
                 .build();
