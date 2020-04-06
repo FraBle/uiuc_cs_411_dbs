@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form, FormGroup, TextInput, Modal, Button, ActionGroup } from '@patternfly/react-core';
-import { AuthContext } from '../../../../App';
+import { AuthContext } from '../../../Auth';
 
 const SignUp = props => {
   const { dispatch } = React.useContext(AuthContext);

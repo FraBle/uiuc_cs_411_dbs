@@ -11,13 +11,14 @@ import {
   ListItem
 } from '@patternfly/react-core';
 import { ExclamationCircleIcon } from '@patternfly/react-icons';
-import { AuthContext } from '../../../App';
+import { AuthContext } from '../../Auth';
+import { Redirect } from 'react-router-dom';
 import SignUp from './SignUp';
 import ForgotCredentials from './ForgotCredentials';
 import Background from '../../resources/background.jpg';
 import Logo from '../../resources/logo.png';
 
-const Login = () => {
+const Login = (props) => {
   const { state: authState, dispatch } = React.useContext(AuthContext);
   const initialState = {
     showHelperText: false,
@@ -76,6 +77,9 @@ const Login = () => {
           type: 'LOGIN',
           payload: resJson
         });
+      })
+      .then(() => {
+        props.history.push('/');
       })
       .catch(error => {
         setData({

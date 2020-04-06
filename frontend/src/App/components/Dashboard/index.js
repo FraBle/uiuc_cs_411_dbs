@@ -31,15 +31,22 @@ import { BellIcon, CogIcon } from '@patternfly/react-icons';
 import imgBrand from '../../resources/logo.png';
 // import imgAvatar from '../../resources/avatar.svg';
 import Players from './components/Players';
-import { AuthContext } from "../../../App";
+import Overview from './components/Overview';
+import { AuthContext } from '../../Auth';
+import { Route } from 'react-router-dom';
 
-const Dashboard = () => {
+const DashboardRoutes = {
+  overview: '/dashboard',
+  'raw-players': '/dashboard/data/players'
+};
+
+const Dashboard = (props) => {
   const { state: authState, dispatch } = React.useContext(AuthContext);
   const initialState = {
     isDropdownOpen: false,
     isKebabDropdownOpen: false,
-    activeGroup: 'players',
-    activeItem: 'players-overview'
+    activeGroup: null,
+    activeItem: 'overview'
   };
   const [data, setData] = React.useState(initialState);
 
@@ -79,6 +86,7 @@ const Dashboard = () => {
       activeItem: result.itemId,
       activeGroup: result.groupId,
     });
+    props.history.push(DashboardRoutes[result.itemId]);
   };
 
   const onLogout = () => {
@@ -90,9 +98,12 @@ const Dashboard = () => {
   const PageNav = (
     <Nav onSelect={onNavSelect} aria-label="Nav" theme="dark">
       <NavList>
-        <NavExpandable title="Players" groupId="players" isActive={data.activeGroup === 'players'} isExpanded>
-          <NavItem groupId="players" itemId="overview" isActive={data.activeItem === 'players-overview'}>
-            Overview
+        <NavItem itemId="overview" isActive={data.activeItem === 'overview'}>
+          Overview
+        </NavItem>
+        <NavExpandable title="Raw Data" groupId="raw-data" isActive={data.activeGroup === 'raw-data'} isExpanded>
+          <NavItem groupId="raw-data" itemId="raw-players" isActive={data.activeItem === 'raw-players'}>
+            Players
           </NavItem>
           {/* <NavItem groupId="players" itemId="More" isActive={data.activeItem === 'More'}>
             More (N/A)
@@ -170,7 +181,8 @@ const Dashboard = () => {
         breadcrumb={PageBreadcrumb}
         mainContainerId={pageId}
       >
-        <Players />
+        <Route path={props.match.path} exact component={Overview} />
+        <Route path={`${props.match.path}/data/players`} component={Players} />
       </Page>
     </React.Fragment>
   );

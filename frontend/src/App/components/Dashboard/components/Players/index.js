@@ -26,7 +26,7 @@ import { global_danger_color_200 as globalDangerColor200 } from '@patternfly/rea
 import { Table, TableHeader, TableBody } from '@patternfly/react-table';
 import { Spinner } from '@patternfly/react-core';
 import moment from 'moment';
-import { AuthContext } from '../../../../../App';
+import { AuthContext } from '../../../../Auth';
 
 const initialState = {
   players: [],

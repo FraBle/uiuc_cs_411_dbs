@@ -25,7 +25,7 @@ public class TableMapperTest {
         final Table table = tableMapper.getTableByNameH2("PLAYER");
 
         assertThat(table).isNotNull();
-        assertThat(table.getName()).isEqualTo("Player");
+        assertThat(table.getName()).isEqualTo("PLAYER");
         assertThat(table.getnRows()).isEqualTo(5);
     }
 }
