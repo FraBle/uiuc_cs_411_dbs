@@ -10,6 +10,7 @@ public class Player {
     private String position;
     private String height;
     private Integer weight;
+    private Boolean isFavorite;
 
     public Integer getId() {
         return id;
@@ -57,6 +58,14 @@ public class Player {
 
     public void setWeight(Integer weight) {
         this.weight = weight;
+    }
+
+    public Boolean getIsFavorite() {
+        return isFavorite;
+    }
+
+    public void setIsFavorite(Boolean isFavorite) {
+        this.isFavorite = isFavorite;
     }
 
 }
