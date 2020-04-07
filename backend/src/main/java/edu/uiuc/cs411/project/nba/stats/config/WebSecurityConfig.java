@@ -58,24 +58,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-
-        String[] staticResources = new String[]{
-				"/",
-				"/*.css",
-				"/*.html",
-				"/*.jpg",
-				"/*.js.map",
-				"/*.js",
-				"/fonts/**"
-        };
 		http.cors().and().csrf().disable()
 			.exceptionHandling().authenticationEntryPoint(authEntryPointJwt).and()
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 			.authorizeRequests()
-			.antMatchers(staticResources).permitAll()
-			.antMatchers("/api/auth/**").permitAll()
-			.antMatchers("/api/test/**").permitAll()
-			.antMatchers("/h2-console/**").permitAll()
+			.antMatchers("/", "/public/**", "/signin", "/signup", "/forgot", "/api/auth/**",
+					"/api/test/**", "/h2-console/**").permitAll()
 			.anyRequest().authenticated();
 
 		http.headers().frameOptions().disable();
