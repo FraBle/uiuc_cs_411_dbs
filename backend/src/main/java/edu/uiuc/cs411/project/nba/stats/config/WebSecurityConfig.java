@@ -29,7 +29,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	private final AuthEntryPointJwt authEntryPointJwt;
 	private final UserDetailsServiceImpl userDetailsService;
 
-	public WebSecurityConfig(JwtUtils jwtUtils, AuthEntryPointJwt authEntryPointJwt, UserDetailsServiceImpl userDetailsService) {
+	public WebSecurityConfig(JwtUtils jwtUtils, AuthEntryPointJwt authEntryPointJwt,
+			UserDetailsServiceImpl userDetailsService) {
 		this.jwtUtils = jwtUtils;
 		this.authEntryPointJwt = authEntryPointJwt;
 		this.userDetailsService = userDetailsService;
@@ -58,12 +59,38 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.cors().and().csrf().disable()
-			.exceptionHandling().authenticationEntryPoint(authEntryPointJwt).and()
-			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-			.authorizeRequests()
-			.antMatchers("/", "/public/**", "/signin", "/signup", "/forgot", "/api/auth/**",
-					"/api/test/**", "/h2-console/**").permitAll()
+
+		String[] staticResources = new String[] {
+			"/*.css",
+			"/*.html",
+			"/*.jpg",
+			"/*.js.map",
+			"/*.js",
+			"/fonts/**"
+		};
+
+		String[] frontendPaths = new String[] {
+			"/",
+			"/dashboard/**",
+			"/forgot",
+			"/h2-console/**",
+			"/public/**",
+			"/signin",
+			"/signup"
+		};
+
+		String[] publicApiPaths = new String[] {
+			"/api/auth/**",
+			"/api/test/**"
+		};
+
+		http.cors().and().csrf().disable().exceptionHandling()
+			.authenticationEntryPoint(authEntryPointJwt).and()
+			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+			.and().authorizeRequests()
+			.antMatchers(frontendPaths).permitAll()
+			.antMatchers(staticResources).permitAll()
+			.antMatchers(publicApiPaths).permitAll()
 			.anyRequest().authenticated();
 
 		http.headers().frameOptions().disable();
