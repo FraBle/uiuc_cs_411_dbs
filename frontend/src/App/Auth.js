@@ -58,7 +58,7 @@ const ProtectedRoute = ({ component: Component, ...otherProps }) => {
             state.isAuthenticated ? (
               <Component {...props} />
             ) : (
-              <Redirect to={otherProps.redirectTo ? otherProps.redirectTo : '/signin'} />
+              <Redirect to={otherProps.redirectTo ? otherProps.redirectTo : `/?redirect=${otherProps.location.pathname}`} />
             )
           }
         />

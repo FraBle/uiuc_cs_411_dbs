@@ -32,7 +32,7 @@ import imgBrand from '../../resources/logo.png';
 // import imgAvatar from '../../resources/avatar.svg';
 import Players from './components/Players';
 import Overview from './components/Overview';
-import { AuthContext } from '../../Auth';
+import { AuthContext, ProtectedRoute } from '../../Auth';
 import { Route } from 'react-router-dom';
 
 const DashboardRoutes = {
@@ -181,8 +181,8 @@ const Dashboard = (props) => {
         breadcrumb={PageBreadcrumb}
         mainContainerId={pageId}
       >
-        <Route path={props.match.path} exact component={Overview} />
-        <Route path={`${props.match.path}/data/players`} component={Players} />
+        <ProtectedRoute path={props.match.path} exact component={Overview} />
+        <ProtectedRoute path={`${props.match.path}/data/players`} component={Players} />
       </Page>
     </React.Fragment>
   );

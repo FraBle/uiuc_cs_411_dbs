@@ -1,8 +1,9 @@
 import React from 'react';
 import { AuthProvider, ProtectedRoute, AuthConsumer } from './Auth';
-import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch, Redirect, useLocation } from 'react-router-dom';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
+import queryString from 'query-string';
 import {
   Title,
   Bullseye,
@@ -27,7 +28,7 @@ const App = () => {
         </EmptyState>
       </Bullseye>
     ) : props.isAuthenticated ? (
-      <Redirect to="/dashboard" />
+      <Redirect to={queryString.parse(useLocation().search).redirect || '/dashboard'} />
     ) : (
       <Redirect to="/signin" />
     );
