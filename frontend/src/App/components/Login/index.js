@@ -4,6 +4,7 @@ import {
   AlertGroup,
   AlertActionCloseButton,
   AlertVariant,
+  Button,
   LoginFooterItem,
   LoginForm,
   LoginMainFooterBandItem,
@@ -116,17 +117,17 @@ const Login = (props) => {
   const signUpForAccountMessage = (
     <LoginMainFooterBandItem>
       Need an account?{' '}
-      <a href="#" onClick={() => toggleSignUpModal(false)}>
+      <Button variant="link" isInline onClick={() => toggleSignUpModal(false)}>
         Sign up.
-      </a>
+      </Button>
     </LoginMainFooterBandItem>
   );
 
   const forgotCredentials = (
     <LoginMainFooterBandItem>
-      <a href="#" onClick={toggleForgotCredentialsModal}>
+      <Button variant="link" isInline onClick={toggleForgotCredentialsModal}>
         Forgot Password?
-      </a>
+      </Button>
     </LoginMainFooterBandItem>
   );
 
