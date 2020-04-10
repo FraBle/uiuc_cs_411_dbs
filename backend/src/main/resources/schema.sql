@@ -23,7 +23,9 @@ DROP TABLE FavoritesPlayer IF EXISTS;
 CREATE TABLE `FavoritesPlayer` (
     `Player` INT NOT NULL,
     `Username` VARCHAR(50) NOT NULL,
-    PRIMARY KEY(`Player`, `Username`)
+    `createdAt` TIMESTAMP NOT NULL,
+    `lastUpdated` TIMESTAMP NOT NULL,
+    PRIMARY KEY (`Player`,`Username`)
 );
 
 DROP TABLE FavoritesFranchise IF EXISTS;
@@ -31,5 +33,19 @@ DROP TABLE FavoritesFranchise IF EXISTS;
 CREATE TABLE `FavoritesFranchise` (
     `Franchise` INT NOT NULL,
     `Username` VARCHAR(50) NOT NULL,
-    PRIMARY KEY(`Franchise`, `Username`)
+    `createdAt` TIMESTAMP NOT NULL,
+    `lastUpdated` TIMESTAMP NOT NULL,
+    PRIMARY KEY (`Franchise`,`Username`)
+);
+
+DROP TABLE Franchise IF EXISTS;
+
+CREATE TABLE `Franchise` (
+    `ID` INT NOT NULL,
+    `Abbreviation` VARCHAR(10) NOT NULL,
+    `Nickname` VARCHAR(100) NOT NULL,
+    `YearFounded` YEAR(4) NOT NULL,
+    `City` VARCHAR(100) NOT NULL,
+    `Arena` VARCHAR(100) NOT NULL,
+    PRIMARY KEY (`ID`)
 );

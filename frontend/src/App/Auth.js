@@ -48,7 +48,7 @@ const reducer = (state, action) => {
   }
 };
 
-const ProtectedRoute = ({ component: Component, ...otherProps }) => {
+const ProtectedRoute = ({ component: Component, componentProps, ...otherProps }) => {
   return (
     <AuthConsumer>
       {({ state }) => (
@@ -56,7 +56,7 @@ const ProtectedRoute = ({ component: Component, ...otherProps }) => {
           {...otherProps}
           render={props =>
             state.isAuthenticated ? (
-              <Component {...props} />
+              <Component {...props} {...componentProps} />
             ) : (
               <Redirect to={otherProps.redirectTo ? otherProps.redirectTo : `/?redirect=${otherProps.location.pathname}`} />
             )

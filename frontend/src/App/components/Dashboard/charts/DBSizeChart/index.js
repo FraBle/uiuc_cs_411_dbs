@@ -3,13 +3,8 @@ import {
   Bullseye,
   Spinner,
   Title,
-  Button,
   EmptyState,
-  EmptyStatePrimary,
-  EmptyStateVariant,
   EmptyStateIcon,
-  EmptyStateBody,
-  EmptyStateSecondaryActions
 } from '@patternfly/react-core';
 import { ChartDonut } from '@patternfly/react-charts';
 import { AuthContext } from '../../../../Auth';

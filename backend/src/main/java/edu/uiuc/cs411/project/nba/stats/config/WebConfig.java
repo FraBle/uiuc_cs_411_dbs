@@ -25,16 +25,14 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 String[] origins = new String[HOSTS.size()];
-                registry.addMapping(EVERYTHING).allowedOrigins(HOSTS.toArray(origins));
+                registry.addMapping(EVERYTHING).allowedOrigins(HOSTS.toArray(origins)).allowedMethods("GET", "POST",
+                        "PUT", "PATCH", "DELETE");
             }
 
             @Override
             public void addResourceHandlers(ResourceHandlerRegistry registry) {
-                registry
-                    .addResourceHandler("/**/*")
-                    .addResourceLocations("classpath:/static/")
-                    .resourceChain(true)
-                    .addResolver(new PathResourceResolver() {
+                registry.addResourceHandler("/**/*").addResourceLocations("classpath:/static/").resourceChain(true)
+                        .addResolver(new PathResourceResolver() {
                             @Override
                             protected Resource getResource(String resourcePath, Resource location) throws IOException {
                                 Resource requestedResource = location.createRelative(resourcePath);

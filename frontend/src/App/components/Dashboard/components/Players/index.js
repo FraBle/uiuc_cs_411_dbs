@@ -37,7 +37,7 @@ const initialState = {
   loading: true,
   sortIsExpanded: false,
   sortSelected: null,
-  sortOrder: 'ASC',
+  sortOrder: 'ASC'
 };
 const cells = ['Favorite', 'Player ID', 'Name', 'Birthdate', 'Position', 'Height', 'Weight'];
 const filterOptions = [
@@ -96,11 +96,25 @@ const reducer = (state, action) => {
         ...state,
         sortOrder: action.payload.sortOrder
       };
+    case 'FAVORITE_CREATED':
+      return {
+        ...state,
+        players: state.players.map(player =>
+          player.id === action.payload.playerId ? { ...player, isFavorite: true } : player
+        )
+      };
+    case 'FAVORITE_DELETED':
+      return {
+        ...state,
+        players: state.players.map(player =>
+          player.id === action.payload.playerId ? { ...player, isFavorite: false } : player
+        )
+      };
     default:
       return state;
   }
 };
-const Players = () => {
+const Players = (props) => {
   const { state: authState, dispatch: authDispatch } = React.useContext(AuthContext);
   const [data, dispatch] = React.useReducer(reducer, initialState);
 
@@ -207,6 +221,34 @@ const Players = () => {
     fetchData(1, data.perPage, data.sortSelected, sortOrder);
   };
 
+  const onToggleFavorite = (playerId, isFavorite) => {
+    fetch(`${BACKEND}/api/user/${authState.username}/favorite/player/${playerId}`, {
+      method: isFavorite ? 'DELETE' : 'PUT',
+      headers: {
+        Authorization: `Bearer ${authState.token}`
+      }
+    })
+      .then(res => {
+        if (res.ok)
+          isFavorite
+            ? dispatch({
+                type: 'FAVORITE_DELETED',
+                payload: { playerId }
+              })
+            : dispatch({
+                type: 'FAVORITE_CREATED',
+                payload: { playerId }
+              });
+        else
+          dispatch({
+            type: 'FAVORITE_ERROR'
+          });
+      })
+      .catch(error => {
+        props.showAlert('Ooops, looks like that didn\'t work 😔')
+      });
+  }
+
   if (data.error) {
     const noResultsRows = [
       {
@@ -301,9 +343,15 @@ const Players = () => {
           <Table
             cells={cells}
             rows={data.players.map(player => [
-              (<div><Button variant="plain" aria-label="Favorite">
-                {player.isFavorite ? <StarIcon /> : <OutlinedStarIcon />}
-              </Button></div>),
+              <div>
+                <Button
+                  variant="plain"
+                  aria-label="Favorite"
+                  onClick={() => onToggleFavorite(player.id, player.isFavorite)}
+                >
+                  {player.isFavorite ? <StarIcon /> : <OutlinedStarIcon />}
+                </Button>
+              </div>,
               player.id,
               player.name,
               moment(player.birthDate).format('ll'),

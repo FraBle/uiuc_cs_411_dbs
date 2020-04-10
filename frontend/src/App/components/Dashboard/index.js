@@ -1,5 +1,9 @@
 import React from 'react';
 import {
+  Alert,
+  AlertGroup,
+  AlertVariant,
+  AlertActionCloseButton,
   Brand,
   Breadcrumb,
   BreadcrumbItem,
@@ -13,12 +17,8 @@ import {
   NavList,
   Page,
   PageHeader,
-  PageSection,
-  PageSectionVariants,
   PageSidebar,
   SkipToContent,
-  TextContent,
-  Text,
   Toolbar,
   ToolbarGroup,
   ToolbarItem
@@ -41,13 +41,14 @@ const DashboardRoutes = {
 };
 
 const Dashboard = (props) => {
-  const { state: authState, dispatch } = React.useContext(AuthContext);
   const initialState = {
     isDropdownOpen: false,
     isKebabDropdownOpen: false,
     activeGroup: null,
-    activeItem: 'overview'
+    activeItem: 'overview',
+    alerts: []
   };
+  const { state: authState, dispatch } = React.useContext(AuthContext);
   const [data, setData] = React.useState(initialState);
 
   const onDropdownToggle = isDropdownOpen => {
@@ -93,7 +94,28 @@ const Dashboard = (props) => {
     dispatch({
       type: 'LOGOUT'
     });
-  }
+  };
+
+  const showAlert = (title, variant) => {
+    setData({
+      ...data,
+      alerts: [
+        ...data.alerts,
+        {
+          title,
+          variant,
+          key: new Date().getTime()
+        }
+      ]
+    });
+  };
+
+  const removeAlert = key => {
+    setData({
+      ...data,
+      alerts: [...data.alerts.filter(el => el.key !== key)]
+    });
+  };
 
   const PageNav = (
     <Nav onSelect={onNavSelect} aria-label="Nav" theme="dark">
@@ -173,6 +195,23 @@ const Dashboard = (props) => {
 
   return (
     <React.Fragment>
+      <AlertGroup isToast>
+        {data.alerts.map(({ key, variant, title }) => (
+          <Alert
+            isLiveRegion
+            variant={AlertVariant[variant]}
+            title={title}
+            action={
+              <AlertActionCloseButton
+                title={title}
+                variantLabel={`${variant} alert`}
+                onClose={() => removeAlert(key)}
+              />
+            }
+            key={key}
+          />
+        ))}
+      </AlertGroup>
       <Page
         header={Header}
         sidebar={Sidebar}
@@ -181,8 +220,9 @@ const Dashboard = (props) => {
         breadcrumb={PageBreadcrumb}
         mainContainerId={pageId}
       >
-        <ProtectedRoute path={props.match.path} exact component={Overview} />
-        <ProtectedRoute path={`${props.match.path}/data/players`} component={Players} />
+        {/* <ProtectedRoute path={props.match.path} exact component={Overview} /> */}
+        <ProtectedRoute path={props.match.path} exact component={Overview} componentProps={{ showAlert }} />
+        <ProtectedRoute path={`${props.match.path}/data/players`} component={Players} componentProps={{ showAlert }} />
       </Page>
     </React.Fragment>
   );

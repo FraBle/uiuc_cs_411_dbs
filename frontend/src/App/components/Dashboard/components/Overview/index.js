@@ -3,8 +3,6 @@ import {
   Card,
   CardHeader,
   CardBody,
-  Gallery,
-  GalleryItem,
   PageSection,
   PageSectionVariants,
   Text,
@@ -14,6 +12,7 @@ import {
   FlexModifiers
 } from '@patternfly/react-core';
 import DBSizeChart from '../../charts/DBSizeChart';
+import LatestFavorites from '../../charts/LatestFavorites';
 import PlaceholderChart from '../../charts/PlaceholderChart';
 
 const Overview = () => {
@@ -38,8 +37,8 @@ const Overview = () => {
             </FlexItem>
             <FlexItem>
               <Card>
-                <CardHeader>Another Chart</CardHeader>
-                <CardBody><PlaceholderChart /></CardBody>
+                <CardHeader>Latest Favorites</CardHeader>
+                <CardBody><LatestFavorites /></CardBody>
               </Card>
             </FlexItem>
             <FlexItem>
