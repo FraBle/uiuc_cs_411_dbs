@@ -50,4 +50,9 @@ public class PlayerController {
         return playerMapper.fetchAll(pageSizeAsInteger, offset, order, orderTypeValue, user.getUsername());
     }
 
+    @GetMapping("/search")
+    public List<Player> searchPlayersByName(@RequestParam("name") String name) {
+        return playerMapper.searchByName(name);
+    }
+
 }

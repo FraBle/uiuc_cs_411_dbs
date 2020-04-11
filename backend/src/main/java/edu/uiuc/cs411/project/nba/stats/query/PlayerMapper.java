@@ -24,4 +24,7 @@ public interface PlayerMapper {
     @Select("SELECT COUNT(*) FROM Player")
     Long count();
 
+    @Select("SELECT * FROM Player WHERE LOWER(Name) LIKE '%${name.toLowerCase()}%'")
+    List<Player> searchByName(String name);
+
 }

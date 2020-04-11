@@ -78,4 +78,12 @@ public class PlayerMapperTest {
         assertThat(players.get(1).getName()).isEqualTo("Stephen Curry");
     }
 
+    @Test
+    public void caseInsensitiveSearchTest() {
+        List<Player> searchResult = playerMapper.searchByName("jOrDAn");
+        assertThat(searchResult.size()).isEqualTo(1);
+
+        assertThat(searchResult.get(0).getName()).isEqualTo("Michael Jordan");
+    }
+
 }
