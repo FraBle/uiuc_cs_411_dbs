@@ -24,7 +24,12 @@ public interface PlayerMapper {
     @Select("SELECT COUNT(*) FROM Player")
     Long count();
 
-    @Select("SELECT * FROM Player WHERE LOWER(Name) LIKE '%${name.toLowerCase()}%'")
-    List<Player> searchByName(String name);
+    @Select("SELECT * FROM Player " +
+            "WHERE LOWER(Name) " +
+            "LIKE '%${name.toLowerCase()}%' " +
+            "ORDER BY ${order} ${orderType} " +
+            "LIMIT ${pageSize} " +
+            "OFFSET ${offset}")
+    List<Player> searchByName(int pageSize, int offset, String order, String orderType, String name);
 
 }

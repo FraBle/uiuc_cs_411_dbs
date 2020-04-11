@@ -51,8 +51,18 @@ public class PlayerController {
     }
 
     @GetMapping("/search")
-    public List<Player> searchPlayersByName(@RequestParam("name") String name) {
-        return playerMapper.searchByName(name);
+    public List<Player> searchPlayersByName(
+            @RequestParam(defaultValue = "1") String page,
+            @RequestParam(defaultValue = "50") String pageSize,
+            @RequestParam(defaultValue = "name") String order,
+            @RequestParam(defaultValue = "ASC") String orderType,
+            @RequestParam("name") String name) {
+        int pageAsInteger = Integer.parseInt(page);
+        int pageSizeAsInteger = Integer.parseInt(pageSize);
+        int offset = pageAsInteger == 1 ? 0 : (pageAsInteger - 1) * pageSizeAsInteger;
+        String orderTypeValue = "DESC".equalsIgnoreCase(orderType) ? "DESC" : "ASC";
+
+        return playerMapper.searchByName(pageSizeAsInteger, offset, order, orderTypeValue, name);
     }
 
 }
