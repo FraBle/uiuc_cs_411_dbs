@@ -7,9 +7,9 @@ import {
   PageSectionVariants,
   Text,
   TextContent,
-  Flex,
-  FlexItem,
-  FlexModifiers
+  TextVariants,
+  Gallery,
+  GalleryItem
 } from '@patternfly/react-core';
 import DBSizeChart from '../../charts/DBSizeChart';
 import LatestFavorites from '../../charts/LatestFavorites';
@@ -20,65 +20,63 @@ const Overview = props => {
     <React.Fragment>
       <PageSection variant={PageSectionVariants.light}>
         <TextContent>
-          <Text component="h1">Overview</Text>
-          <Text component="p">Welcome!</Text>
+          <Text component={TextVariants.h1}>Overview: Dashboard</Text>
+          <Text component={TextVariants.p}>
+            Welcome to NBA Analytics - A project for CS 411 (Database Systems) at UIUC!
+          </Text>
         </TextContent>
       </PageSection>
       <PageSection>
-        <Flex breakpointMods={[{ modifier: FlexModifiers.column }]}>
-          <Flex breakpointMods={[{ modifier: FlexModifiers['justify-content-space-between'] }]}>
-            <FlexItem>
-              <Card>
-                <CardHeader>DB Size</CardHeader>
-                <CardBody>
-                  <DBSizeChart />
-                </CardBody>
-              </Card>
-            </FlexItem>
-            <FlexItem>
-              <Card>
-                <CardHeader>Latest Favorites</CardHeader>
-                <CardBody>
-                  <LatestFavorites showAlert={props.showAlert} />
-                </CardBody>
-              </Card>
-            </FlexItem>
-            <FlexItem>
-              <Card>
-                <CardHeader>Another Chart</CardHeader>
-                <CardBody>
-                  <PlaceholderChart />
-                </CardBody>
-              </Card>
-            </FlexItem>
-          </Flex>
-          <Flex breakpointMods={[{ modifier: FlexModifiers['justify-content-space-between'] }]}>
-            <FlexItem>
-              <Card>
-                <CardHeader>Another Chart</CardHeader>
-                <CardBody>
-                  <PlaceholderChart />
-                </CardBody>
-              </Card>
-            </FlexItem>
-            <FlexItem>
-              <Card>
-                <CardHeader>Another Chart</CardHeader>
-                <CardBody>
-                  <PlaceholderChart />
-                </CardBody>
-              </Card>
-            </FlexItem>
-            <FlexItem>
-              <Card>
-                <CardHeader>Another Chart</CardHeader>
-                <CardBody>
-                  <PlaceholderChart />
-                </CardBody>
-              </Card>
-            </FlexItem>
-          </Flex>
-        </Flex>
+        <Gallery gutter="sm">
+          <GalleryItem>
+            <Card style={{ minHeight: '20em' }}>
+              <CardHeader>DB Size</CardHeader>
+              <CardBody>
+                <DBSizeChart />
+              </CardBody>
+            </Card>
+          </GalleryItem>
+          <GalleryItem>
+            <Card style={{ minHeight: '20em' }}>
+              <CardHeader>Latest Favorites</CardHeader>
+              <CardBody>
+                <LatestFavorites showAlert={props.showAlert} />
+              </CardBody>
+            </Card>
+          </GalleryItem>
+          <GalleryItem>
+            <Card style={{ minHeight: '20em' }}>
+              <CardHeader>Another Chart</CardHeader>
+              <CardBody>
+                <PlaceholderChart />
+              </CardBody>
+            </Card>
+          </GalleryItem>
+          <GalleryItem>
+            <Card style={{ minHeight: '20em' }}>
+              <CardHeader>Another Chart</CardHeader>
+              <CardBody>
+                <PlaceholderChart />
+              </CardBody>
+            </Card>
+          </GalleryItem>
+          <GalleryItem>
+            <Card style={{ minHeight: '20em' }}>
+              <CardHeader>Another Chart</CardHeader>
+              <CardBody>
+                <PlaceholderChart />
+              </CardBody>
+            </Card>
+          </GalleryItem>
+          <GalleryItem>
+            <Card style={{ minHeight: '20em' }}>
+              <CardHeader>Another Chart</CardHeader>
+              <CardBody>
+                <PlaceholderChart />
+              </CardBody>
+            </Card>
+          </GalleryItem>
+        </Gallery>
       </PageSection>
     </React.Fragment>
   );

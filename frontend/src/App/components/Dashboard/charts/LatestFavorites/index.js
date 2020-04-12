@@ -72,7 +72,9 @@ const reducer = (state, action) => {
               }
             : state.selectedPlayer,
         selectedFranchise:
-          action.payload.type === 'FRANCHISE' && state.selectedFranchise && state.selectedFranchise.id === action.payload.id
+          action.payload.type === 'FRANCHISE' &&
+          state.selectedFranchise &&
+          state.selectedFranchise.id === action.payload.id
             ? {
                 ...state.selectedFranchise,
                 isFavorite: true
@@ -90,7 +92,9 @@ const reducer = (state, action) => {
               }
             : state.selectedPlayer,
         selectedFranchise:
-          action.payload.type === 'FRANCHISE' && state.selectedFranchise && state.selectedFranchise.id === action.payload.id
+          action.payload.type === 'FRANCHISE' &&
+          state.selectedFranchise &&
+          state.selectedFranchise.id === action.payload.id
             ? {
                 ...state.selectedFranchise,
                 isFavorite: false
@@ -186,22 +190,18 @@ const LatestFavorites = props => {
   };
 
   return !data.hasData ? (
-    <div style={{ minWidth: '300px', minHeight: '300px' }}>
-      <Bullseye>
-        <Spinner />
-      </Bullseye>
-    </div>
+    <Bullseye>
+      <Spinner />
+    </Bullseye>
   ) : data.hasError ? (
-    <div style={{ minWidth: '300px', minHeight: '300px' }}>
-      <Bullseye>
-        <EmptyState>
-          <EmptyStateIcon icon={ExclamationTriangleIcon} />
-          <Title size="lg">Could not load data.</Title>
-        </EmptyState>
-      </Bullseye>
-    </div>
+    <Bullseye>
+      <EmptyState>
+        <EmptyStateIcon icon={ExclamationTriangleIcon} />
+        <Title size="lg">Could not load data.</Title>
+      </EmptyState>
+    </Bullseye>
   ) : (
-    <div style={{ minWidth: '300px', minHeight: '300px' }}>
+    <React.Fragment>
       <PlayerDetails
         player={data.selectedPlayer}
         isOpen={data.playerDetailModalOpen}
@@ -243,7 +243,7 @@ const LatestFavorites = props => {
           )}
         </SimpleListGroup>
       </SimpleList>
-    </div>
+    </React.Fragment>
   );
 };
 

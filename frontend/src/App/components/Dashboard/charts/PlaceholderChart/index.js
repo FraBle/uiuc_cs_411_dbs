@@ -4,14 +4,12 @@ import { ClockIcon } from '@patternfly/react-icons';
 
 const PlaceholderChart = () => {
   return (
-    <div style={{ minWidth: '300px', minHeight: '300px' }}>
-      <Bullseye>
-        <EmptyState>
-          <EmptyStateIcon icon={ClockIcon} />
-          <Title size="lg">Coming soon.</Title>
-        </EmptyState>
-      </Bullseye>
-    </div>
+    <Bullseye>
+      <EmptyState>
+        <EmptyStateIcon icon={ClockIcon} />
+        <Title size="lg">Coming soon.</Title>
+      </EmptyState>
+    </Bullseye>
   );
 };
 

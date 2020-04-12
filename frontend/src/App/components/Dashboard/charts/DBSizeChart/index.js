@@ -114,41 +114,26 @@ const DBSizeChart = props => {
   };
 
   return !state.hasData ? (
-    <div style={{ minWidth: '300px', minHeight: '300px' }}>
-      <Bullseye>
-        <Spinner />
-      </Bullseye>
-    </div>
+    <Bullseye>
+      <Spinner />
+    </Bullseye>
   ) : state.hasError ? (
-    <div style={{ minWidth: '300px', minHeight: '300px' }}>
-      <Bullseye>
-        <EmptyState>
-          <EmptyStateIcon icon={ExclamationTriangleIcon} />
-          <Title size="lg">Could not load data.</Title>
-        </EmptyState>
-      </Bullseye>
-    </div>
+    <Bullseye>
+      <EmptyState>
+        <EmptyStateIcon icon={ExclamationTriangleIcon} />
+        <Title size="lg">Could not load data.</Title>
+      </EmptyState>
+    </Bullseye>
   ) : (
-    <div
-      style={{
-        width: '300px',
-        height: '300px',
-        minWidth: '300px',
-        minHeight: '300px',
-        maxWidth: '300px',
-        maxHeight: '300px'
-      }}
-    >
-      <ChartDonut
-        ariaDesc={METADATA.ariaDescription}
-        ariaTitle={METADATA.ariaTitle}
-        constrainToVisibleArea={true}
-        data={state.chartData}
-        labels={labels}
-        subTitle={METADATA.subTitle}
-        title={numbro(state.chartData.reduce((total, { y }) => total + y, 0)).format({ thousandSeparated: true })}
-      />
-    </div>
+    <ChartDonut
+      ariaDesc={METADATA.ariaDescription}
+      ariaTitle={METADATA.ariaTitle}
+      constrainToVisibleArea={true}
+      data={state.chartData}
+      labels={labels}
+      subTitle={METADATA.subTitle}
+      title={numbro(state.chartData.reduce((total, { y }) => total + y, 0)).format({ thousandSeparated: true })}
+    />
   );
 };
 
