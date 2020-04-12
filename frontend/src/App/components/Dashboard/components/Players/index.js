@@ -19,14 +19,22 @@ import {
   SelectVariant,
   Text,
   TextContent,
-  Title,
+  Title
 } from '@patternfly/react-core';
-import { ExclamationCircleIcon, SortAlphaDownIcon, SortAlphaUpIcon, StarIcon, OutlinedStarIcon } from '@patternfly/react-icons';
+import {
+  ExclamationCircleIcon,
+  SortAlphaDownIcon,
+  SortAlphaUpIcon,
+  StarIcon,
+  OutlinedStarIcon,
+  SearchIcon
+} from '@patternfly/react-icons';
 import { global_danger_color_200 as globalDangerColor200 } from '@patternfly/react-tokens';
 import { Table, TableHeader, TableBody } from '@patternfly/react-table';
 import { Spinner } from '@patternfly/react-core';
 import moment from 'moment';
 import { AuthContext } from '../../../../Auth';
+import PlayerDetails from '../PlayerDetails';
 
 const initialState = {
   players: [],
@@ -36,19 +44,32 @@ const initialState = {
   error: null,
   loading: true,
   sortIsExpanded: false,
-  sortSelected: null,
-  sortOrder: 'ASC'
+  sortSelected: 'Player ID',
+  sortOrder: 'ASC',
+  detailModalOpen: false,
+  selectedPlayer: null
 };
 const cells = ['Favorite', 'Player ID', 'Name', 'Birthdate', 'Position', 'Height', 'Weight'];
+
+const mapping = {
+  'Player ID': 'id',
+  Name: 'name',
+  Birthdate: 'birthDate',
+  Position: 'position',
+  Height: 'height',
+  Weight: 'weight',
+  Favorite: 'isFavorite'
+};
+
 const filterOptions = [
   {
     value: 'Sort By',
     disabled: false,
-    isPlaceholder: true,
+    isPlaceholder: true
   },
   ...cells.map(cell => ({
     value: cell,
-    disabled: false,
+    disabled: false
   }))
 ];
 
@@ -75,7 +96,6 @@ const reducer = (state, action) => {
         ...state,
         loading: false,
         error: action.payload.error,
-        loading: false,
         perPage: 0,
         page: 0,
         total: 0
@@ -101,20 +121,40 @@ const reducer = (state, action) => {
         ...state,
         players: state.players.map(player =>
           player.id === action.payload.playerId ? { ...player, isFavorite: true } : player
-        )
+        ),
+        selectedPlayer:
+          state.selectedPlayer && state.selectedPlayer.id === action.payload.playerId
+            ? {
+                ...state.selectedPlayer,
+                isFavorite: true
+              }
+            : state.selectedPlayer
       };
     case 'FAVORITE_DELETED':
       return {
         ...state,
         players: state.players.map(player =>
           player.id === action.payload.playerId ? { ...player, isFavorite: false } : player
-        )
+        ),
+        selectedPlayer:
+          state.selectedPlayer && state.selectedPlayer.id === action.payload.playerId
+            ? {
+                ...state.selectedPlayer,
+                isFavorite: false
+              }
+            : state.selectedPlayer
+      };
+    case 'DETAIL_MODAL_TOGGLE':
+      return {
+        ...state,
+        detailModalOpen: !state.detailModalOpen,
+        selectedPlayer: action.payload.player
       };
     default:
       return state;
   }
 };
-const Players = (props) => {
+const Players = props => {
   const { state: authState, dispatch: authDispatch } = React.useContext(AuthContext);
   const [data, dispatch] = React.useReducer(reducer, initialState);
 
@@ -122,12 +162,7 @@ const Players = (props) => {
     dispatch({
       type: 'FETCH_PLAYERS_REQUEST'
     });
-    fetchData(
-      data.page || 1,
-      data.perPage || 20,
-      data.sortSelected || 'id',
-      data.sortOrder || 'ASC'
-    );
+    fetchData(data.page || 1, data.perPage || 20, mapping[data.sortSelected] || 'id', data.sortOrder || 'ASC');
   }, []);
 
   const fetchData = (page, perPage, order, orderType) => {
@@ -177,33 +212,32 @@ const Players = (props) => {
         itemCount={data.total}
         page={data.page}
         perPage={data.perPage}
-        onSetPage={(_evt, value) => fetchData(value, data.perPage, data.sortSelected, data.sortOrder)}
-        onPerPageSelect={(_evt, value) => fetchData(1, value, data.sortSelected, data.sortOrder)}
+        onSetPage={(_evt, value) => fetchData(value, data.perPage, mapping[data.sortSelected], data.sortOrder)}
+        onPerPageSelect={(_evt, value) => fetchData(1, value, mapping[data.sortSelected], data.sortOrder)}
         variant={variant}
       />
     );
-  }
+  };
 
-  const onSortToggle = isExpanded => dispatch({
-    type: 'SORT_PLAYERS_TOGGLE',
-    payload: {
-      isExpanded
-    }
-  });
+  const onSortToggle = isExpanded =>
+    dispatch({
+      type: 'SORT_PLAYERS_TOGGLE',
+      payload: {
+        isExpanded
+      }
+    });
 
   const onSortSelect = (event, selection) => {
     if (selection === 'Sort By') selection = data.sortSelected;
-    if (selection === 'Player ID') selection = 'id';
-    if (selection === 'Favorite') selection = 'isFavorite';
     dispatch({
       type: 'SORT_PLAYERS_SELECT',
       payload: {
         isExpanded: false,
-        selection
+        selection: selection
       }
     });
-    fetchData(1, data.perPage, selection, data.sortOrder);
-  }
+    fetchData(1, data.perPage, mapping[selection], data.sortOrder);
+  };
 
   const onSortOrderToggle = () => {
     let sortOrder;
@@ -218,36 +252,40 @@ const Players = (props) => {
         sortOrder
       }
     });
-    fetchData(1, data.perPage, data.sortSelected, sortOrder);
+    fetchData(1, data.perPage, mapping[data.sortSelected], sortOrder);
   };
 
-  const onToggleFavorite = (playerId, isFavorite) => {
-    fetch(`${BACKEND}/api/user/${authState.username}/favorite/player/${playerId}`, {
-      method: isFavorite ? 'DELETE' : 'PUT',
+  const onToggleFavorite = player => {
+    fetch(`${BACKEND}/api/user/${authState.username}/favorite/player/${player.id}`, {
+      method: player.isFavorite ? 'DELETE' : 'PUT',
       headers: {
         Authorization: `Bearer ${authState.token}`
       }
     })
       .then(res => {
         if (res.ok)
-          isFavorite
+          player.isFavorite
             ? dispatch({
                 type: 'FAVORITE_DELETED',
-                payload: { playerId }
+                payload: { playerId: player.id }
               })
             : dispatch({
                 type: 'FAVORITE_CREATED',
-                payload: { playerId }
+                payload: { playerId: player.id }
               });
-        else
-          dispatch({
-            type: 'FAVORITE_ERROR'
-          });
+        else props.showAlert("Ooops, looks like that didn't work 😔");
       })
       .catch(error => {
-        props.showAlert('Ooops, looks like that didn\'t work 😔')
+        props.showAlert("Ooops, looks like that didn't work 😔");
       });
-  }
+  };
+
+  const onToggleDetailModal = player => {
+    dispatch({
+      type: 'DETAIL_MODAL_TOGGLE',
+      payload: { player }
+    });
+  };
 
   if (data.error) {
     const noResultsRows = [
@@ -284,25 +322,34 @@ const Players = (props) => {
     );
   }
 
-  const loadingRows = [{
-    heightAuto: true,
-    cells: [
-      {
-        id: 1,
-        props: { colSpan: 8 },
-        title: (
-          <Bullseye>
-            <center>
-              <Spinner size="xl" />
-            </center>
-          </Bullseye>
-        )
-      }
-    ]
-  }];
+  const loadingRows = [
+    {
+      heightAuto: true,
+      cells: [
+        {
+          id: 1,
+          props: { colSpan: 8 },
+          title: (
+            <Bullseye>
+              <center>
+                <Spinner size="xl" />
+              </center>
+            </Bullseye>
+          )
+        }
+      ]
+    }
+  ];
 
   return (
     <React.Fragment>
+      <PlayerDetails
+        player={data.selectedPlayer}
+        isOpen={data.detailModalOpen}
+        showAlert={props.showAlert}
+        toggle={onToggleDetailModal}
+        toggleFavorite={onToggleFavorite}
+      />
       <PageSection variant={PageSectionVariants.light}>
         <TextContent>
           <Text component="h1">Players</Text>
@@ -341,23 +388,24 @@ const Players = (props) => {
 
         {!data.loading && (
           <Table
-            cells={cells}
+            cells={[...cells, 'Details']}
             rows={data.players.map(player => [
-              <div>
-                <Button
-                  variant="plain"
-                  aria-label="Favorite"
-                  onClick={() => onToggleFavorite(player.id, player.isFavorite)}
-                >
+              <React.Fragment>
+                <Button variant="plain" aria-label="Favorite" onClick={() => onToggleFavorite(player)}>
                   {player.isFavorite ? <StarIcon /> : <OutlinedStarIcon />}
                 </Button>
-              </div>,
+              </React.Fragment>,
               player.id,
               player.name,
               moment(player.birthDate).format('ll'),
               player.position,
               `${player.height.split('-')[0]}' ${player.height.split('-')[1]}"`,
-              `${player.weight} lbs`
+              `${player.weight} lbs`,
+              <React.Fragment>
+                <Button variant="plain" aria-label="Details" onClick={() => onToggleDetailModal(player)}>
+                  <SearchIcon />
+                </Button>
+              </React.Fragment>
             ])}
             aria-label="Players Overview Table"
           >
@@ -374,6 +422,6 @@ const Players = (props) => {
       </PageSection>
     </React.Fragment>
   );
-}
+};
 
 export default Players;

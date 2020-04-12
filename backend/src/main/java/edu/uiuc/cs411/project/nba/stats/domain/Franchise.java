@@ -8,6 +8,7 @@ public class Franchise {
     private Integer yearFounded;
     private String city;
     private String arena;
+    private Boolean isFavorite;
 
     public Integer getId() {
         return this.id;
@@ -57,5 +58,12 @@ public class Franchise {
         this.arena = arena;
     }
 
+    public Boolean getIsFavorite() {
+        return this.isFavorite;
+    }
+
+    public void setIsFavorite(Boolean isFavorite) {
+        this.isFavorite = isFavorite;
+    }
 
 }

@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
@@ -9,6 +10,9 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './src/index.html',
       filename: './index.html'
+    }),
+    new webpack.DefinePlugin({
+      GOOGLE_ANALYTICS_TRACKING_ID: JSON.stringify('UA-119866108-2'),
     })
   ],
   module: {

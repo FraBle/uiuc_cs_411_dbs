@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  Bullseye,
-  Spinner,
-  Title,
-  EmptyState,
-  EmptyStateIcon,
-} from '@patternfly/react-core';
+import { Bullseye, Spinner, Title, EmptyState, EmptyStateIcon } from '@patternfly/react-core';
 import { ChartDonut } from '@patternfly/react-charts';
 import { AuthContext } from '../../../../Auth';
 import { ExclamationTriangleIcon } from '@patternfly/react-icons';
@@ -38,7 +32,7 @@ const initialState = {
   tables: []
 };
 
-const labels = ({datum}) => `${datum.x}: ${numbro(datum.y).format({thousandSeparated: true})}`;
+const labels = ({ datum }) => `${datum.x}: ${numbro(datum.y).format({ thousandSeparated: true })}`;
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -135,7 +129,16 @@ const DBSizeChart = props => {
       </Bullseye>
     </div>
   ) : (
-    <div style={{ width: '300px', height: '300px', minWidth: '300px', minHeight: '300px', maxWidth: '300px', maxHeight: '300px' }}>
+    <div
+      style={{
+        width: '300px',
+        height: '300px',
+        minWidth: '300px',
+        minHeight: '300px',
+        maxWidth: '300px',
+        maxHeight: '300px'
+      }}
+    >
       <ChartDonut
         ariaDesc={METADATA.ariaDescription}
         ariaTitle={METADATA.ariaTitle}
@@ -143,7 +146,7 @@ const DBSizeChart = props => {
         data={state.chartData}
         labels={labels}
         subTitle={METADATA.subTitle}
-        title={numbro(state.chartData.reduce((total, {y}) => total + y, 0)).format({thousandSeparated: true})}
+        title={numbro(state.chartData.reduce((total, { y }) => total + y, 0)).format({ thousandSeparated: true })}
       />
     </div>
   );

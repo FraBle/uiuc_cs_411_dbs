@@ -19,7 +19,7 @@ public interface FavoritesFranchiseMapper {
     @Delete("DELETE FROM FavoritesFranchise WHERE Username = #{username} AND Franchise = #{franchiseId}")
     void deleteFavorite(String username, int franchiseId);
 
-    @Select("SELECT Franchise.* FROM FavoritesFranchise JOIN Franchise ON FavoritesFranchise.Franchise=Franchise.ID WHERE FavoritesFranchise.Username=#{username} ORDER BY ${order} ${orderType} LIMIT ${pageSize} OFFSET ${offset}")
+    @Select("SELECT Franchise.*, true AS isFavorite FROM FavoritesFranchise JOIN Franchise ON FavoritesFranchise.Franchise=Franchise.ID WHERE FavoritesFranchise.Username=#{username} ORDER BY ${order} ${orderType} LIMIT ${pageSize} OFFSET ${offset}")
     List<Franchise> franchiseIdsByUsername(
             String username,
             @Param("pageSize") int pageSize,

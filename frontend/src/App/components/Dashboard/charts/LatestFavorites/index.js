@@ -7,10 +7,14 @@ import {
   EmptyStateIcon,
   SimpleList,
   SimpleListItem,
-  SimpleListGroup
+  SimpleListGroup,
+  Text,
+  TextVariants
 } from '@patternfly/react-core';
 import { AuthContext } from '../../../../Auth';
 import { ExclamationTriangleIcon } from '@patternfly/react-icons';
+import PlayerDetails from '../../components/PlayerDetails';
+import FranchiseDetails from '../../components/FranchiseDetails';
 
 const initialState = {
   hasData: false,
@@ -19,8 +23,11 @@ const initialState = {
   error: null,
   favoritePlayers: [],
   favoriteFranchises: [],
+  selectedPlayer: null,
+  selectedFranchise: null,
+  franchiseDetailModalOpen: false,
+  playerDetailModalOpen: false
 };
-
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -43,6 +50,52 @@ const reducer = (state, action) => {
         loading: false,
         hasError: true,
         error: action.payload.error
+      };
+    case 'DETAIL_MODAL_TOGGLE':
+      return {
+        ...state,
+        franchiseDetailModalOpen:
+          action.payload.type === 'FRANCHISE' ? !state.franchiseDetailModalOpen : state.franchiseDetailModalOpen,
+        playerDetailModalOpen:
+          action.payload.type === 'PLAYER' ? !state.playerDetailModalOpen : state.playerDetailModalOpen,
+        selectedFranchise: action.payload.type === 'FRANCHISE' ? action.payload.data : state.selectedFranchise,
+        selectedPlayer: action.payload.type === 'PLAYER' ? action.payload.data : state.selectedPlayer
+      };
+    case 'FAVORITE_CREATED':
+      return {
+        ...state,
+        selectedPlayer:
+          action.payload.type === 'PLAYER' && state.selectedPlayer && state.selectedPlayer.id === action.payload.id
+            ? {
+                ...state.selectedPlayer,
+                isFavorite: true
+              }
+            : state.selectedPlayer,
+        selectedFranchise:
+          action.payload.type === 'FRANCHISE' && state.selectedFranchise && state.selectedFranchise.id === action.payload.id
+            ? {
+                ...state.selectedFranchise,
+                isFavorite: true
+              }
+            : state.selectedFranchise
+      };
+    case 'FAVORITE_DELETED':
+      return {
+        ...state,
+        selectedPlayer:
+          action.payload.type === 'PLAYER' && state.selectedPlayer && state.selectedPlayer.id === action.payload.id
+            ? {
+                ...state.selectedPlayer,
+                isFavorite: false
+              }
+            : state.selectedPlayer,
+        selectedFranchise:
+          action.payload.type === 'FRANCHISE' && state.selectedFranchise && state.selectedFranchise.id === action.payload.id
+            ? {
+                ...state.selectedFranchise,
+                isFavorite: false
+              }
+            : state.selectedFranchise
       };
     default:
       return state;
@@ -99,6 +152,39 @@ const LatestFavorites = props => {
       );
   };
 
+  const onToggleDetailModal = (type, data) => {
+    dispatch({
+      type: 'DETAIL_MODAL_TOGGLE',
+      payload: { type, data }
+    });
+  };
+
+  const onToggleFavorite = (type, id, isFavorite) => {
+    fetch(`${BACKEND}/api/user/${authState.username}/favorite/${type.toLowerCase()}/${id}`, {
+      method: isFavorite ? 'DELETE' : 'PUT',
+      headers: {
+        Authorization: `Bearer ${authState.token}`
+      }
+    })
+      .then(res => {
+        if (res.ok)
+          isFavorite
+            ? dispatch({
+                type: 'FAVORITE_DELETED',
+                payload: { type, id }
+              })
+            : dispatch({
+                type: 'FAVORITE_CREATED',
+                payload: { type, id }
+              });
+        else props.showAlert("Ooops, looks like that didn't work 😔");
+      })
+      .then(() => fetchData())
+      .catch(error => {
+        props.showAlert("Ooops, looks like that didn't work 😔");
+      });
+  };
+
   return !data.hasData ? (
     <div style={{ minWidth: '300px', minHeight: '300px' }}>
       <Bullseye>
@@ -116,16 +202,45 @@ const LatestFavorites = props => {
     </div>
   ) : (
     <div style={{ minWidth: '300px', minHeight: '300px' }}>
-      <SimpleList aria-label="Grouped List Example">
+      <PlayerDetails
+        player={data.selectedPlayer}
+        isOpen={data.playerDetailModalOpen}
+        showAlert={props.showAlert}
+        toggle={(...params) => onToggleDetailModal('PLAYER', ...params)}
+        toggleFavorite={(...params) => onToggleFavorite('PLAYER', ...params)}
+      />
+      <FranchiseDetails
+        franchise={data.selectedFranchise}
+        isOpen={data.franchiseDetailModalOpen}
+        showAlert={props.showAlert}
+        toggle={(...params) => onToggleDetailModal('FRANCHISE', ...params)}
+        toggleFavorite={(...params) => onToggleFavorite('FRANCHISE', ...params)}
+      />
+      <SimpleList>
         <SimpleListGroup title="Franchises" id="franchises">
-          {data.favoriteFranchises.map(franchise => (
-            <SimpleListItem key={'franchise-' + franchise.id}>{franchise.nickname}</SimpleListItem>
-          ))}
+          {data.favoriteFranchises && data.favoriteFranchises.length ? (
+            data.favoriteFranchises.map(franchise => (
+              <SimpleListItem
+                key={'franchise-' + franchise.id}
+                onClick={() => onToggleDetailModal('FRANCHISE', franchise)}
+              >
+                {franchise.nickname}
+              </SimpleListItem>
+            ))
+          ) : (
+            <Text component={TextVariants.small}>You don't have any favorite franchises yet 😱</Text>
+          )}
         </SimpleListGroup>
         <SimpleListGroup title="Players" id="players">
-          {data.favoritePlayers.map(player => (
-            <SimpleListItem key={'player-' + player.id}>{player.name}</SimpleListItem>
-          ))}
+          {data.favoritePlayers && data.favoritePlayers.length ? (
+            data.favoritePlayers.map(player => (
+              <SimpleListItem key={'player-' + player.id} onClick={() => onToggleDetailModal('PLAYER', player)}>
+                {player.name}
+              </SimpleListItem>
+            ))
+          ) : (
+            <Text component={TextVariants.small}>You didn't fave any players yet 😔</Text>
+          )}
         </SimpleListGroup>
       </SimpleList>
     </div>

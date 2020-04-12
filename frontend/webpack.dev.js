@@ -29,7 +29,8 @@ module.exports = merge(common, {
   },
   plugins: [
     new webpack.DefinePlugin({
-      BACKEND: JSON.stringify('http://localhost:8080')
+      BACKEND: JSON.stringify('http://localhost:8080'),
+      GOOGLE_ANALYTICS_TEST_MODE: true
     })
   ]
 });

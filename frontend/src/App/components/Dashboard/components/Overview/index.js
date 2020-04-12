@@ -15,7 +15,7 @@ import DBSizeChart from '../../charts/DBSizeChart';
 import LatestFavorites from '../../charts/LatestFavorites';
 import PlaceholderChart from '../../charts/PlaceholderChart';
 
-const Overview = () => {
+const Overview = props => {
   return (
     <React.Fragment>
       <PageSection variant={PageSectionVariants.light}>
@@ -26,7 +26,7 @@ const Overview = () => {
       </PageSection>
       <PageSection>
         <Flex breakpointMods={[{ modifier: FlexModifiers.column }]}>
-          <Flex breakpointMods={[{modifier: FlexModifiers["justify-content-space-between"]}]}>
+          <Flex breakpointMods={[{ modifier: FlexModifiers['justify-content-space-between'] }]}>
             <FlexItem>
               <Card>
                 <CardHeader>DB Size</CardHeader>
@@ -38,33 +38,43 @@ const Overview = () => {
             <FlexItem>
               <Card>
                 <CardHeader>Latest Favorites</CardHeader>
-                <CardBody><LatestFavorites /></CardBody>
+                <CardBody>
+                  <LatestFavorites showAlert={props.showAlert} />
+                </CardBody>
               </Card>
             </FlexItem>
             <FlexItem>
               <Card>
                 <CardHeader>Another Chart</CardHeader>
-                <CardBody><PlaceholderChart /></CardBody>
+                <CardBody>
+                  <PlaceholderChart />
+                </CardBody>
               </Card>
             </FlexItem>
           </Flex>
-          <Flex breakpointMods={[{modifier: FlexModifiers["justify-content-space-between"]}]}>
+          <Flex breakpointMods={[{ modifier: FlexModifiers['justify-content-space-between'] }]}>
             <FlexItem>
               <Card>
                 <CardHeader>Another Chart</CardHeader>
-                <CardBody><PlaceholderChart /></CardBody>
+                <CardBody>
+                  <PlaceholderChart />
+                </CardBody>
               </Card>
             </FlexItem>
             <FlexItem>
               <Card>
                 <CardHeader>Another Chart</CardHeader>
-                <CardBody><PlaceholderChart /></CardBody>
+                <CardBody>
+                  <PlaceholderChart />
+                </CardBody>
               </Card>
             </FlexItem>
             <FlexItem>
               <Card>
                 <CardHeader>Another Chart</CardHeader>
-                <CardBody><PlaceholderChart /></CardBody>
+                <CardBody>
+                  <PlaceholderChart />
+                </CardBody>
               </Card>
             </FlexItem>
           </Flex>

@@ -4,6 +4,7 @@ import {
   AlertGroup,
   AlertVariant,
   AlertActionCloseButton,
+  Avatar,
   Brand,
   Breadcrumb,
   BreadcrumbItem,
@@ -23,29 +24,63 @@ import {
   ToolbarGroup,
   ToolbarItem
 } from '@patternfly/react-core';
-// make sure you've installed @patternfly/patternfly
 import accessibleStyles from '@patternfly/react-styles/css/utilities/Accessibility/accessibility';
-import spacingStyles from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { css } from '@patternfly/react-styles';
-import { BellIcon, CogIcon } from '@patternfly/react-icons';
 import imgBrand from '../../resources/logo.png';
-// import imgAvatar from '../../resources/avatar.svg';
 import Players from './components/Players';
+import Franchises from './components/Franchises';
 import Overview from './components/Overview';
 import { AuthContext, ProtectedRoute } from '../../Auth';
-import { Route } from 'react-router-dom';
+import gravatarUrl from 'gravatar-url';
 
 const DashboardRoutes = {
   overview: '/dashboard',
-  'raw-players': '/dashboard/data/players'
+  'raw-players': '/dashboard/data/players',
+  'raw-franchises': '/dashboard/data/franchises'
 };
 
-const Dashboard = (props) => {
+const RoutesToNavMapping = {
+  '/dashboard': {
+    activeGroup: null,
+    activeItem: 'overview'
+  },
+  '/dashboard/data/players': {
+    activeGroup: 'raw-data',
+    activeItem: 'raw-players'
+  },
+  '/dashboard/data/franchises': {
+    activeGroup: 'raw-data',
+    activeItem: 'raw-franchises'
+  }
+};
+
+const RoutesToBreadcrumbs = {
+  '/dashboard': (
+    <Breadcrumb>
+      <BreadcrumbItem>Overview</BreadcrumbItem>
+      <BreadcrumbItem isActive>Dashboard</BreadcrumbItem>
+    </Breadcrumb>
+  ),
+  '/dashboard/data/players': (
+    <Breadcrumb>
+      <BreadcrumbItem>Raw Data</BreadcrumbItem>
+      <BreadcrumbItem isActive>Players</BreadcrumbItem>
+    </Breadcrumb>
+  ),
+  '/dashboard/data/franchises': (
+    <Breadcrumb>
+      <BreadcrumbItem>Raw Data</BreadcrumbItem>
+      <BreadcrumbItem isActive>Franchises</BreadcrumbItem>
+    </Breadcrumb>
+  )
+};
+
+const Dashboard = props => {
   const initialState = {
     isDropdownOpen: false,
     isKebabDropdownOpen: false,
-    activeGroup: null,
-    activeItem: 'overview',
+    activeGroup: RoutesToNavMapping[props.location.pathname].activeGroup,
+    activeItem: RoutesToNavMapping[props.location.pathname].activeItem,
     alerts: []
   };
   const { state: authState, dispatch } = React.useContext(AuthContext);
@@ -62,7 +97,7 @@ const Dashboard = (props) => {
     event.preventDefault();
     setData({
       ...data,
-      isDropdownOpen: !data.isDropdownOpen,
+      isDropdownOpen: !data.isDropdownOpen
     });
   };
 
@@ -77,7 +112,7 @@ const Dashboard = (props) => {
     event.preventDefault();
     setData({
       ...data,
-      isKebabDropdownOpen: !data.isKebabDropdownOpen,
+      isKebabDropdownOpen: !data.isKebabDropdownOpen
     });
   };
 
@@ -85,7 +120,7 @@ const Dashboard = (props) => {
     setData({
       ...data,
       activeItem: result.itemId,
-      activeGroup: result.groupId,
+      activeGroup: result.groupId
     });
     props.history.push(DashboardRoutes[result.itemId]);
   };
@@ -127,22 +162,10 @@ const Dashboard = (props) => {
           <NavItem groupId="raw-data" itemId="raw-players" isActive={data.activeItem === 'raw-players'}>
             Players
           </NavItem>
-          {/* <NavItem groupId="players" itemId="More" isActive={data.activeItem === 'More'}>
-            More (N/A)
-          </NavItem> */}
+          <NavItem groupId="raw-data" itemId="raw-franchises" isActive={data.activeItem === 'raw-franchises'}>
+            Franchises
+          </NavItem>
         </NavExpandable>
-        {/* <NavExpandable title="Franchises" groupId="franchises" isActive={data.activeGroup === 'franchises'}>
-          <NavItem
-            groupId="franchises"
-            itemId="franchises-overview"
-            isActive={data.activeItem === 'franchises-overview'}
-          >
-            Overview
-          </NavItem>
-          <NavItem groupId="franchises" itemId="franchises_itm-2" isActive={data.activeItem === 'franchises-more'}>
-            More (N/A)
-          </NavItem>
-        </NavExpandable> */}
       </NavList>
     </Nav>
   );
@@ -176,19 +199,12 @@ const Dashboard = (props) => {
     <PageHeader
       logo={<Brand src={imgBrand} alt="UIUC CS411" />}
       toolbar={PageToolbar}
-      // avatar={<Avatar src={imgAvatar} alt="Avatar image" />}
+      avatar={<Avatar src={gravatarUrl(authState.email, { size: 36 })} alt="Avatar image" />}
       showNavToggle
     />
   );
 
   const Sidebar = <PageSidebar nav={PageNav} theme="dark" />;
-
-  const PageBreadcrumb = (
-    <Breadcrumb>
-      <BreadcrumbItem>Players</BreadcrumbItem>
-      <BreadcrumbItem to="#" isActive>Overview</BreadcrumbItem>
-    </Breadcrumb>
-  );
 
   const pageId = 'main-content-page-layout-expandable-nav';
   const PageSkipToContent = <SkipToContent href={`#${pageId}`}>Skip to content</SkipToContent>;
@@ -217,12 +233,16 @@ const Dashboard = (props) => {
         sidebar={Sidebar}
         isManagedSidebar
         skipToContent={PageSkipToContent}
-        breadcrumb={PageBreadcrumb}
+        breadcrumb={RoutesToBreadcrumbs[props.location.pathname]}
         mainContainerId={pageId}
       >
-        {/* <ProtectedRoute path={props.match.path} exact component={Overview} /> */}
         <ProtectedRoute path={props.match.path} exact component={Overview} componentProps={{ showAlert }} />
         <ProtectedRoute path={`${props.match.path}/data/players`} component={Players} componentProps={{ showAlert }} />
+        <ProtectedRoute
+          path={`${props.match.path}/data/franchises`}
+          component={Franchises}
+          componentProps={{ showAlert }}
+        />
       </Page>
     </React.Fragment>
   );

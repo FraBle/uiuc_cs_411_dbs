@@ -4,15 +4,13 @@ import { BrowserRouter as Router, Route, Switch, Redirect, useLocation } from 'r
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import queryString from 'query-string';
-import {
-  Title,
-  Bullseye,
-  EmptyState,
-  EmptyStateIcon
-} from '@patternfly/react-core';
+import { Title, Bullseye, EmptyState, EmptyStateIcon } from '@patternfly/react-core';
+import { withGoogleAnalytics } from './Analytics';
 
 const App = () => {
-  const LoadingPlaceHolder = (props) => {
+  withGoogleAnalytics();
+
+  const LoadingPlaceHolder = props => {
     const Spinner = () => (
       <span className="pf-c-spinner" role="progressbar" aria-valuetext="Loading...">
         <span className="pf-c-spinner__clipper" />
@@ -35,27 +33,22 @@ const App = () => {
   };
 
   return (
-    <Router>
-      <AuthProvider>
-        <AuthConsumer>
-          {({ state }) => (
-            <Switch>
-              <Route exact path="/" component={() => <LoadingPlaceHolder isReady={state.isReady} isAuthenticated={state.isAuthenticated} />}
-              />
-              <ProtectedRoute path="/dashboard" component={Dashboard} />
-              <Route path="/signin" component={Login} />
-            </Switch>
-          )}
-        </AuthConsumer>
-      </AuthProvider>
-    </Router>
+    <AuthProvider>
+      <AuthConsumer>
+        {({ state }) => (
+          <Switch>
+            <Route
+              exact
+              path="/"
+              component={() => <LoadingPlaceHolder isReady={state.isReady} isAuthenticated={state.isAuthenticated} />}
+            />
+            <ProtectedRoute path="/dashboard" component={Dashboard} />
+            <Route path="/signin" component={Login} />
+          </Switch>
+        )}
+      </AuthConsumer>
+    </AuthProvider>
   );
 };
 
 export default App;
-
-
-/*
-<ProtectedRoute path="/forms" component={FormList} />
-<Route component={PageNotFound} />
-*/
