@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Bullseye,
   Button,
+  ButtonVariant,
   DataToolbar,
   DataToolbarContent,
   DataToolbarGroup,
@@ -11,14 +12,18 @@ import {
   EmptyStateIcon,
   EmptyStateVariant,
   FlexModifiers,
+  Form,
+  InputGroup,
   PageSection,
   PageSectionVariants,
   Pagination,
   Select,
   SelectOption,
   SelectVariant,
+  Spinner,
   Text,
   TextContent,
+  TextInput,
   Title
 } from '@patternfly/react-core';
 import {
@@ -31,7 +36,6 @@ import {
 } from '@patternfly/react-icons';
 import { global_danger_color_200 as globalDangerColor200 } from '@patternfly/react-tokens';
 import { Table, TableHeader, TableBody } from '@patternfly/react-table';
-import { Spinner } from '@patternfly/react-core';
 import moment from 'moment';
 import { AuthContext } from '../../../../Auth';
 import PlayerDetails from '../PlayerDetails';
@@ -47,7 +51,8 @@ const initialState = {
   sortSelected: 'Player ID',
   sortOrder: 'ASC',
   detailModalOpen: false,
-  selectedPlayer: null
+  selectedPlayer: null,
+  search: ''
 };
 const cells = ['Favorite', 'Player ID', 'Name', 'Birthdate', 'Position', 'Height', 'Weight'];
 
@@ -86,7 +91,7 @@ const reducer = (state, action) => {
         ...state,
         loading: false,
         error: null,
-        total: action.payload.total,
+        total: action.payload.total ? action.payload.total : state.total,
         players: action.payload.players,
         perPage: action.payload.perPage,
         page: action.payload.page
@@ -150,6 +155,11 @@ const reducer = (state, action) => {
         detailModalOpen: !state.detailModalOpen,
         selectedPlayer: action.payload.player
       };
+    case 'PLAYER_SEARCH':
+      return {
+        ...state,
+        search: action.payload.search
+      };
     default:
       return state;
   }
@@ -162,28 +172,39 @@ const Players = props => {
     dispatch({
       type: 'FETCH_PLAYERS_REQUEST'
     });
-    fetchData(data.page || 1, data.perPage || 20, mapping[data.sortSelected] || 'id', data.sortOrder || 'ASC');
+    fetchData(
+      data.page || 1,
+      data.perPage || 20,
+      mapping[data.sortSelected] || 'id',
+      data.sortOrder || 'ASC',
+      data.search || '',
+      true // needsRecount
+    );
   }, []);
 
-  const fetchData = (page, perPage, order, orderType) => {
-    Promise.all([
-      fetch(
-        `${BACKEND}/api/player?pageSize=${perPage}&page=${page}&order=${
-          order ? order.toLowerCase() : 'id'
-        }&orderType=${orderType}`,
-        {
-          headers: {
-            Authorization: `Bearer ${authState.token}`
-          }
-        }
-      ),
-      fetch(`${BACKEND}/api/player/count`, {
+  const fetchPlayers = (page, perPage, order, orderType, search) => {
+    return fetch(
+      `${BACKEND}/api/player?pageSize=${perPage}&page=${page}&order=${
+        order ? order.toLowerCase() : 'id'
+      }&orderType=${orderType}&search=${search}`,
+      {
         headers: {
           Authorization: `Bearer ${authState.token}`
         }
-      })
-    ])
-      .then(([players, total]) => Promise.all([players.json(), total.json()]))
+      }
+    ).then(players => players.json());
+  };
+
+  const fetchTotal = search => {
+    return fetch(`${BACKEND}/api/player/count?search=${search}`, {
+      headers: {
+        Authorization: `Bearer ${authState.token}`
+      }
+    }).then(total => total.json());
+  };
+
+  const fetchData = (page, perPage, order, orderType, search, needsRecount) => {
+    Promise.all([fetchPlayers(page, perPage, order, orderType, search), needsRecount ? fetchTotal(search) : null])
       .then(([playersJson, totalJson]) =>
         dispatch({
           type: 'FETCH_PLAYERS_SUCCESS',
@@ -212,8 +233,10 @@ const Players = props => {
         itemCount={data.total}
         page={data.page}
         perPage={data.perPage}
-        onSetPage={(_evt, value) => fetchData(value, data.perPage, mapping[data.sortSelected], data.sortOrder)}
-        onPerPageSelect={(_evt, value) => fetchData(1, value, mapping[data.sortSelected], data.sortOrder)}
+        onSetPage={(_evt, value) =>
+          fetchData(value, data.perPage, mapping[data.sortSelected], data.sortOrder, data.search)
+        }
+        onPerPageSelect={(_evt, value) => fetchData(1, value, mapping[data.sortSelected], data.sortOrder, data.search)}
         variant={variant}
       />
     );
@@ -236,7 +259,7 @@ const Players = props => {
         selection: selection
       }
     });
-    fetchData(1, data.perPage, mapping[selection], data.sortOrder);
+    fetchData(1, data.perPage, mapping[selection], data.sortOrder, data.search);
   };
 
   const onSortOrderToggle = () => {
@@ -252,7 +275,7 @@ const Players = props => {
         sortOrder
       }
     });
-    fetchData(1, data.perPage, mapping[data.sortSelected], sortOrder);
+    fetchData(1, data.perPage, mapping[data.sortSelected], sortOrder, data.search);
   };
 
   const onToggleFavorite = player => {
@@ -285,6 +308,19 @@ const Players = props => {
       type: 'DETAIL_MODAL_TOGGLE',
       payload: { player }
     });
+  };
+
+  const onSearch = value => {
+    event.preventDefault();
+    dispatch({
+      type: 'PLAYER_SEARCH',
+      payload: { search: value }
+    });
+  };
+
+  const onSearchSubmit = event => {
+    event.preventDefault();
+    fetchData(1, data.perPage, mapping[data.sortSelected], data.sortOrder, data.search, true);
   };
 
   if (data.error) {
@@ -378,6 +414,27 @@ const Players = props => {
                 <Button variant="plain" aria-label="Sort A-Z" onClick={onSortOrderToggle}>
                   {data.sortOrder === 'ASC' ? <SortAlphaDownIcon /> : <SortAlphaUpIcon />}
                 </Button>
+              </DataToolbarItem>
+              <DataToolbarItem>
+                <Form noValidate>
+                  <InputGroup>
+                    <TextInput
+                      name="text-search"
+                      id="text-search"
+                      type="search"
+                      aria-label="text search"
+                      onChange={onSearch}
+                    />
+                    <Button
+                      variant={ButtonVariant.control}
+                      aria-label="search button for text search"
+                      type="submit"
+                      onClick={onSearchSubmit}
+                    >
+                      <SearchIcon />
+                    </Button>
+                  </InputGroup>
+                </Form>
               </DataToolbarItem>
             </DataToolbarGroup>
             <DataToolbarItem breakpointMods={[{ modifier: FlexModifiers['align-right'] }]}>
