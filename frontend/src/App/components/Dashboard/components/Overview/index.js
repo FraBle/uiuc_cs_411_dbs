@@ -29,7 +29,7 @@ const Overview = props => {
       <PageSection>
         <Gallery gutter="sm">
           <GalleryItem>
-            <Card style={{ minHeight: '20em' }}>
+            <Card isHoverable style={{ minHeight: '22em' }}>
               <CardHeader>DB Size</CardHeader>
               <CardBody>
                 <DBSizeChart />
@@ -37,7 +37,7 @@ const Overview = props => {
             </Card>
           </GalleryItem>
           <GalleryItem>
-            <Card style={{ minHeight: '20em' }}>
+            <Card isHoverable style={{ minHeight: '22em' }}>
               <CardHeader>Latest Favorites</CardHeader>
               <CardBody>
                 <LatestFavorites showAlert={props.showAlert} />
@@ -45,7 +45,7 @@ const Overview = props => {
             </Card>
           </GalleryItem>
           <GalleryItem>
-            <Card style={{ minHeight: '20em' }}>
+            <Card isHoverable style={{ minHeight: '22em' }}>
               <CardHeader>Another Chart</CardHeader>
               <CardBody>
                 <PlaceholderChart />
@@ -53,7 +53,7 @@ const Overview = props => {
             </Card>
           </GalleryItem>
           <GalleryItem>
-            <Card style={{ minHeight: '20em' }}>
+            <Card isHoverable style={{ minHeight: '22em' }}>
               <CardHeader>Another Chart</CardHeader>
               <CardBody>
                 <PlaceholderChart />
@@ -61,7 +61,7 @@ const Overview = props => {
             </Card>
           </GalleryItem>
           <GalleryItem>
-            <Card style={{ minHeight: '20em' }}>
+            <Card isHoverable style={{ minHeight: '22em' }}>
               <CardHeader>Another Chart</CardHeader>
               <CardBody>
                 <PlaceholderChart />
@@ -69,7 +69,7 @@ const Overview = props => {
             </Card>
           </GalleryItem>
           <GalleryItem>
-            <Card style={{ minHeight: '20em' }}>
+            <Card isHoverable style={{ minHeight: '22em' }}>
               <CardHeader>Another Chart</CardHeader>
               <CardBody>
                 <PlaceholderChart />
