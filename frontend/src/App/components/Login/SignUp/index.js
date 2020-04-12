@@ -36,7 +36,7 @@ const SignUp = props => {
     });
   };
 
-  const onSignupButtonClick = event => {
+  const onSubmit = event => {
     event.preventDefault();
     setData({
       ...data,
@@ -97,7 +97,7 @@ const SignUp = props => {
       });
   };
 
-  const onCancelButtonClick = () => {
+  const onCancel = () => {
     setData({
       ...data,
       usernameValue: '',
@@ -113,7 +113,7 @@ const SignUp = props => {
 
   return (
     <Modal isSmall title="Sign Up" isOpen={props.open} onClose={() => props.handler(false)} isFooterLeftAligned>
-      <Form isHorizontal>
+      <Form isHorizontal noValidate>
         <FormGroup
           label="Username"
           isRequired
@@ -160,10 +160,10 @@ const SignUp = props => {
           />
         </FormGroup>
         <ActionGroup>
-          <Button variant="primary" onClick={onSignupButtonClick}>
+          <Button variant="primary" type="submit" onClick={onSubmit}>
             Submit
           </Button>
-          <Button variant="secondary" onClick={onCancelButtonClick}>
+          <Button variant="secondary" onClick={onCancel}>
             Cancel
           </Button>
         </ActionGroup>
