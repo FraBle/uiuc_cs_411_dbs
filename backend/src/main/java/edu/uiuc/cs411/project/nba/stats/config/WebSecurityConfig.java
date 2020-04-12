@@ -60,38 +60,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-		String[] staticResources = new String[] {
-			"/*.css",
-			"/*.html",
-			"/*.jpg",
-			"/*.js.map",
-			"/*.js",
-			"/fonts/**"
-		};
+		String[] staticResources = new String[] { "/*.css", "/*.html", "/*.jpg", "/*.png", "/*.js.map", "/*.js",
+				"/fonts/**" };
 
-		String[] frontendPaths = new String[] {
-			"/",
-			"/dashboard/**",
-			"/forgot",
-			"/h2-console/**",
-			"/public/**",
-			"/signin",
-			"/signup"
-		};
+		String[] frontendPaths = new String[] { "/", "/dashboard/**", "/forgot", "/h2-console/**", "/public/**",
+				"/signin", "/signup" };
 
-		String[] publicApiPaths = new String[] {
-			"/api/auth/**",
-			"/api/test/**"
-		};
+		String[] publicApiPaths = new String[] { "/api/auth/**", "/api/test/**" };
 
-		http.cors().and().csrf().disable().exceptionHandling()
-			.authenticationEntryPoint(authEntryPointJwt).and()
-			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-			.and().authorizeRequests()
-			.antMatchers(frontendPaths).permitAll()
-			.antMatchers(staticResources).permitAll()
-			.antMatchers(publicApiPaths).permitAll()
-			.anyRequest().authenticated();
+		http.cors().and().csrf().disable().exceptionHandling().authenticationEntryPoint(authEntryPointJwt).and()
+				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
+				.antMatchers(frontendPaths).permitAll().antMatchers(staticResources).permitAll()
+				.antMatchers(publicApiPaths).permitAll().anyRequest().authenticated();
 
 		http.headers().frameOptions().disable();
 
