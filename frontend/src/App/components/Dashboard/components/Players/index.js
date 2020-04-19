@@ -278,23 +278,23 @@ const Players = props => {
     fetchData(1, data.perPage, mapping[data.sortSelected], sortOrder, data.search);
   };
 
-  const onToggleFavorite = player => {
-    fetch(`${BACKEND}/api/user/${authState.username}/favorite/player/${player.id}`, {
-      method: player.isFavorite ? 'DELETE' : 'PUT',
+  const onToggleFavorite = (playerId, isFavorite) => {
+    fetch(`${BACKEND}/api/user/${authState.username}/favorite/player/${playerId}`, {
+      method: isFavorite ? 'DELETE' : 'PUT',
       headers: {
         Authorization: `Bearer ${authState.token}`
       }
     })
       .then(res => {
         if (res.ok)
-          player.isFavorite
+          isFavorite
             ? dispatch({
                 type: 'FAVORITE_DELETED',
-                payload: { playerId: player.id }
+                payload: { playerId: playerId }
               })
             : dispatch({
                 type: 'FAVORITE_CREATED',
-                payload: { playerId: player.id }
+                payload: { playerId: playerId }
               });
         else props.showAlert("Ooops, looks like that didn't work 😔");
       })
@@ -448,7 +448,11 @@ const Players = props => {
             cells={[...cells, 'Details']}
             rows={data.players.map(player => [
               <React.Fragment>
-                <Button variant="plain" aria-label="Favorite" onClick={() => onToggleFavorite(player)}>
+                <Button
+                  variant="plain"
+                  aria-label="Favorite"
+                  onClick={() => onToggleFavorite(player.id, player.isFavorite)}
+                >
                   {player.isFavorite ? <StarIcon /> : <OutlinedStarIcon />}
                 </Button>
               </React.Fragment>,

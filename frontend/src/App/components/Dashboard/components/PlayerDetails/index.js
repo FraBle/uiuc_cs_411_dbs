@@ -136,7 +136,7 @@ const PlayerDetail = props => {
                 <Switch
                   id="player-details-is-favorite"
                   isChecked={props.player.isFavorite}
-                  onChange={() => props.toggleFavorite(props.player)}
+                  onChange={() => props.toggleFavorite(props.player.id, props.player.isFavorite)}
                 />
               </TextListItem>
               <TextListItem component="dt">Birthdate</TextListItem>
