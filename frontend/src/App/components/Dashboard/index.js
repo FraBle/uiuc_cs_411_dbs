@@ -30,13 +30,15 @@ import imgBrand from '../../resources/logo.png';
 import Players from './components/Players';
 import Franchises from './components/Franchises';
 import Overview from './components/Overview';
+import PlayerComparison from './components/PlayerComparison';
 import { AuthContext, ProtectedRoute } from '../../Auth';
 import gravatarUrl from 'gravatar-url';
 
 const DashboardRoutes = {
   overview: '/dashboard',
   'raw-players': '/dashboard/data/players',
-  'raw-franchises': '/dashboard/data/franchises'
+  'raw-franchises': '/dashboard/data/franchises',
+  'comparison-players': '/dashboard/comparison/players'
 };
 
 const RoutesToNavMapping = {
@@ -51,6 +53,10 @@ const RoutesToNavMapping = {
   '/dashboard/data/franchises': {
     activeGroup: 'raw-data',
     activeItem: 'raw-franchises'
+  },
+  '/dashboard/comparison/players': {
+    activeGroup: 'comparison',
+    activeItem: 'comparison-players'
   }
 };
 
@@ -71,6 +77,12 @@ const RoutesToBreadcrumbs = {
     <Breadcrumb>
       <BreadcrumbItem>Raw Data</BreadcrumbItem>
       <BreadcrumbItem isActive>Franchises</BreadcrumbItem>
+    </Breadcrumb>
+  ),
+  '/dashboard/comparison/players': (
+    <Breadcrumb>
+      <BreadcrumbItem>Comparison</BreadcrumbItem>
+      <BreadcrumbItem isActive>Players</BreadcrumbItem>
     </Breadcrumb>
   )
 };
@@ -158,6 +170,11 @@ const Dashboard = props => {
         <NavItem itemId="overview" isActive={data.activeItem === 'overview'}>
           Overview
         </NavItem>
+        <NavExpandable title="Comparison" groupId="comparison" isActive={data.activeGroup === 'comparison'} isExpanded>
+          <NavItem groupId="comparison" itemId="comparison-players" isActive={data.activeItem === 'comparison-players'}>
+            Players
+          </NavItem>
+        </NavExpandable>
         <NavExpandable title="Raw Data" groupId="raw-data" isActive={data.activeGroup === 'raw-data'} isExpanded>
           <NavItem groupId="raw-data" itemId="raw-players" isActive={data.activeItem === 'raw-players'}>
             Players
@@ -241,6 +258,11 @@ const Dashboard = props => {
         <ProtectedRoute
           path={`${props.match.path}/data/franchises`}
           component={Franchises}
+          componentProps={{ showAlert }}
+        />
+        <ProtectedRoute
+          path={`${props.match.path}/comparison/players`}
+          component={PlayerComparison}
           componentProps={{ showAlert }}
         />
       </Page>
