@@ -113,11 +113,11 @@ const reducer = (state, action) => {
           [action.payload.pos]:
             state.searchFranchise[action.payload.pos] === ''
               ? state.franchises
-              : state.franchises.filter(
-                  franchise =>
-                    franchise.nickname
-                      .toLowerCase()
-                      .indexOf(state.searchFranchise[action.payload.pos].toLowerCase()) !== -1
+              : state.franchises.filter(franchise =>
+                  _.includes(
+                    _.toLower(_.join(_.concat(_.split(franchise.city, /\s+/), _.split(franchise.nickname, /\s+/)), '')),
+                    _.toLower(_.join(_.split(state.searchFranchise[action.payload.pos], /\s+/), ''))
+                  )
                 )
         })
       };

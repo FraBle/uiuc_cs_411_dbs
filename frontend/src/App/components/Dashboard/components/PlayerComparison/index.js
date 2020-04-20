@@ -112,9 +112,11 @@ const reducer = (state, action) => {
           [action.payload.pos]:
             state.searchPlayer[action.payload.pos] === ''
               ? state.players
-              : state.players.filter(
-                  player =>
-                    player.name.toLowerCase().indexOf(state.searchPlayer[action.payload.pos].toLowerCase()) !== -1
+              : state.players.filter(player =>
+                  _.includes(
+                    _.toLower(_.join(_.split(player.name, /\s+/), '')),
+                    _.toLower(_.join(_.split(state.searchPlayer[action.payload.pos], /\s+/), ''))
+                  )
                 )
         })
       };
