@@ -31,6 +31,7 @@ import Players from './components/Players';
 import Franchises from './components/Franchises';
 import Overview from './components/Overview';
 import PlayerComparison from './components/PlayerComparison';
+import FranchiseComparison from './components/FranchiseComparison';
 import { AuthContext, ProtectedRoute } from '../../Auth';
 import gravatarUrl from 'gravatar-url';
 
@@ -38,7 +39,8 @@ const DashboardRoutes = {
   overview: '/dashboard',
   'raw-players': '/dashboard/data/players',
   'raw-franchises': '/dashboard/data/franchises',
-  'comparison-players': '/dashboard/comparison/players'
+  'comparison-players': '/dashboard/comparison/players',
+  'comparison-franchises': '/dashboard/comparison/franchises'
 };
 
 const RoutesToNavMapping = {
@@ -57,6 +59,10 @@ const RoutesToNavMapping = {
   '/dashboard/comparison/players': {
     activeGroup: 'comparison',
     activeItem: 'comparison-players'
+  },
+  '/dashboard/comparison/franchises': {
+    activeGroup: 'comparison',
+    activeItem: 'comparison-franchises'
   }
 };
 
@@ -83,6 +89,12 @@ const RoutesToBreadcrumbs = {
     <Breadcrumb>
       <BreadcrumbItem>Comparison</BreadcrumbItem>
       <BreadcrumbItem isActive>Players</BreadcrumbItem>
+    </Breadcrumb>
+  ),
+  '/dashboard/comparison/franchises': (
+    <Breadcrumb>
+      <BreadcrumbItem>Comparison</BreadcrumbItem>
+      <BreadcrumbItem isActive>Franchises</BreadcrumbItem>
     </Breadcrumb>
   )
 };
@@ -174,6 +186,13 @@ const Dashboard = props => {
           <NavItem groupId="comparison" itemId="comparison-players" isActive={data.activeItem === 'comparison-players'}>
             Players
           </NavItem>
+          <NavItem
+            groupId="comparison"
+            itemId="comparison-franchises"
+            isActive={data.activeItem === 'comparison-franchises'}
+          >
+            Franchises
+          </NavItem>
         </NavExpandable>
         <NavExpandable title="Raw Data" groupId="raw-data" isActive={data.activeGroup === 'raw-data'} isExpanded>
           <NavItem groupId="raw-data" itemId="raw-players" isActive={data.activeItem === 'raw-players'}>
@@ -263,6 +282,11 @@ const Dashboard = props => {
         <ProtectedRoute
           path={`${props.match.path}/comparison/players`}
           component={PlayerComparison}
+          componentProps={{ showAlert }}
+        />
+        <ProtectedRoute
+          path={`${props.match.path}/comparison/franchises`}
+          component={FranchiseComparison}
           componentProps={{ showAlert }}
         />
       </Page>
