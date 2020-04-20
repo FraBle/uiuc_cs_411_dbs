@@ -23,7 +23,8 @@ import {
 import { Table, cellWidth, TableBody, TableHeader, textCenter } from '@patternfly/react-table';
 import { ExclamationTriangleIcon, StarIcon, OutlinedStarIcon } from '@patternfly/react-icons';
 import { AuthContext } from '../../../../Auth';
-import moment from 'moment';
+import _ from 'lodash';
+import Avatar from 'react-avatar';
 import PlaceholderChart from '../../charts/PlaceholderChart';
 
 const initialState = {
@@ -34,7 +35,10 @@ const initialState = {
   searchFranchise: ['', ''],
   dropdownIsOpen: [false, false],
   error: null,
-  loading: true
+  loading: true,
+  sportDbLoading: [false, false],
+  sportDbError: [null, null],
+  selectedFranchiseSportsDb: [{}, {}]
 };
 
 const franchiseDataColumns = [
@@ -94,7 +98,9 @@ const reducer = (state, action) => {
         ...state,
         selectedFranchise: Object.assign([...state.selectedFranchise], { [action.payload.pos]: action.payload.value }),
         selectedFranchiseData: Object.assign([...state.selectedFranchiseData], {
-          [action.payload.pos]: state.franchises.find(franchise => franchise.nickname === action.payload.value)
+          [action.payload.pos]: state.franchises.find(
+            franchise => `${franchise.city} ${franchise.nickname}` === action.payload.value
+          )
         }),
         dropdownIsOpen: Object.assign([...state.dropdownIsOpen], {
           [action.payload.pos]: !state.dropdownIsOpen[action.payload.pos]
@@ -127,12 +133,35 @@ const reducer = (state, action) => {
           [action.payload.pos]: franchise
         })
       };
+    case 'FETCH_SPORTSDB_REQUEST':
+      return {
+        ...state,
+        sportDbLoading: [true, true],
+        sportDbError: [null, null]
+      };
+    case 'FETCH_SPORTSDB_SUCCESS':
+      return {
+        ...state,
+        sportDbLoading: [false, false],
+        sportDbError: [null, null],
+        selectedFranchiseSportsDb: Object.assign([...state.selectedFranchiseSportsDb], {
+          [action.payload.pos]: action.payload.franchise
+        })
+      };
+    case 'FETCH_SPORTSDB_FAILURE':
+      return {
+        ...state,
+        sportDbLoading: [false, false],
+        sportDbError: Object.assign([...state.sportDbError], {
+          [action.payload.pos]: action.payload.error
+        })
+      };
     default:
       return state;
   }
 };
 const FranchiseComparison = props => {
-  const { state: authState, dispatch: authDispatch } = React.useContext(AuthContext);
+  const { state: authState } = React.useContext(AuthContext);
   const [data, dispatch] = React.useReducer(reducer, initialState);
 
   React.useEffect(() => {
@@ -141,6 +170,16 @@ const FranchiseComparison = props => {
     });
     fetchFranchises();
   }, []);
+
+  React.useEffect(() => {
+    dispatch({
+      type: 'FETCH_SPORTSDB_REQUEST'
+    });
+    if (data.selectedFranchise[0] !== _.get(data.selectedFranchiseSportsDb[0], 'strFranchise', null))
+      fetchSportsDb(data.selectedFranchise[0], 0);
+    if (data.selectedFranchise[1] !== _.get(data.selectedFranchiseSportsDb[1], 'strFranchise', null))
+      fetchSportsDb(data.selectedFranchise[1], 1);
+  }, [data.selectedFranchise]);
 
   const fetchFranchises = () => {
     fetch(`${BACKEND}/api/franchise?pageSize=200&page=1&order=nickname&orderType=ASC`, {
@@ -166,6 +205,33 @@ const FranchiseComparison = props => {
           type: 'FETCH_FRANCHISES_FAILURE',
           payload: {
             error
+          }
+        })
+      );
+  };
+
+  const fetchSportsDb = (franchiseName, pos) => {
+    if (!franchiseName) return;
+    fetch(`https://www.thesportsdb.com/api/v1/json/1/searchteams.php?t=${franchiseName}`)
+      .then(response => {
+        if (!response.ok) throw new Error(response.status);
+        else return response.json();
+      })
+      .then(franchises =>
+        dispatch({
+          type: 'FETCH_SPORTSDB_SUCCESS',
+          payload: {
+            franchise: _.head(franchises.teams),
+            pos
+          }
+        })
+      )
+      .catch(error =>
+        dispatch({
+          type: 'FETCH_SPORTSDB_FAILURE',
+          payload: {
+            error,
+            pos
           }
         })
       );
@@ -234,9 +300,20 @@ const FranchiseComparison = props => {
         screenReaderLabel="Selected Franchise:"
       >
         {data.filteredFranchises[pos].map(franchise => (
-          <ContextSelectorItem key={franchise.id}>{franchise.nickname}</ContextSelectorItem>
+          <ContextSelectorItem key={franchise.id}>{`${franchise.city} ${franchise.nickname}`}</ContextSelectorItem>
         ))}
       </ContextSelector>
+    );
+
+  const photo = pos =>
+    _.get(data.selectedFranchiseSportsDb[pos], 'strTeamBadge') ? (
+      <Bullseye>
+        <Avatar src={data.selectedFranchiseSportsDb[pos].strTeamBadge} color="#ecedec" size="250px" />
+      </Bullseye>
+    ) : (
+      <Bullseye>
+        <Avatar value={`F${pos + 1}`} color="#ecedec" size="250px" round />
+      </Bullseye>
     );
 
   const franchiseDataRows = [
@@ -337,6 +414,13 @@ const FranchiseComparison = props => {
                   </GridItem>
                   <GridItem span={5}>
                     <Bullseye>{dropdown(1)}</Bullseye>
+                  </GridItem>
+                  <GridItem span={5}>
+                    <Bullseye>{photo(0)}</Bullseye>
+                  </GridItem>
+                  <GridItem span={2}></GridItem>
+                  <GridItem span={5}>
+                    <Bullseye>{photo(1)}</Bullseye>
                   </GridItem>
                   <GridItem span={12}>
                     <Bullseye>

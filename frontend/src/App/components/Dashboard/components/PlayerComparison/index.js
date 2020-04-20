@@ -24,6 +24,8 @@ import { Table, cellWidth, TableBody, TableHeader, textCenter } from '@patternfl
 import { ExclamationTriangleIcon, StarIcon, OutlinedStarIcon } from '@patternfly/react-icons';
 import { AuthContext } from '../../../../Auth';
 import moment from 'moment';
+import _ from 'lodash';
+import Avatar from 'react-avatar';
 import PlaceholderChart from '../../charts/PlaceholderChart';
 
 const initialState = {
@@ -34,7 +36,10 @@ const initialState = {
   searchPlayer: ['', ''],
   dropdownIsOpen: [false, false],
   error: null,
-  loading: true
+  loading: true,
+  sportDbLoading: [false, false],
+  sportDbError: [null, null],
+  selectedPlayerSportsDb: [{}, {}]
 };
 
 const playerDataColumns = [
@@ -123,6 +128,29 @@ const reducer = (state, action) => {
           [action.payload.pos]: player
         })
       };
+    case 'FETCH_SPORTSDB_REQUEST':
+      return {
+        ...state,
+        sportDbLoading: [true, true],
+        sportDbError: [null, null]
+      };
+    case 'FETCH_SPORTSDB_SUCCESS':
+      return {
+        ...state,
+        sportDbLoading: [false, false],
+        sportDbError: [null, null],
+        selectedPlayerSportsDb: Object.assign([...state.selectedPlayerSportsDb], {
+          [action.payload.pos]: action.payload.player
+        })
+      };
+    case 'FETCH_SPORTSDB_FAILURE':
+      return {
+        ...state,
+        sportDbLoading: [false, false],
+        sportDbError: Object.assign([...state.sportDbError], {
+          [action.payload.pos]: action.payload.error
+        })
+      };
     default:
       return state;
   }
@@ -137,6 +165,16 @@ const PlayerComparison = props => {
     });
     fetchPlayers();
   }, []);
+
+  React.useEffect(() => {
+    dispatch({
+      type: 'FETCH_SPORTSDB_REQUEST'
+    });
+    if (data.selectedPlayer[0] !== _.get(data.selectedPlayerSportsDb[0], 'strPlayer', null))
+      fetchSportsDb(data.selectedPlayer[0], 0);
+    if (data.selectedPlayer[1] !== _.get(data.selectedPlayerSportsDb[1], 'strPlayer', null))
+      fetchSportsDb(data.selectedPlayer[1], 1);
+  }, [data.selectedPlayer]);
 
   const fetchPlayers = () => {
     fetch(`${BACKEND}/api/player?pageSize=2000&page=1&order=name&orderType=ASC`, {
@@ -162,6 +200,33 @@ const PlayerComparison = props => {
           type: 'FETCH_PLAYERS_FAILURE',
           payload: {
             error
+          }
+        })
+      );
+  };
+
+  const fetchSportsDb = (playerName, pos) => {
+    if (!playerName) return;
+    fetch(`https://www.thesportsdb.com/api/v1/json/1/searchplayers.php?p=${playerName}`)
+      .then(response => {
+        if (!response.ok) throw new Error(response.status);
+        else return response.json();
+      })
+      .then(players =>
+        dispatch({
+          type: 'FETCH_SPORTSDB_SUCCESS',
+          payload: {
+            player: _.head(players.player),
+            pos
+          }
+        })
+      )
+      .catch(error =>
+        dispatch({
+          type: 'FETCH_SPORTSDB_FAILURE',
+          payload: {
+            error,
+            pos
           }
         })
       );
@@ -233,6 +298,17 @@ const PlayerComparison = props => {
           <ContextSelectorItem key={player.id}>{player.name}</ContextSelectorItem>
         ))}
       </ContextSelector>
+    );
+
+  const photo = pos =>
+    _.get(data.selectedPlayerSportsDb[pos], 'strThumb') ? (
+      <Bullseye>
+        <Avatar src={data.selectedPlayerSportsDb[pos].strThumb} color="#ecedec" size="250px" round />
+      </Bullseye>
+    ) : (
+      <Bullseye>
+        <Avatar value={`P${pos + 1}`} color="#ecedec" size="250px" round />
+      </Bullseye>
     );
 
   const playerDataRows = [
@@ -345,6 +421,13 @@ const PlayerComparison = props => {
                   </GridItem>
                   <GridItem span={5}>
                     <Bullseye>{dropdown(1)}</Bullseye>
+                  </GridItem>
+                  <GridItem span={5}>
+                    <Bullseye>{photo(0)}</Bullseye>
+                  </GridItem>
+                  <GridItem span={2}></GridItem>
+                  <GridItem span={5}>
+                    <Bullseye>{photo(1)}</Bullseye>
                   </GridItem>
                   <GridItem span={12}>
                     <Bullseye>
