@@ -296,7 +296,7 @@ const PlayerComparison = props => {
       cells: [
         data.selectedPlayerData[0].hasOwnProperty('weight') ? `${data.selectedPlayerData[0].weight} lbs` : '',
         'Weight',
-        data.selectedPlayerData[1].hasOwnProperty('weight') ? `${data.selectedPlayerData[0].weight} lbs` : ''
+        data.selectedPlayerData[1].hasOwnProperty('weight') ? `${data.selectedPlayerData[1].weight} lbs` : ''
       ]
     }
   ];
