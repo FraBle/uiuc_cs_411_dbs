@@ -1,5 +1,6 @@
 package edu.uiuc.cs411.project.nba.stats.rest;
 
+import edu.uiuc.cs411.project.nba.stats.domain.Player;
 import edu.uiuc.cs411.project.nba.stats.query.FavoritesPlayerMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +18,11 @@ public class FavoritesPlayerController {
         this.favoritesPlayerMapper = favoritesPlayerMapper;
     }
 
-    @GetMapping("/{username}/favorite/player/")
-    public List<Integer> favoritePlayerIdsByUsername(@PathVariable("username") String username,
+    @GetMapping("/{username}/favorite/player")
+    public List<Player> favoritePlayerIdsByUsername(@PathVariable("username") String username,
                                            @RequestParam(defaultValue = "1") String page,
                                            @RequestParam(defaultValue = "50") String pageSize,
-                                           @RequestParam(defaultValue = "Player") String order,
+                                           @RequestParam(defaultValue = "ID") String order,
                                            @RequestParam(defaultValue = "ASC") String orderType) {
         int pageAsInteger = Integer.parseInt(page);
         int pageSizeAsInteger = Integer.parseInt(pageSize);

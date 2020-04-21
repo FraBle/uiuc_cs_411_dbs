@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Bullseye,
   Button,
+  ButtonVariant,
   DataToolbar,
   DataToolbarContent,
   DataToolbarGroup,
@@ -11,22 +12,33 @@ import {
   EmptyStateIcon,
   EmptyStateVariant,
   FlexModifiers,
+  Form,
+  InputGroup,
   PageSection,
   PageSectionVariants,
   Pagination,
   Select,
   SelectOption,
   SelectVariant,
+  Spinner,
   Text,
   TextContent,
-  Title,
+  TextInput,
+  Title
 } from '@patternfly/react-core';
-import { ExclamationCircleIcon, SortAlphaDownIcon, SortAlphaUpIcon, StarIcon, OutlinedStarIcon } from '@patternfly/react-icons';
+import {
+  ExclamationCircleIcon,
+  SortAlphaDownIcon,
+  SortAlphaUpIcon,
+  StarIcon,
+  OutlinedStarIcon,
+  SearchIcon
+} from '@patternfly/react-icons';
 import { global_danger_color_200 as globalDangerColor200 } from '@patternfly/react-tokens';
 import { Table, TableHeader, TableBody } from '@patternfly/react-table';
-import { Spinner } from '@patternfly/react-core';
 import moment from 'moment';
 import { AuthContext } from '../../../../Auth';
+import PlayerDetails from '../PlayerDetails';
 
 const initialState = {
   players: [],
@@ -36,19 +48,33 @@ const initialState = {
   error: null,
   loading: true,
   sortIsExpanded: false,
-  sortSelected: null,
+  sortSelected: 'Player ID',
   sortOrder: 'ASC',
+  detailModalOpen: false,
+  selectedPlayer: null,
+  search: ''
 };
 const cells = ['Favorite', 'Player ID', 'Name', 'Birthdate', 'Position', 'Height', 'Weight'];
+
+const mapping = {
+  'Player ID': 'id',
+  Name: 'name',
+  Birthdate: 'birthDate',
+  Position: 'position',
+  Height: 'height',
+  Weight: 'weight',
+  Favorite: 'isFavorite'
+};
+
 const filterOptions = [
   {
     value: 'Sort By',
     disabled: false,
-    isPlaceholder: true,
+    isPlaceholder: true
   },
   ...cells.map(cell => ({
     value: cell,
-    disabled: false,
+    disabled: false
   }))
 ];
 
@@ -65,7 +91,7 @@ const reducer = (state, action) => {
         ...state,
         loading: false,
         error: null,
-        total: action.payload.total,
+        total: action.payload.total ? action.payload.total : state.total,
         players: action.payload.players,
         perPage: action.payload.perPage,
         page: action.payload.page
@@ -75,7 +101,6 @@ const reducer = (state, action) => {
         ...state,
         loading: false,
         error: action.payload.error,
-        loading: false,
         perPage: 0,
         page: 0,
         total: 0
@@ -96,11 +121,50 @@ const reducer = (state, action) => {
         ...state,
         sortOrder: action.payload.sortOrder
       };
+    case 'FAVORITE_CREATED':
+      return {
+        ...state,
+        players: state.players.map(player =>
+          player.id === action.payload.playerId ? { ...player, isFavorite: true } : player
+        ),
+        selectedPlayer:
+          state.selectedPlayer && state.selectedPlayer.id === action.payload.playerId
+            ? {
+                ...state.selectedPlayer,
+                isFavorite: true
+              }
+            : state.selectedPlayer
+      };
+    case 'FAVORITE_DELETED':
+      return {
+        ...state,
+        players: state.players.map(player =>
+          player.id === action.payload.playerId ? { ...player, isFavorite: false } : player
+        ),
+        selectedPlayer:
+          state.selectedPlayer && state.selectedPlayer.id === action.payload.playerId
+            ? {
+                ...state.selectedPlayer,
+                isFavorite: false
+              }
+            : state.selectedPlayer
+      };
+    case 'DETAIL_MODAL_TOGGLE':
+      return {
+        ...state,
+        detailModalOpen: !state.detailModalOpen,
+        selectedPlayer: action.payload.player
+      };
+    case 'PLAYER_SEARCH':
+      return {
+        ...state,
+        search: action.payload.search
+      };
     default:
       return state;
   }
 };
-const Players = () => {
+const Players = props => {
   const { state: authState, dispatch: authDispatch } = React.useContext(AuthContext);
   const [data, dispatch] = React.useReducer(reducer, initialState);
 
@@ -111,30 +175,36 @@ const Players = () => {
     fetchData(
       data.page || 1,
       data.perPage || 20,
-      data.sortSelected || 'id',
-      data.sortOrder || 'ASC'
+      mapping[data.sortSelected] || 'id',
+      data.sortOrder || 'ASC',
+      data.search || '',
+      true // needsRecount
     );
   }, []);
 
-  const fetchData = (page, perPage, order, orderType) => {
-    Promise.all([
-      fetch(
-        `${BACKEND}/api/player?pageSize=${perPage}&page=${page}&order=${
-          order ? order.toLowerCase() : 'id'
-        }&orderType=${orderType}`,
-        {
-          headers: {
-            Authorization: `Bearer ${authState.token}`
-          }
-        }
-      ),
-      fetch(`${BACKEND}/api/player/count`, {
+  const fetchPlayers = (page, perPage, order, orderType, search) => {
+    return fetch(
+      `${BACKEND}/api/player?pageSize=${perPage}&page=${page}&order=${
+        order ? order.toLowerCase() : 'id'
+      }&orderType=${orderType}&search=${search}`,
+      {
         headers: {
           Authorization: `Bearer ${authState.token}`
         }
-      })
-    ])
-      .then(([players, total]) => Promise.all([players.json(), total.json()]))
+      }
+    ).then(players => players.json());
+  };
+
+  const fetchTotal = search => {
+    return fetch(`${BACKEND}/api/player/count?search=${search}`, {
+      headers: {
+        Authorization: `Bearer ${authState.token}`
+      }
+    }).then(total => total.json());
+  };
+
+  const fetchData = (page, perPage, order, orderType, search, needsRecount) => {
+    Promise.all([fetchPlayers(page, perPage, order, orderType, search), needsRecount ? fetchTotal(search) : null])
       .then(([playersJson, totalJson]) =>
         dispatch({
           type: 'FETCH_PLAYERS_SUCCESS',
@@ -163,33 +233,34 @@ const Players = () => {
         itemCount={data.total}
         page={data.page}
         perPage={data.perPage}
-        onSetPage={(_evt, value) => fetchData(value, data.perPage, data.sortSelected, data.sortOrder)}
-        onPerPageSelect={(_evt, value) => fetchData(1, value, data.sortSelected, data.sortOrder)}
+        onSetPage={(_evt, value) =>
+          fetchData(value, data.perPage, mapping[data.sortSelected], data.sortOrder, data.search)
+        }
+        onPerPageSelect={(_evt, value) => fetchData(1, value, mapping[data.sortSelected], data.sortOrder, data.search)}
         variant={variant}
       />
     );
-  }
+  };
 
-  const onSortToggle = isExpanded => dispatch({
-    type: 'SORT_PLAYERS_TOGGLE',
-    payload: {
-      isExpanded
-    }
-  });
+  const onSortToggle = isExpanded =>
+    dispatch({
+      type: 'SORT_PLAYERS_TOGGLE',
+      payload: {
+        isExpanded
+      }
+    });
 
   const onSortSelect = (event, selection) => {
     if (selection === 'Sort By') selection = data.sortSelected;
-    if (selection === 'Player ID') selection = 'id';
-    if (selection === 'Favorite') selection = 'isFavorite';
     dispatch({
       type: 'SORT_PLAYERS_SELECT',
       payload: {
         isExpanded: false,
-        selection
+        selection: selection
       }
     });
-    fetchData(1, data.perPage, selection, data.sortOrder);
-  }
+    fetchData(1, data.perPage, mapping[selection], data.sortOrder, data.search);
+  };
 
   const onSortOrderToggle = () => {
     let sortOrder;
@@ -204,7 +275,52 @@ const Players = () => {
         sortOrder
       }
     });
-    fetchData(1, data.perPage, data.sortSelected, sortOrder);
+    fetchData(1, data.perPage, mapping[data.sortSelected], sortOrder, data.search);
+  };
+
+  const onToggleFavorite = (playerId, isFavorite) => {
+    fetch(`${BACKEND}/api/user/${authState.username}/favorite/player/${playerId}`, {
+      method: isFavorite ? 'DELETE' : 'PUT',
+      headers: {
+        Authorization: `Bearer ${authState.token}`
+      }
+    })
+      .then(res => {
+        if (res.ok)
+          isFavorite
+            ? dispatch({
+                type: 'FAVORITE_DELETED',
+                payload: { playerId: playerId }
+              })
+            : dispatch({
+                type: 'FAVORITE_CREATED',
+                payload: { playerId: playerId }
+              });
+        else props.showAlert("Ooops, looks like that didn't work 😔");
+      })
+      .catch(error => {
+        props.showAlert("Ooops, looks like that didn't work 😔");
+      });
+  };
+
+  const onToggleDetailModal = player => {
+    dispatch({
+      type: 'DETAIL_MODAL_TOGGLE',
+      payload: { player }
+    });
+  };
+
+  const onSearch = value => {
+    event.preventDefault();
+    dispatch({
+      type: 'PLAYER_SEARCH',
+      payload: { search: value }
+    });
+  };
+
+  const onSearchSubmit = event => {
+    event.preventDefault();
+    fetchData(1, data.perPage, mapping[data.sortSelected], data.sortOrder, data.search, true);
   };
 
   if (data.error) {
@@ -242,25 +358,34 @@ const Players = () => {
     );
   }
 
-  const loadingRows = [{
-    heightAuto: true,
-    cells: [
-      {
-        id: 1,
-        props: { colSpan: 8 },
-        title: (
-          <Bullseye>
-            <center>
-              <Spinner size="xl" />
-            </center>
-          </Bullseye>
-        )
-      }
-    ]
-  }];
+  const loadingRows = [
+    {
+      heightAuto: true,
+      cells: [
+        {
+          id: 1,
+          props: { colSpan: 8 },
+          title: (
+            <Bullseye>
+              <center>
+                <Spinner size="xl" />
+              </center>
+            </Bullseye>
+          )
+        }
+      ]
+    }
+  ];
 
   return (
     <React.Fragment>
+      <PlayerDetails
+        player={data.selectedPlayer}
+        isOpen={data.detailModalOpen}
+        showAlert={props.showAlert}
+        toggle={onToggleDetailModal}
+        toggleFavorite={onToggleFavorite}
+      />
       <PageSection variant={PageSectionVariants.light}>
         <TextContent>
           <Text component="h1">Players</Text>
@@ -290,6 +415,27 @@ const Players = () => {
                   {data.sortOrder === 'ASC' ? <SortAlphaDownIcon /> : <SortAlphaUpIcon />}
                 </Button>
               </DataToolbarItem>
+              <DataToolbarItem>
+                <Form noValidate>
+                  <InputGroup>
+                    <TextInput
+                      name="text-search"
+                      id="text-search"
+                      type="search"
+                      aria-label="text search"
+                      onChange={onSearch}
+                    />
+                    <Button
+                      variant={ButtonVariant.control}
+                      aria-label="search button for text search"
+                      type="submit"
+                      onClick={onSearchSubmit}
+                    >
+                      <SearchIcon />
+                    </Button>
+                  </InputGroup>
+                </Form>
+              </DataToolbarItem>
             </DataToolbarGroup>
             <DataToolbarItem breakpointMods={[{ modifier: FlexModifiers['align-right'] }]}>
               {renderPagination()}
@@ -299,17 +445,28 @@ const Players = () => {
 
         {!data.loading && (
           <Table
-            cells={cells}
+            cells={[...cells, 'Details']}
             rows={data.players.map(player => [
-              (<div><Button variant="plain" aria-label="Favorite">
-                {player.isFavorite ? <StarIcon /> : <OutlinedStarIcon />}
-              </Button></div>),
+              <React.Fragment>
+                <Button
+                  variant="plain"
+                  aria-label="Favorite"
+                  onClick={() => onToggleFavorite(player.id, player.isFavorite)}
+                >
+                  {player.isFavorite ? <StarIcon /> : <OutlinedStarIcon />}
+                </Button>
+              </React.Fragment>,
               player.id,
               player.name,
               moment(player.birthDate).format('ll'),
               player.position,
               `${player.height.split('-')[0]}' ${player.height.split('-')[1]}"`,
-              `${player.weight} lbs`
+              `${player.weight} lbs`,
+              <React.Fragment>
+                <Button variant="plain" aria-label="Details" onClick={() => onToggleDetailModal(player)}>
+                  <SearchIcon />
+                </Button>
+              </React.Fragment>
             ])}
             aria-label="Players Overview Table"
           >
@@ -326,6 +483,6 @@ const Players = () => {
       </PageSection>
     </React.Fragment>
   );
-}
+};
 
 export default Players;

@@ -1,5 +1,6 @@
 package edu.uiuc.cs411.project.nba.stats.query;
 
+import edu.uiuc.cs411.project.nba.stats.domain.Franchise;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
@@ -18,8 +19,8 @@ public interface FavoritesFranchiseMapper {
     @Delete("DELETE FROM FavoritesFranchise WHERE Username = #{username} AND Franchise = #{franchiseId}")
     void deleteFavorite(String username, int franchiseId);
 
-    @Select("SELECT Franchise FROM FavoritesFranchise WHERE Username = #{username} ORDER BY ${order} ${orderType} LIMIT ${pageSize} OFFSET ${offset} ")
-    List<Integer> franchiseIdsByUsername(
+    @Select("SELECT Franchise.*, true AS isFavorite FROM FavoritesFranchise JOIN Franchise ON FavoritesFranchise.Franchise=Franchise.ID WHERE FavoritesFranchise.Username=#{username} ORDER BY ${order} ${orderType} LIMIT ${pageSize} OFFSET ${offset}")
+    List<Franchise> franchiseIdsByUsername(
             String username,
             @Param("pageSize") int pageSize,
             @Param("offset") int offset,

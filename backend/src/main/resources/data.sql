@@ -14,7 +14,6 @@ VALUES (4, 'Stephen Curry', parseDateTime('198803140000000','yyyyMMddHHmmss'), '
 INSERT INTO Player
 VALUES (5, 'Kevin Durant', parseDateTime('19630217000000','yyyyMMddHHmmss'), 'F', '6.10', 240, NULL);
 
-
 INSERT INTO Games
 VALUES (100, 2018, 1001, 1003, parseDateTime('20090218000000','yyyyMMddHHmmss'));
 
@@ -32,3 +31,9 @@ VALUES (101, 3, 1001, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10
 
 INSERT INTO PlayerGameStats
 VALUES (102, 3, 1001, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10);
+
+INSERT INTO Franchise
+VALUES (1, 'GSW', 'Warriors', 1946, 'Golden State', 'Chase Center');
+
+INSERT INTO Franchise
+VALUES (2, 'LAL', 'Lakers', 1948, 'Los Angeles', 'Staples Center');

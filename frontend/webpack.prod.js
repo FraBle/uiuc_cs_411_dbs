@@ -24,7 +24,8 @@ module.exports = merge(common, {
       chunkFilename: '[id].css'
     }),
     new webpack.DefinePlugin({
-      BACKEND: JSON.stringify('')
+      BACKEND: JSON.stringify(''),
+      GOOGLE_ANALYTICS_TEST_MODE: false
     })
   ],
   module: {

@@ -4,6 +4,7 @@ import {
   AlertGroup,
   AlertActionCloseButton,
   AlertVariant,
+  Button,
   LoginFooterItem,
   LoginForm,
   LoginMainFooterBandItem,
@@ -12,14 +13,13 @@ import {
 } from '@patternfly/react-core';
 import { ExclamationCircleIcon } from '@patternfly/react-icons';
 import { AuthContext } from '../../Auth';
-import { Redirect } from 'react-router-dom';
 import SignUp from './SignUp';
 import ForgotCredentials from './ForgotCredentials';
 import Background from '../../resources/background.jpg';
 import Logo from '../../resources/logo.png';
 
-const Login = (props) => {
-  const { state: authState, dispatch } = React.useContext(AuthContext);
+const Login = props => {
+  const { dispatch } = React.useContext(AuthContext);
   const initialState = {
     showHelperText: false,
     usernameValue: '',
@@ -91,11 +91,14 @@ const Login = (props) => {
       });
   };
 
-  const toggleSignUpModal = (success) => {
+  const toggleSignUpModal = success => {
+    if (success) dispatch({ type: 'SIGNUP' });
     setData({
       ...data,
       isSignUpModalOpen: !data.isSignUpModalOpen,
-      alerts: success ? [...data.alerts, { title: 'Successfully Signed Up! 🚀', variant: 'success', key: new Date().getTime() }] : data.alerts
+      alerts: success
+        ? [...data.alerts, { title: 'Successfully Signed Up! 🚀', variant: 'success', key: new Date().getTime() }]
+        : data.alerts
     });
   };
 
@@ -116,17 +119,17 @@ const Login = (props) => {
   const signUpForAccountMessage = (
     <LoginMainFooterBandItem>
       Need an account?{' '}
-      <a href="#" onClick={() => toggleSignUpModal(false)}>
+      <Button variant="link" isInline onClick={() => toggleSignUpModal(false)}>
         Sign up.
-      </a>
+      </Button>
     </LoginMainFooterBandItem>
   );
 
   const forgotCredentials = (
     <LoginMainFooterBandItem>
-      <a href="#" onClick={toggleForgotCredentialsModal}>
+      <Button variant="link" isInline onClick={toggleForgotCredentialsModal}>
         Forgot Password?
-      </a>
+      </Button>
     </LoginMainFooterBandItem>
   );
 
@@ -149,11 +152,11 @@ const Login = (props) => {
   const addAlert = (title, variant) => {
     setData({
       ...data,
-      alerts: [...data.alerts, {title, variant, key: new Date().getTime()}]
+      alerts: [...data.alerts, { title, variant, key: new Date().getTime() }]
     });
-  }
+  };
 
-  const removeAlert = (key) => {
+  const removeAlert = key => {
     setData({
       ...data,
       alerts: [...data.alerts.filter(el => el.key !== key)]

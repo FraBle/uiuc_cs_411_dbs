@@ -1,17 +1,16 @@
 import React from 'react';
 import { AuthProvider, ProtectedRoute, AuthConsumer } from './Auth';
-import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch, Redirect, useLocation } from 'react-router-dom';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
-import {
-  Title,
-  Bullseye,
-  EmptyState,
-  EmptyStateIcon
-} from '@patternfly/react-core';
+import queryString from 'query-string';
+import { Title, Bullseye, EmptyState, EmptyStateIcon } from '@patternfly/react-core';
+import { withGoogleAnalytics } from './Analytics';
 
 const App = () => {
-  const LoadingPlaceHolder = (props) => {
+  withGoogleAnalytics();
+
+  const LoadingPlaceHolder = props => {
     const Spinner = () => (
       <span className="pf-c-spinner" role="progressbar" aria-valuetext="Loading...">
         <span className="pf-c-spinner__clipper" />
@@ -27,34 +26,29 @@ const App = () => {
         </EmptyState>
       </Bullseye>
     ) : props.isAuthenticated ? (
-      <Redirect to="/dashboard" />
+      <Redirect to={queryString.parse(useLocation().search).redirect || '/dashboard'} />
     ) : (
       <Redirect to="/signin" />
     );
   };
 
   return (
-    <Router>
-      <AuthProvider>
-        <AuthConsumer>
-          {({ state }) => (
-            <Switch>
-              <Route exact path="/" component={() => <LoadingPlaceHolder isReady={state.isReady} isAuthenticated={state.isAuthenticated} />}
-              />
-              <ProtectedRoute path="/dashboard" component={Dashboard} />
-              <Route path="/signin" component={Login} />
-            </Switch>
-          )}
-        </AuthConsumer>
-      </AuthProvider>
-    </Router>
+    <AuthProvider>
+      <AuthConsumer>
+        {({ state }) => (
+          <Switch>
+            <Route
+              exact
+              path="/"
+              component={() => <LoadingPlaceHolder isReady={state.isReady} isAuthenticated={state.isAuthenticated} />}
+            />
+            <ProtectedRoute path="/dashboard" component={Dashboard} />
+            <Route path="/signin" component={Login} />
+          </Switch>
+        )}
+      </AuthConsumer>
+    </AuthProvider>
   );
 };
 
 export default App;
-
-
-/*
-<ProtectedRoute path="/forms" component={FormList} />
-<Route component={PageNotFound} />
-*/

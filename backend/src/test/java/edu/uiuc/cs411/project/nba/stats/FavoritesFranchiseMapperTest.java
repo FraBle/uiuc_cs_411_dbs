@@ -2,8 +2,10 @@ package edu.uiuc.cs411.project.nba.stats;
 
 import edu.uiuc.cs411.project.nba.stats.config.DevPersistenceConfig;
 import edu.uiuc.cs411.project.nba.stats.query.FavoritesFranchiseMapper;
+import edu.uiuc.cs411.project.nba.stats.query.FranchiseMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import edu.uiuc.cs411.project.nba.stats.domain.Franchise;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -22,28 +24,26 @@ public class FavoritesFranchiseMapperTest {
     @Autowired
     FavoritesFranchiseMapper favoritesFranchiseMapper;
 
+    @Autowired
+    FranchiseMapper franchiseMapper;
+
     @Test
     public void nonExistent_favorites_queries_test() {
-        assertTrue(favoritesFranchiseMapper.franchiseIdsByUsername("nonExistentUser", 3, 0, 
-                "Franchise",
-                "ASC").isEmpty());
+        assertTrue(favoritesFranchiseMapper.franchiseIdsByUsername("nonExistentUser", 3, 1, "ID", "ASC").isEmpty());
     }
 
     @Test
     public void existentFavorite_queries_test() {
         // Arrange
-        favoritesFranchiseMapper.makeFavorite("zhe", 0);
         favoritesFranchiseMapper.makeFavorite("zhe", 1);
+        favoritesFranchiseMapper.makeFavorite("zhe", 2);
 
         // Act
-        List<Integer> favoritedFranchiseIds = favoritesFranchiseMapper.franchiseIdsByUsername(
-                "zhe", 3, 0,
-                "Franchise",
-                "ASC");
+        List<Franchise> favoritedFranchiseIds = favoritesFranchiseMapper.franchiseIdsByUsername("zhe", 3, 0, "ID", "ASC");
 
         // Assert
-        assertEquals(favoritedFranchiseIds.get(0), 0);
-        assertEquals(favoritedFranchiseIds.get(1), 1);
+        assertEquals(favoritedFranchiseIds.get(0).getId(), franchiseMapper.getFranchiseById(1, "zhe").getId());
+        assertEquals(favoritedFranchiseIds.get(1).getId(), franchiseMapper.getFranchiseById(2, "zhe").getId());
     }
 
     @Test

@@ -6,7 +6,7 @@ export default class ForgotCredentials extends React.Component {
     super(props);
 
     this.state = {
-      email: '',
+      email: ''
     };
 
     this.handleEmailChange = email => {

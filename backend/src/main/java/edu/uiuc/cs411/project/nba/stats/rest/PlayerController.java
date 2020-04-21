@@ -25,8 +25,8 @@ public class PlayerController {
     }
 
     @GetMapping("/count")
-    public Long count() {
-        return playerMapper.count();
+    public Long count(@RequestParam(defaultValue = "", required = false) String search) {
+        return playerMapper.count(search);
     }
 
     @GetMapping("/{id}")
@@ -34,20 +34,16 @@ public class PlayerController {
         return playerMapper.getPlayerById(Integer.parseInt(id), user.getUsername());
     }
 
-    @GetMapping(value = { "", "/"})
-    public List<Player> fetchAllPlayers(
-            @AuthenticationPrincipal User user,
-            @RequestParam(defaultValue = "1") String page,
-            @RequestParam(defaultValue = "50") String pageSize,
-            @RequestParam(defaultValue = "id") String order,
-            @RequestParam(defaultValue = "ASC") String orderType
-    ) {
+    @GetMapping(value = { "", "/" })
+    public List<Player> fetchAllPlayers(@AuthenticationPrincipal User user,
+            @RequestParam(defaultValue = "1") String page, @RequestParam(defaultValue = "50") String pageSize,
+            @RequestParam(defaultValue = "id") String order, @RequestParam(defaultValue = "ASC") String orderType,
+            @RequestParam(defaultValue = "", required = false) String search) {
         int pageAsInteger = Integer.parseInt(page);
         int pageSizeAsInteger = Integer.parseInt(pageSize);
         int offset = pageAsInteger == 1 ? 0 : (pageAsInteger - 1) * pageSizeAsInteger;
         String orderTypeValue = "DESC".equalsIgnoreCase(orderType) ? "DESC" : "ASC";
 
-        return playerMapper.fetchAll(pageSizeAsInteger, offset, order, orderTypeValue, user.getUsername());
+        return playerMapper.fetchAll(pageSizeAsInteger, offset, order, orderTypeValue, search, user.getUsername());
     }
-
 }

@@ -35,14 +35,14 @@ public class PlayerMapperTest {
 
     @Test
     public void count_shouldReturn_how_many_records_exists() {
-        final Long count = playerMapper.count();
+        final Long count = playerMapper.count("");
 
         assertThat(count).isEqualTo(5);
     }
 
     @Test
     public void sort_players_by_name() {
-        List<Player> players = playerMapper.fetchAll(5, 0, "Name", "ASC", null);
+        List<Player> players = playerMapper.fetchAll(5, 0, "Name", "ASC", "", null);
         assertThat(players.size()).isEqualTo(5);
 
         assertThat(players.get(0).getName()).isEqualTo("Kevin Durant");
@@ -54,7 +54,7 @@ public class PlayerMapperTest {
 
     @Test
     public void sort_players_by_name_desc() {
-        List<Player> players = playerMapper.fetchAll(5, 0, "Name", "DESC", null);
+        List<Player> players = playerMapper.fetchAll(5, 0, "Name", "DESC", "", null);
         assertThat(players.size()).isEqualTo(5);
 
         assertThat(players.get(0).getName()).isEqualTo("Stephen Curry");
@@ -66,16 +66,24 @@ public class PlayerMapperTest {
 
     @Test
     public void pagination_test() {
-        List<Player> players = playerMapper.fetchAll(3, 0, "Name", "ASC", null);
+        List<Player> players = playerMapper.fetchAll(3, 0, "Name", "ASC", "", null);
         assertThat(players.size()).isEqualTo(3);
         assertThat(players.get(0).getName()).isEqualTo("Kevin Durant");
         assertThat(players.get(1).getName()).isEqualTo("Kobe Bryant");
         assertThat(players.get(2).getName()).isEqualTo("LeBron James");
 
-        players = playerMapper.fetchAll(3, 3, "Name", "ASC", null);
+        players = playerMapper.fetchAll(3, 3, "Name", "ASC", "", null);
         assertThat(players.size()).isEqualTo(2);
         assertThat(players.get(0).getName()).isEqualTo("Michael Jordan");
         assertThat(players.get(1).getName()).isEqualTo("Stephen Curry");
+    }
+
+    @Test
+    public void caseInsensitiveSearchTest() {
+        List<Player> searchResult = playerMapper.fetchAll(50, 0, "Name", "ASC", "jOrDAn", null);
+        assertThat(searchResult.size()).isEqualTo(1);
+
+        assertThat(searchResult.get(0).getName()).isEqualTo("Michael Jordan");
     }
 
 }

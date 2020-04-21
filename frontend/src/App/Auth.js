@@ -1,5 +1,6 @@
 import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
+import { trackEvent, trackUser } from './Analytics';
 
 const AuthContext = React.createContext();
 
@@ -17,6 +18,8 @@ const reducer = (state, action) => {
       localStorage.setItem('username', action.payload.username);
       localStorage.setItem('email', action.payload.email);
       localStorage.setItem('token', action.payload.token);
+      trackUser(action.payload.username);
+      trackEvent('AUTH', 'LOGIN');
       return {
         ...state,
         isAuthenticated: true,
@@ -25,12 +28,16 @@ const reducer = (state, action) => {
         token: action.payload.token
       };
     case 'LOGOUT':
+      trackEvent('AUTH', 'LOGOUT');
       localStorage.clear();
       return {
         ...state,
         isAuthenticated: false,
         username: null
       };
+    case 'SIGNUP':
+      trackEvent('AUTH', 'SIGNUP');
+      return state;
     case 'READY_SUCCESS':
       return {
         ...state,
@@ -48,7 +55,7 @@ const reducer = (state, action) => {
   }
 };
 
-const ProtectedRoute = ({ component: Component, ...otherProps }) => {
+const ProtectedRoute = ({ component: Component, componentProps, ...otherProps }) => {
   return (
     <AuthConsumer>
       {({ state }) => (
@@ -56,9 +63,11 @@ const ProtectedRoute = ({ component: Component, ...otherProps }) => {
           {...otherProps}
           render={props =>
             state.isAuthenticated ? (
-              <Component {...props} />
+              <Component {...props} {...componentProps} />
             ) : (
-              <Redirect to={otherProps.redirectTo ? otherProps.redirectTo : '/signin'} />
+              <Redirect
+                to={otherProps.redirectTo ? otherProps.redirectTo : `/?redirect=${otherProps.location.pathname}`}
+              />
             )
           }
         />
