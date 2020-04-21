@@ -59,6 +59,8 @@ CREATE TABLE `Games` (
   `Date` date NOT NULL
 );
 
+DROP VIEW `PlayerAllStats` IF EXISTS;
+DROP VIEW `PlayerSeasonStats` IF EXISTS;
 DROP TABLE PlayerGameStats IF EXISTS;
 CREATE TABLE `PlayerGameStats` (
   `Game` int(11) NOT NULL,
@@ -81,7 +83,7 @@ CREATE TABLE `PlayerGameStats` (
   `PersonalFouls` tinyint(4) NOT NULL
 );
 
-CREATE OR REPLACE VIEW `PlayerAllStats` AS
+CREATE VIEW `PlayerAllStats` AS
 SELECT Player,
        SUM(MinutesPlayed) as MinutesPlayed,
        SUM(FieldGoalsMade) as FieldGoalsMade,
@@ -101,7 +103,7 @@ SELECT Player,
 FROM PlayerGameStats
 GROUP BY Player;
 
-CREATE OR REPLACE VIEW `PlayerSeasonStats` AS
+CREATE VIEW `PlayerSeasonStats` AS
 SELECT Player,
        Season,
        SUM(MinutesPlayed) as MinutesPlayed,

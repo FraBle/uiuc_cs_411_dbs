@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/player/stats/")
+@RequestMapping("/api/playerstats/")
 public class PlayerStatsController {
 
     private final PlayerStatsMapper playerStatsMapper;
