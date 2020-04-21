@@ -33,9 +33,24 @@ DROP TABLE FavoritesFranchise IF EXISTS;
 CREATE TABLE `FavoritesFranchise` (
     `Franchise` INT NOT NULL,
     `Username` VARCHAR(50) NOT NULL,
-    PRIMARY KEY(`Franchise`, `Username`)
+    `createdAt` TIMESTAMP NOT NULL,
+    `lastUpdated` TIMESTAMP NOT NULL,
+    PRIMARY KEY (`Franchise`,`Username`)
 );
 
+DROP TABLE Franchise IF EXISTS;
+
+CREATE TABLE `Franchise` (
+    `ID` INT NOT NULL,
+    `Abbreviation` VARCHAR(10) NOT NULL,
+    `Nickname` VARCHAR(100) NOT NULL,
+    `YearFounded` YEAR(4) NOT NULL,
+    `City` VARCHAR(100) NOT NULL,
+    `Arena` VARCHAR(100) NOT NULL,
+    PRIMARY KEY (`ID`)
+);
+
+DROP TABLE Games IF EXISTS;
 CREATE TABLE `Games` (
   `ID` int(11) PRIMARY KEY,
   `Season` year(4) NOT NULL,
@@ -44,6 +59,7 @@ CREATE TABLE `Games` (
   `Date` date NOT NULL
 );
 
+DROP TABLE PlayerGameStats IF EXISTS;
 CREATE TABLE `PlayerGameStats` (
   `Game` int(11) NOT NULL,
   `Player` int(11) NOT NULL,
@@ -108,19 +124,3 @@ FROM (
   FROM PlayerGameStats LEFT JOIN Games on (PlayerGameStats.Game = Games.ID)
 )
 GROUP BY Player, Season;
-    `createdAt` TIMESTAMP NOT NULL,
-    `lastUpdated` TIMESTAMP NOT NULL,
-    PRIMARY KEY (`Franchise`,`Username`)
-);
-
-DROP TABLE Franchise IF EXISTS;
-
-CREATE TABLE `Franchise` (
-    `ID` INT NOT NULL,
-    `Abbreviation` VARCHAR(10) NOT NULL,
-    `Nickname` VARCHAR(100) NOT NULL,
-    `YearFounded` YEAR(4) NOT NULL,
-    `City` VARCHAR(100) NOT NULL,
-    `Arena` VARCHAR(100) NOT NULL,
-    PRIMARY KEY (`ID`)
-);
