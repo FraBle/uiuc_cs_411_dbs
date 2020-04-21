@@ -33,3 +33,76 @@ CREATE TABLE `FavoritesFranchise` (
     `Username` VARCHAR(50) NOT NULL,
     PRIMARY KEY(`Franchise`, `Username`)
 );
+
+CREATE TABLE `Games` (
+  `ID` int(11) PRIMARY KEY,
+  `Season` year(4) NOT NULL,
+  `HomeFranchise` int(11)  NOT NULL,
+  `VisitorFranchise` int(11)  NOT NULL,
+  `Date` date NOT NULL
+);
+
+CREATE TABLE `PlayerGameStats` (
+  `Game` int(11) NOT NULL,
+  `Player` int(11) NOT NULL,
+  `Franchise` int(11) NOT NULL,
+  `MinutesPlayed` tinyint(4) NOT NULL,
+  `FieldGoalsMade` tinyint(4) NOT NULL,
+  `FieldGoalsAttempted` tinyint(4) NOT NULL,
+  `ThreePointersMade` tinyint(4) NOT NULL,
+  `ThreePointersAttempted` tinyint(4) NOT NULL,
+  `FreeThrowsMade` tinyint(4) NOT NULL,
+  `FreeThrowsAttempted` tinyint(4) NOT NULL,
+  `OffensiveRebounds` tinyint(4) NOT NULL,
+  `DefensiveRebounds` tinyint(4) NOT NULL,
+  `Points` tinyint(4) NOT NULL,
+  `Assists` tinyint(4) NOT NULL,
+  `Steals` tinyint(4) NOT NULL,
+  `Blocks` tinyint(4) NOT NULL,
+  `Turnovers` tinyint(4) NOT NULL,
+  `PersonalFouls` tinyint(4) NOT NULL
+);
+
+CREATE OR REPLACE VIEW `PlayerAllStats` AS
+SELECT Player,
+       SUM(MinutesPlayed) as MinutesPlayed,
+       SUM(FieldGoalsMade) as FieldGoalsMade,
+       SUM(FieldGoalsAttempted) as FieldGoalsAttempted,
+       SUM(ThreePointersMade) as ThreePointersMade,
+       SUM(ThreePointersAttempted) as ThreePointersAttempted,
+       SUM(FreeThrowsMade) as FreeThrowsMade,
+       SUM(FreeThrowsAttempted) as FreeThrowsAttempted,
+       SUM(OffensiveRebounds) as OffensiveRebounds,
+       SUM(DefensiveRebounds) as DefensiveRebounds,
+       SUM(Points) as Points,
+       SUM(Assists) as Assists,
+       SUM(Steals) as Steals,
+       SUM(Blocks) as Blocks,
+       SUM(Turnovers) as Turnovers,
+       SUM(PersonalFouls) as PersonalFouls
+FROM PlayerGameStats
+GROUP BY Player;
+
+CREATE OR REPLACE VIEW `PlayerSeasonStats` AS
+SELECT Player,
+       Season,
+       SUM(MinutesPlayed) as MinutesPlayed,
+       SUM(FieldGoalsMade) as FieldGoalsMade,
+       SUM(FieldGoalsAttempted) as FieldGoalsAttempted,
+       SUM(ThreePointersMade) as ThreePointersMade,
+       SUM(ThreePointersAttempted) as ThreePointersAttempted,
+       SUM(FreeThrowsMade) as FreeThrowsMade,
+       SUM(FreeThrowsAttempted) as FreeThrowsAttempted,
+       SUM(OffensiveRebounds) as OffensiveRebounds,
+       SUM(DefensiveRebounds) as DefensiveRebounds,
+       SUM(Points) as Points,
+       SUM(Assists) as Assists,
+       SUM(Steals) as Steals,
+       SUM(Blocks) as Blocks,
+       SUM(Turnovers) as Turnovers,
+       SUM(PersonalFouls) as PersonalFouls
+FROM (
+  SELECT *
+  FROM PlayerGameStats LEFT JOIN Games on (PlayerGameStats.Game = Games.ID)
+)
+GROUP BY Player, Season;
