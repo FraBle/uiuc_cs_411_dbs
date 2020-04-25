@@ -1,6 +1,5 @@
 package edu.uiuc.cs411.project.nba.stats.rest;
 
-import edu.uiuc.cs411.project.nba.stats.domain.Player;
 import edu.uiuc.cs411.project.nba.stats.domain.PlayerSeasonStats;
 import edu.uiuc.cs411.project.nba.stats.domain.PlayerStats;
 import edu.uiuc.cs411.project.nba.stats.query.PlayerStatsMapper;
@@ -29,7 +28,8 @@ public class PlayerStatsController {
     }
 
     @GetMapping("/{id}/season/{season}")
-    public PlayerStats getPlayerStatsBySeasonById(@PathVariable("id") String id, @PathVariable("season") String season) {
+    public PlayerStats getPlayerStatsBySeasonById(@PathVariable("id") String id,
+            @PathVariable("season") String season) {
         return playerStatsMapper.getPlayerStatsBySeasonById(Integer.parseInt(id), Integer.parseInt(season));
     }
 

@@ -20,10 +20,6 @@ public interface FavoritesPlayerMapper {
     void deleteFavorite(String username, int playerId);
 
     @Select("SELECT Player.*, true AS isFavorite FROM FavoritesPlayer JOIN Player ON FavoritesPlayer.Player=Player.ID WHERE FavoritesPlayer.Username=#{username} ORDER BY ${order} ${orderType} LIMIT ${pageSize} OFFSET ${offset}")
-    List<Player> playerIdsByUsername(
-                          String username,
-                          @Param("pageSize") int pageSize,
-                          @Param("offset") int offset,
-                          @Param("order") String order,
-                          @Param("orderType") String orderType);
+    List<Player> playerIdsByUsername(String username, @Param("pageSize") int pageSize, @Param("offset") int offset,
+            @Param("order") String order, @Param("orderType") String orderType);
 }

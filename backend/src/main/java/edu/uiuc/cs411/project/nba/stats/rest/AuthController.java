@@ -29,7 +29,8 @@ public class AuthController {
 	private final JwtUtils jwtUtils;
 
 	@Autowired
-	public AuthController(AuthenticationManager authenticationManager, UserMapper userMapper, PasswordEncoder encoder, JwtUtils jwtUtils) {
+	public AuthController(AuthenticationManager authenticationManager, UserMapper userMapper, PasswordEncoder encoder,
+			JwtUtils jwtUtils) {
 		this.authenticationManager = authenticationManager;
 		this.userMapper = userMapper;
 		this.encoder = encoder;
@@ -51,18 +52,15 @@ public class AuthController {
 	@PostMapping("/signup")
 	public ResponseEntity<?> registerUser(@RequestBody SignupRequest signUpRequest) {
 		if (userMapper.existsByUsername(signUpRequest.getUsername())) {
-			return ResponseEntity
-					.badRequest()
-					.body("Error: Username is already taken!");
+			return ResponseEntity.badRequest().body("Error: Username is already taken!");
 		}
 
 		if (userMapper.existsByEmail(signUpRequest.getEmail())) {
-			return ResponseEntity
-					.badRequest()
-					.body("Error: Email is already in use!");
+			return ResponseEntity.badRequest().body("Error: Email is already in use!");
 		}
 
-		User user = new User(signUpRequest.getUsername(), signUpRequest.getEmail(), encoder.encode(signUpRequest.getPassword()));
+		User user = new User(signUpRequest.getUsername(), signUpRequest.getEmail(),
+				encoder.encode(signUpRequest.getPassword()));
 		userMapper.save(user);
 
 		return ResponseEntity.ok("User registered successfully!");

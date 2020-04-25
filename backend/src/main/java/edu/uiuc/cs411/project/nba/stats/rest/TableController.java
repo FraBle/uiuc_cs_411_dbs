@@ -34,7 +34,7 @@ public class TableController {
     }
 
     // Only works in MySql, not in H2
-    @GetMapping(value = { "", "/"})
+    @GetMapping(value = { "", "/" })
     public List<Table> fetchAllTables() {
         if (isInDev())
             return tableMapper.fetchAllH2();

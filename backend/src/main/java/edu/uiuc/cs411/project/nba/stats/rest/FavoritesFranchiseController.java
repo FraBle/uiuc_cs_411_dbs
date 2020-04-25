@@ -20,28 +20,24 @@ public class FavoritesFranchiseController {
 
     @GetMapping("/{username}/favorite/franchise")
     public List<Franchise> favoriteFranchiseIdsByUsername(@PathVariable("username") String username,
-                                           @RequestParam(defaultValue = "1") String page,
-                                           @RequestParam(defaultValue = "50") String pageSize,
-                                           @RequestParam(defaultValue = "ID") String order,
-                                           @RequestParam(defaultValue = "ASC") String orderType) {
+            @RequestParam(defaultValue = "1") String page, @RequestParam(defaultValue = "50") String pageSize,
+            @RequestParam(defaultValue = "ID") String order, @RequestParam(defaultValue = "ASC") String orderType) {
         int pageAsInteger = Integer.parseInt(page);
         int pageSizeAsInteger = Integer.parseInt(pageSize);
         int offset = pageAsInteger == 1 ? 0 : (pageAsInteger - 1) * pageSizeAsInteger;
         String orderTypeValue = "DESC".equalsIgnoreCase(orderType) ? "DESC" : "ASC";
 
-        return favoritesFranchiseMapper.franchiseIdsByUsername(username, pageSizeAsInteger,
-                offset, order, orderTypeValue);
+        return favoritesFranchiseMapper.franchiseIdsByUsername(username, pageSizeAsInteger, offset, order,
+                orderTypeValue);
     }
 
     @PutMapping("/{username}/favorite/franchise/{franchiseId}")
-    void makeFavorite(@PathVariable("username") String username,
-                      @PathVariable("franchiseId") int franchiseId) {
+    void makeFavorite(@PathVariable("username") String username, @PathVariable("franchiseId") int franchiseId) {
         favoritesFranchiseMapper.makeFavorite(username, franchiseId);
     }
 
     @DeleteMapping("/{username}/favorite/franchise/{franchiseId}")
-    void deleteFavorite(@PathVariable("username") String username,
-                        @PathVariable("franchiseId") int franchiseId) {
+    void deleteFavorite(@PathVariable("username") String username, @PathVariable("franchiseId") int franchiseId) {
         favoritesFranchiseMapper.deleteFavorite(username, franchiseId);
     }
 }

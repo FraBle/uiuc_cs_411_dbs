@@ -34,14 +34,10 @@ public class FranchiseController {
         return franchiseMapper.getFranchiseById(Integer.parseInt(id), user.getUsername());
     }
 
-    @GetMapping(value = { "", "/"})
-    public List<Franchise> fetchAllFranchises(
-            @AuthenticationPrincipal User user,
-            @RequestParam(defaultValue = "1") String page,
-            @RequestParam(defaultValue = "50") String pageSize,
-            @RequestParam(defaultValue = "id") String order,
-            @RequestParam(defaultValue = "ASC") String orderType
-    ) {
+    @GetMapping(value = { "", "/" })
+    public List<Franchise> fetchAllFranchises(@AuthenticationPrincipal User user,
+            @RequestParam(defaultValue = "1") String page, @RequestParam(defaultValue = "50") String pageSize,
+            @RequestParam(defaultValue = "id") String order, @RequestParam(defaultValue = "ASC") String orderType) {
         int pageAsInteger = Integer.parseInt(page);
         int pageSizeAsInteger = Integer.parseInt(pageSize);
         int offset = pageAsInteger == 1 ? 0 : (pageAsInteger - 1) * pageSizeAsInteger;

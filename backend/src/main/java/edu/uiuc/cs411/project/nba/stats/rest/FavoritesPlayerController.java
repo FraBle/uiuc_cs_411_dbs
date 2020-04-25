@@ -20,10 +20,8 @@ public class FavoritesPlayerController {
 
     @GetMapping("/{username}/favorite/player")
     public List<Player> favoritePlayerIdsByUsername(@PathVariable("username") String username,
-                                           @RequestParam(defaultValue = "1") String page,
-                                           @RequestParam(defaultValue = "50") String pageSize,
-                                           @RequestParam(defaultValue = "ID") String order,
-                                           @RequestParam(defaultValue = "ASC") String orderType) {
+            @RequestParam(defaultValue = "1") String page, @RequestParam(defaultValue = "50") String pageSize,
+            @RequestParam(defaultValue = "ID") String order, @RequestParam(defaultValue = "ASC") String orderType) {
         int pageAsInteger = Integer.parseInt(page);
         int pageSizeAsInteger = Integer.parseInt(pageSize);
         int offset = pageAsInteger == 1 ? 0 : (pageAsInteger - 1) * pageSizeAsInteger;
@@ -33,14 +31,12 @@ public class FavoritesPlayerController {
     }
 
     @PutMapping("/{username}/favorite/player/{playerId}")
-    void makeFavorite(@PathVariable("username") String username,
-                                      @PathVariable("playerId") int playerId) {
+    void makeFavorite(@PathVariable("username") String username, @PathVariable("playerId") int playerId) {
         favoritesPlayerMapper.makeFavorite(username, playerId);
     }
 
     @DeleteMapping("/{username}/favorite/player/{playerId}")
-    void deleteFavorite(@PathVariable("username") String username,
-                      @PathVariable("playerId") int playerId) {
+    void deleteFavorite(@PathVariable("username") String username, @PathVariable("playerId") int playerId) {
         favoritesPlayerMapper.deleteFavorite(username, playerId);
     }
 }
