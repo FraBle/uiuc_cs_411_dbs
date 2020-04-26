@@ -1,8 +1,12 @@
 package edu.uiuc.cs411.project.nba.stats.rest;
 
 import edu.uiuc.cs411.project.nba.stats.domain.Player;
+import edu.uiuc.cs411.project.nba.stats.domain.PlayerSeasonStats;
+import edu.uiuc.cs411.project.nba.stats.domain.PlayerStats;
 import edu.uiuc.cs411.project.nba.stats.domain.User;
 import edu.uiuc.cs411.project.nba.stats.query.PlayerMapper;
+import edu.uiuc.cs411.project.nba.stats.query.PlayerStatsMapper;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,10 +22,12 @@ import java.util.List;
 public class PlayerController {
 
     private final PlayerMapper playerMapper;
+    private final PlayerStatsMapper playerStatsMapper;
 
     @Autowired
-    public PlayerController(PlayerMapper playerMapper) {
+    public PlayerController(PlayerMapper playerMapper, PlayerStatsMapper playerStatsMapper) {
         this.playerMapper = playerMapper;
+        this.playerStatsMapper = playerStatsMapper;
     }
 
     @GetMapping("/count")
@@ -46,4 +52,27 @@ public class PlayerController {
 
         return playerMapper.fetchAll(pageSizeAsInteger, offset, order, orderTypeValue, search, user.getUsername());
     }
+
+    // PlayerStats sub-resource
+    @GetMapping("/{id}/stats")
+    public PlayerStats getPlayerStatsOverallById(@PathVariable("id") String id) {
+        return playerStatsMapper.getPlayerStatsOverallById(Integer.parseInt(id));
+    }
+
+    @GetMapping("/{id}/stats/season/{season}")
+    public PlayerStats getPlayerStatsBySeasonById(@PathVariable("id") String id,
+            @PathVariable("season") String season) {
+        return playerStatsMapper.getPlayerStatsBySeasonById(Integer.parseInt(id), Integer.parseInt(season));
+    }
+
+    @GetMapping("/{id}/stats/game/{game}")
+    public PlayerStats getPlayerStatsByGameById(@PathVariable("id") String id, @PathVariable("game") String game) {
+        return playerStatsMapper.getPlayerStatsByGameById(Integer.parseInt(id), Integer.parseInt(game));
+    }
+
+    @GetMapping("/{id}/stats/season")
+    public List<PlayerSeasonStats> getPlayerStatsGroupedBySeason(@PathVariable("id") String id) {
+        return playerStatsMapper.getPlayerStatsGroupedBySeason(Integer.parseInt(id));
+    }
+
 }
