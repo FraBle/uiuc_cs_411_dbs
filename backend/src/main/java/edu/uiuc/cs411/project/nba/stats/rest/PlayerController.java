@@ -75,4 +75,30 @@ public class PlayerController {
         return playerStatsMapper.getPlayerStatsGroupedBySeason(Integer.parseInt(id));
     }
 
+    @GetMapping(value = { "/stats/top/", "/stats/top/all" })
+    public List<PlayerStats> topPlayerStats(@RequestParam("topN") String topN,
+                                                    @RequestParam("sortType") String sortType) {
+        return playerStatsMapper.topPlayerStats(sortType, Integer.parseInt(topN));
+    }
+
+    @GetMapping("/stats/top/season/{season}")
+    public List<PlayerStats> topPlayerStatsBySeason(@RequestParam("topN") String topN,
+                                                    @RequestParam("sortType") String sortType,
+                                                    @PathVariable("season") String season) {
+        return playerStatsMapper.topPlayerStatsBySeason(Integer.parseInt(season), sortType, Integer.parseInt(topN));
+    }
+
+    @GetMapping("/stats/top/franchise/{franchise}")
+    public List<PlayerStats> topPlayerStatsByFranchise(@RequestParam("topN") String topN,
+                                                    @RequestParam("sortType") String sortType,
+                                                    @PathVariable("season") String franchise) {
+        return playerStatsMapper.topPlayerStatsByFranchise(Integer.parseInt(franchise), sortType, Integer.parseInt(topN));
+    }
+
+    @GetMapping("/stats/top/game/{game}")
+    public List<PlayerStats> topPlayerStatsByGame(@RequestParam("topN") String topN,
+                                                       @RequestParam("sortType") String sortType,
+                                                       @PathVariable("game") String game) {
+        return playerStatsMapper.topPlayerStatsByGame(Integer.parseInt(game), sortType, Integer.parseInt(topN));
+    }
 }

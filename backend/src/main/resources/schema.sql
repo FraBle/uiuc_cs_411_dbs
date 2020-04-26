@@ -126,3 +126,24 @@ FROM (
   FROM PlayerGameStats LEFT JOIN Games on (PlayerGameStats.Game = Games.ID)
 )
 GROUP BY Player, Season;
+
+CREATE VIEW `PlayerFranchiseStats` AS
+SELECT Player,
+       Franchise,
+       SUM(MinutesPlayed) as MinutesPlayed,
+       SUM(FieldGoalsMade) as FieldGoalsMade,
+       SUM(FieldGoalsAttempted) as FieldGoalsAttempted,
+       SUM(ThreePointersMade) as ThreePointersMade,
+       SUM(ThreePointersAttempted) as ThreePointersAttempted,
+       SUM(FreeThrowsMade) as FreeThrowsMade,
+       SUM(FreeThrowsAttempted) as FreeThrowsAttempted,
+       SUM(OffensiveRebounds) as OffensiveRebounds,
+       SUM(DefensiveRebounds) as DefensiveRebounds,
+       SUM(Points) as Points,
+       SUM(Assists) as Assists,
+       SUM(Steals) as Steals,
+       SUM(Blocks) as Blocks,
+       SUM(Turnovers) as Turnovers,
+       SUM(PersonalFouls) as PersonalFouls
+FROM PlayerGameStats
+GROUP BY Player, Franchise;

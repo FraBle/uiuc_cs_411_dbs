@@ -67,4 +67,39 @@ public class PlayerStatsMapperTest {
         assertThat(stats.getAssists()).isEqualTo(10);
         assertThat(stats.getBlocks()).isEqualTo(10);
     }
+
+    @Test
+    public void topAll() {
+        final List<PlayerStats> stats = playerStatsMapper.topPlayerStats("Points", 2);
+
+        assertThat(stats).isNotNull();
+        assertThat(stats.get(0).getPlayer()).isEqualTo(2);
+        assertThat(stats.get(1).getPlayer()).isEqualTo(3);
+    }
+
+    @Test
+    public void topFranchise() {
+        final List<PlayerStats> stats = playerStatsMapper.topPlayerStatsByFranchise(1001,"Points", 2);
+
+        assertThat(stats.get(0).getPlayer()).isEqualTo(3);
+        assertThat(stats.get(1).getPlayer()).isEqualTo(1);
+    }
+
+    @Test
+    public void topGame() {
+        final List<PlayerStats> stats = playerStatsMapper.topPlayerStatsByGame(100, "Points", 2);
+
+        assertThat(stats.get(0).getPlayer()).isEqualTo(2);
+        assertThat(stats.get(1).getPlayer()).isEqualTo(3);
+    }
+
+    @Test
+    public void topSeason() {
+        final List<PlayerStats> stats = playerStatsMapper.topPlayerStatsBySeason(2018, "Points", 2);
+
+
+        System.out.println(stats);
+        assertThat(stats.get(0).getPlayer()).isEqualTo(2);
+        assertThat(stats.get(1).getPlayer()).isEqualTo(3);
+    }
 }

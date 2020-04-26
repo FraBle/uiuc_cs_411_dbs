@@ -15,13 +15,13 @@ INSERT INTO Player
 VALUES (5, 'Kevin Durant', parseDateTime('19630217000000','yyyyMMddHHmmss'), 'F', '6.10', 240, NULL);
 
 INSERT INTO Games
-VALUES (100, 2018, 1001, 1003, parseDateTime('20090218000000','yyyyMMddHHmmss'));
+VALUES (100, 2018, 1001, 1003, parseDateTime('20180218000000','yyyyMMddHHmmss'));
 
 INSERT INTO Games
-VALUES (101, 2019, 1001, 1002, parseDateTime('20090217000000','yyyyMMddHHmmss'));
+VALUES (101, 2019, 1001, 1002, parseDateTime('20190217000000','yyyyMMddHHmmss'));
 
 INSERT INTO Games
-VALUES (102, 2019, 1001, 1003, parseDateTime('20090218000000','yyyyMMddHHmmss'));
+VALUES (102, 2019, 1001, 1003, parseDateTime('20190218000000','yyyyMMddHHmmss'));
 
 INSERT INTO PlayerGameStats
 VALUES (100, 3, 1001, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10);
@@ -31,6 +31,12 @@ VALUES (101, 3, 1001, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10
 
 INSERT INTO PlayerGameStats
 VALUES (102, 3, 1001, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10);
+
+INSERT INTO PlayerGameStats
+VALUES (100, 2, 1002, 10, 10, 10, 10, 10, 10, 10, 10, 10, 100, 10, 10, 10, 10, 10);
+
+INSERT INTO PlayerGameStats
+VALUES (100, 1, 1001, 10, 10, 10, 10, 10, 10, 10, 10, 10, 9, 10, 10, 10, 10, 10);
 
 INSERT INTO Franchise
 VALUES (1, 'GSW', 'Warriors', 1946, 'Golden State', 'Chase Center');
