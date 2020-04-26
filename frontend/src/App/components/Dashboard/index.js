@@ -1,17 +1,17 @@
 import React from 'react';
 import {
   Alert,
+  AlertActionCloseButton,
   AlertGroup,
   AlertVariant,
-  AlertActionCloseButton,
   Avatar,
   Brand,
   Breadcrumb,
   BreadcrumbItem,
   Dropdown,
-  DropdownToggle,
   DropdownItem,
   DropdownSeparator,
+  DropdownToggle,
   Nav,
   NavExpandable,
   NavItem,
@@ -26,21 +26,25 @@ import {
 } from '@patternfly/react-core';
 import accessibleStyles from '@patternfly/react-styles/css/utilities/Accessibility/accessibility';
 import { css } from '@patternfly/react-styles';
+import gravatarUrl from 'gravatar-url';
+
+import { AuthContext, ProtectedRoute } from '../../Auth';
 import imgBrand from '../../resources/logo.png';
-import Players from './components/Players';
+import FranchiseComparison from './components/FranchiseComparison';
 import Franchises from './components/Franchises';
 import Overview from './components/Overview';
 import PlayerComparison from './components/PlayerComparison';
-import FranchiseComparison from './components/FranchiseComparison';
-import { AuthContext, ProtectedRoute } from '../../Auth';
-import gravatarUrl from 'gravatar-url';
+import PlayerAnalysis from './components/PlayerAnalysis';
+import Players from './components/Players';
 
 const DashboardRoutes = {
   overview: '/dashboard',
   'raw-players': '/dashboard/data/players',
   'raw-franchises': '/dashboard/data/franchises',
   'comparison-players': '/dashboard/comparison/players',
-  'comparison-franchises': '/dashboard/comparison/franchises'
+  'comparison-franchises': '/dashboard/comparison/franchises',
+  'analysis-player': '/dashboard/analysis/player',
+  'analysis-franchise': '/dashboard/analysis/franchise'
 };
 
 const RoutesToNavMapping = {
@@ -63,6 +67,14 @@ const RoutesToNavMapping = {
   '/dashboard/comparison/franchises': {
     activeGroup: 'comparison',
     activeItem: 'comparison-franchises'
+  },
+  '/dashboard/analysis/player': {
+    activeGroup: 'analysis',
+    activeItem: 'analysis-player'
+  },
+  '/dashboard/analysis/franchise': {
+    activeGroup: 'analysis',
+    activeItem: 'analysis-franchise'
   }
 };
 
@@ -95,6 +107,18 @@ const RoutesToBreadcrumbs = {
     <Breadcrumb>
       <BreadcrumbItem>Comparison</BreadcrumbItem>
       <BreadcrumbItem isActive>Franchises</BreadcrumbItem>
+    </Breadcrumb>
+  ),
+  '/dashboard/analysis/player': (
+    <Breadcrumb>
+      <BreadcrumbItem>Analysis</BreadcrumbItem>
+      <BreadcrumbItem isActive>Player</BreadcrumbItem>
+    </Breadcrumb>
+  ),
+  '/dashboard/analysis/franchise': (
+    <Breadcrumb>
+      <BreadcrumbItem>Analysis</BreadcrumbItem>
+      <BreadcrumbItem isActive>Franchise</BreadcrumbItem>
     </Breadcrumb>
   )
 };
@@ -182,6 +206,14 @@ const Dashboard = props => {
         <NavItem itemId="overview" isActive={data.activeItem === 'overview'}>
           Overview
         </NavItem>
+        <NavExpandable title="Analysis" groupId="analysis" isActive={data.activeGroup === 'analysis'} isExpanded>
+          <NavItem groupId="analysis" itemId="analysis-player" isActive={data.activeItem === 'analysis-player'}>
+            Player
+          </NavItem>
+          <NavItem groupId="analysis" itemId="analysis-franchise" isActive={data.activeItem === 'analysis-franchise'}>
+            Franchise
+          </NavItem>
+        </NavExpandable>
         <NavExpandable title="Comparison" groupId="comparison" isActive={data.activeGroup === 'comparison'} isExpanded>
           <NavItem groupId="comparison" itemId="comparison-players" isActive={data.activeItem === 'comparison-players'}>
             Players
@@ -289,6 +321,16 @@ const Dashboard = props => {
           component={FranchiseComparison}
           componentProps={{ showAlert }}
         />
+        <ProtectedRoute
+          path={`${props.match.path}/analysis/player`}
+          component={PlayerAnalysis}
+          componentProps={{ showAlert }}
+        />
+        {/* <ProtectedRoute
+          path={`${props.match.path}/comparison/franchises`}
+          component={FranchiseComparison}
+          componentProps={{ showAlert }}
+        /> */}
       </Page>
     </React.Fragment>
   );
