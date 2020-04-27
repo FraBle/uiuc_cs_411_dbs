@@ -97,8 +97,6 @@ public class PlayerStatsMapperTest {
     public void topSeason() {
         final List<PlayerStats> stats = playerStatsMapper.topPlayerStatsBySeason(2018, "Points", 2);
 
-
-        System.out.println(stats);
         assertThat(stats.get(0).getPlayer()).isEqualTo(2);
         assertThat(stats.get(1).getPlayer()).isEqualTo(3);
     }

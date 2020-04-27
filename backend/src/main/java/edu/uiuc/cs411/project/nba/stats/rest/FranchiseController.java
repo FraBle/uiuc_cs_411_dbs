@@ -25,8 +25,8 @@ public class FranchiseController {
     }
 
     @GetMapping("/count")
-    public Long count() {
-        return franchiseMapper.count();
+    public Long count(@RequestParam(defaultValue = "") String search) {
+        return franchiseMapper.count(search);
     }
 
     @GetMapping("/{id}")
@@ -35,15 +35,20 @@ public class FranchiseController {
     }
 
     @GetMapping(value = { "", "/" })
-    public List<Franchise> fetchAllFranchises(@AuthenticationPrincipal User user,
-            @RequestParam(defaultValue = "1") String page, @RequestParam(defaultValue = "50") String pageSize,
-            @RequestParam(defaultValue = "id") String order, @RequestParam(defaultValue = "ASC") String orderType) {
+    public List<Franchise> fetchAllFranchises(
+            @AuthenticationPrincipal User user,
+            @RequestParam(defaultValue = "1") String page,
+            @RequestParam(defaultValue = "50") String pageSize,
+            @RequestParam(defaultValue = "id") String order,
+            @RequestParam(defaultValue = "ASC") String orderType,
+            @RequestParam(defaultValue = "") String search
+    ) {
         int pageAsInteger = Integer.parseInt(page);
         int pageSizeAsInteger = Integer.parseInt(pageSize);
         int offset = pageAsInteger == 1 ? 0 : (pageAsInteger - 1) * pageSizeAsInteger;
         String orderTypeValue = "DESC".equalsIgnoreCase(orderType) ? "DESC" : "ASC";
 
-        return franchiseMapper.fetchAll(pageSizeAsInteger, offset, order, orderTypeValue, user.getUsername());
+        return franchiseMapper.fetchAll(pageSizeAsInteger, offset, order, orderTypeValue, user.getUsername(), search);
     }
 
 }
