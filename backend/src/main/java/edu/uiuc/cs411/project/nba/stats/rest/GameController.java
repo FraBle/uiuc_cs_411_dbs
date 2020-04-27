@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -22,8 +23,8 @@ public class GameController {
     this.gameMapper = gameMapper;
   }
 
-  @GetMapping("/month/{month}/year/{year}")
-  public List<Game> getGamesByMonthYear(@PathVariable("month") String month, @PathVariable("year") String year) {
+  @GetMapping(value = { "", "/" })
+  public List<Game> getGamesByMonthYear(@RequestParam String month, @RequestParam String year) {
     return gameMapper.getGamesByMonthYear(Integer.parseInt(month), Integer.parseInt(year));
   }
 }
