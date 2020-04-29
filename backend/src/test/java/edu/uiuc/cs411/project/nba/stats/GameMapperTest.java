@@ -30,4 +30,19 @@ public class GameMapperTest {
     assertThat(games.get(0).getId()).isEqualTo(101);
     assertThat(games.get(1).getId()).isEqualTo(102);
   }
+
+  @Test
+  public void gamesBetweenFranchises() {
+    List<Game> games = gameMapper.getGamesBetweenFranchises(1, 2);
+
+    assertThat(games.size()).isEqualTo(3);
+  }
+
+  @Test
+  public void gamesBetweenFranchisesIntoSeason() {
+    List<Game> games = gameMapper.getGamesBetweenFranchisesInSeason(1, 2, 2018);
+
+    assertThat(games.size()).isEqualTo(1);
+  }
+
 }

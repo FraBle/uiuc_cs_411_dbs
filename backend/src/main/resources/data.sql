@@ -21,15 +21,15 @@ VALUES
 
 INSERT INTO Games
 VALUES
-    (100, 2018, 1, 2, parseDateTime('20180218000000','yyyyMMddHHmmss'));
+    (100, 2018, 1, 2, parseDateTime('20180218000000','yyyyMMddHHmmss'), 100, 80);
 
 INSERT INTO Games
 VALUES
-    (101, 2019, 2, 1, parseDateTime('20190217000000','yyyyMMddHHmmss'));
+    (101, 2019, 2, 1, parseDateTime('20190217000000','yyyyMMddHHmmss'), 95, 90);
 
 INSERT INTO Games
 VALUES
-    (102, 2019, 1, 2, parseDateTime('20190218000000','yyyyMMddHHmmss'));
+    (102, 2019, 1, 2, parseDateTime('20190218000000','yyyyMMddHHmmss'), 90, 80);
 
 INSERT INTO PlayerGameStats
 VALUES

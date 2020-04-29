@@ -56,11 +56,14 @@ CREATE TABLE `Games` (
   `Season` year(4) NOT NULL,
   `HomeFranchise` int(11)  NOT NULL,
   `VisitorFranchise` int(11)  NOT NULL,
-  `Date` date NOT NULL
+  `Date` date NOT NULL,
+  `HomeScore` int(3)  NOT NULL,
+  `VisitorScore` int(3)  NOT NULL
 );
 
 DROP VIEW `PlayerAllStats` IF EXISTS;
 DROP VIEW `PlayerSeasonStats` IF EXISTS;
+DROP VIEW `PLAYERFRANCHISESTATS` IF EXISTS;
 DROP TABLE PlayerGameStats IF EXISTS;
 CREATE TABLE `PlayerGameStats` (
   `Game` int(11) NOT NULL,
