@@ -9,8 +9,8 @@ public class Game {
   private Integer homeFranchise;
   private Integer visitorFranchise;
   private Date date;
-  private Integer homeScore;
-  private Integer visitorScore;
+  private Integer homePoints;
+  private Integer awayPoints;
 
   public Integer getId() {
     return this.id;
@@ -52,25 +52,25 @@ public class Game {
     this.date = date;
   }
 
-  public Integer getHomeScore() {
-    return homeScore;
+  public Integer getHomePoints() {
+    return homePoints;
   }
 
-  public void setHomeScore(Integer homeScore) {
-    this.homeScore = homeScore;
+  public void setHomePoints(Integer homePoints) {
+    this.homePoints = homePoints;
   }
 
-  public Integer getVisitorScore() {
-    return visitorScore;
+  public Integer getAwayPoints() {
+    return awayPoints;
   }
 
-  public void setVisitorScore(Integer visitorScore) {
-    this.visitorScore = visitorScore;
+  public void setAwayPoints(Integer awayPoints) {
+    this.awayPoints = awayPoints;
   }
 
   @Transient
   public int winner() {
-    if (homeScore > visitorScore) {
+    if (homePoints > awayPoints) {
       return homeFranchise;
     }
 

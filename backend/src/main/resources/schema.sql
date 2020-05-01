@@ -57,8 +57,8 @@ CREATE TABLE `Games` (
   `HomeFranchise` int(11)  NOT NULL,
   `VisitorFranchise` int(11)  NOT NULL,
   `Date` date NOT NULL,
-  `HomeScore` int(3)  NOT NULL,
-  `VisitorScore` int(3)  NOT NULL
+  `HomePoints` int(3)  NOT NULL,
+  `AwayPoints` int(3)  NOT NULL
 );
 
 DROP VIEW `PlayerAllStats` IF EXISTS;
