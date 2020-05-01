@@ -35,6 +35,7 @@ import Franchises from './components/Franchises';
 import Overview from './components/Overview';
 import PlayerComparison from './components/PlayerComparison';
 import PlayerAnalysis from './components/PlayerAnalysis';
+import GameAnalysis from './components/GameAnalysis';
 import Players from './components/Players';
 
 const DashboardRoutes = {
@@ -44,7 +45,8 @@ const DashboardRoutes = {
   'comparison-players': '/dashboard/comparison/players',
   'comparison-franchises': '/dashboard/comparison/franchises',
   'analysis-player': '/dashboard/analysis/player',
-  'analysis-franchise': '/dashboard/analysis/franchise'
+  'analysis-franchise': '/dashboard/analysis/franchise',
+  'analysis-game': '/dashboard/analysis/game'
 };
 
 const RoutesToNavMapping = {
@@ -75,6 +77,10 @@ const RoutesToNavMapping = {
   '/dashboard/analysis/franchise': {
     activeGroup: 'analysis',
     activeItem: 'analysis-franchise'
+  },
+  '/dashboard/analysis/game': {
+    activeGroup: 'analysis',
+    activeItem: 'analysis-game'
   }
 };
 
@@ -119,6 +125,12 @@ const RoutesToBreadcrumbs = {
     <Breadcrumb>
       <BreadcrumbItem>Analysis</BreadcrumbItem>
       <BreadcrumbItem isActive>Franchise</BreadcrumbItem>
+    </Breadcrumb>
+  ),
+  '/dashboard/analysis/game': (
+    <Breadcrumb>
+      <BreadcrumbItem>Analysis</BreadcrumbItem>
+      <BreadcrumbItem isActive>Game</BreadcrumbItem>
     </Breadcrumb>
   )
 };
@@ -212,6 +224,9 @@ const Dashboard = props => {
           </NavItem>
           <NavItem groupId="analysis" itemId="analysis-franchise" isActive={data.activeItem === 'analysis-franchise'}>
             Franchise
+          </NavItem>
+          <NavItem groupId="analysis" itemId="analysis-game" isActive={data.activeItem === 'analysis-game'}>
+            Game
           </NavItem>
         </NavExpandable>
         <NavExpandable title="Comparison" groupId="comparison" isActive={data.activeGroup === 'comparison'} isExpanded>
@@ -326,11 +341,11 @@ const Dashboard = props => {
           component={PlayerAnalysis}
           componentProps={{ showAlert }}
         />
-        {/* <ProtectedRoute
-          path={`${props.match.path}/comparison/franchises`}
-          component={FranchiseComparison}
+        <ProtectedRoute
+          path={`${props.match.path}/analysis/game`}
+          component={GameAnalysis}
           componentProps={{ showAlert }}
-        /> */}
+        />
       </Page>
     </React.Fragment>
   );
