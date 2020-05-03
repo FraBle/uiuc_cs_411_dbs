@@ -1,8 +1,8 @@
 import React from 'react';
 import {
   Accordion,
-  AccordionItem,
   AccordionContent,
+  AccordionItem,
   AccordionToggle,
   Bullseye,
   Card,
@@ -10,11 +10,13 @@ import {
   EmptyState,
   EmptyStateIcon,
   EmptyStateVariant,
+  InputGroup,
+  InputGroupText,
+  PageSection,
+  PageSectionVariants,
   Select,
   SelectOption,
   SelectVariant,
-  PageSection,
-  PageSectionVariants,
   Spinner,
   Split,
   SplitItem,
@@ -25,26 +27,30 @@ import {
   Tabs,
   Text,
   TextContent,
+  TextInput,
   TextList,
   TextListItem,
   TextVariants,
   Title
 } from '@patternfly/react-core';
-import { SearchIcon } from '@patternfly/react-icons';
-import moment from 'moment';
 import _ from 'lodash';
-import Avatar from 'react-avatar';
 import { AuthContext } from '../../../../Auth';
-import PlayerSearch from '../PlayerSearch';
-import PlaceholderChart from '../../charts/PlaceholderChart';
-import AttemptsVsMadeChart from '../../charts/AttemptsVsMadeChart';
+import { CalendarAltIcon, SearchIcon } from '@patternfly/react-icons';
+import { useLocation } from 'react-router-dom';
 import AttemptsVsMadeAreaChart from '../../charts/AttemptsVsMadeAreaChart';
-import ReboundsChart from '../../charts/ReboundsChart';
-import ReboundsAreaChart from '../../charts/ReboundsAreaChart';
-import PointsVsAssistsChart from '../../charts/PointsVsAssistsChart';
-import PointsVsAssistsAreaChart from '../../charts/PointsVsAssistsAreaChart';
-import GeneralStatsChart from '../../charts/GeneralStatsChart';
+import AttemptsVsMadeChart from '../../charts/AttemptsVsMadeChart';
+import Avatar from 'react-avatar';
+import GameSearch from '../GameSearch';
+import { formatGame } from '../GameSearch';
 import GeneralStatsAreaChart from '../../charts/GeneralStatsAreaChart';
+import GeneralStatsChart from '../../charts/GeneralStatsChart';
+import moment from 'moment';
+import PlayerSearch from '../PlayerSearch';
+import PointsVsAssistsAreaChart from '../../charts/PointsVsAssistsAreaChart';
+import PointsVsAssistsChart from '../../charts/PointsVsAssistsChart';
+import queryString from 'query-string';
+import ReboundsAreaChart from '../../charts/ReboundsAreaChart';
+import ReboundsChart from '../../charts/ReboundsChart';
 
 const initialState = {
   loading: {
@@ -65,10 +71,12 @@ const initialState = {
   playerStatsBySeason: {},
   playerStatsByGame: {},
   selectedPlayer: {},
+  selectedGameID: null,
   selectedGame: null,
+  selectedGameMonthYear: null,
   sportsDbData: {},
   activeTabKey: 0,
-  activeSeasonTabKey: 0,
+  activeTabKeyFromUrl: false,
   seasonSelectIsExpanded: false,
   selectedSeasons: []
 };
@@ -82,7 +90,9 @@ const reducer = (state, action) => {
           ...state.loading,
           player: true,
           sportsDb: true,
-          playerStatsOverall: true
+          playerStatsOverall: _.isNil(action.payload.tabIndex) || action.payload.tabIndex === 0,
+          playerStatsBySeason: action.payload.tabIndex === 1,
+          playerStatsByGame: action.payload.tabIndex === 2
         },
         playerData: {},
         playerStatsOverall: {},
@@ -92,7 +102,9 @@ const reducer = (state, action) => {
         selectedPlayer: {
           id: action.payload.playerId,
           name: action.payload.playerName
-        }
+        },
+        activeTabKey: _.isNil(action.payload.tabIndex) ? state.activeTabKey : action.payload.tabIndex,
+        activeTabKeyFromUrl: !_.isNil(action.payload.tabIndex)
       };
     case 'FETCH_SPORTSDB_SUCCESS':
       return {
@@ -112,6 +124,26 @@ const reducer = (state, action) => {
           player: false
         },
         playerData: action.payload.player
+      };
+    case 'FETCH_PLAYER_SUCCESS':
+      return {
+        ...state,
+        loading: {
+          ...state.loading,
+          player: false
+        },
+        playerData: action.payload.player
+      };
+    case 'FETCH_GAME_REQUEST':
+      return {
+        ...state,
+        selectedGameID: action.payload.selectedGameID,
+        selectedGameMonthYear: action.payload.selectedGameMonthYear
+      };
+    case 'FETCH_GAME_SUCCESS':
+      return {
+        ...state,
+        selectedGame: action.payload.game
       };
     case 'FETCH_PLAYER_STATS_OVERALL_SUCCESS':
       return {
@@ -139,6 +171,14 @@ const reducer = (state, action) => {
         },
         playerStatsBySeason: action.payload.stats
       };
+    case 'FETCH_PLAYER_STATS_BY_GAME_REQUEST':
+      return {
+        ...state,
+        loading: {
+          ...state.loading,
+          playerStatsByGame: true
+        }
+      };
     case 'FETCH_PLAYER_STATS_BY_GAME_SUCCESS':
       return {
         ...state,
@@ -151,7 +191,8 @@ const reducer = (state, action) => {
     case 'TAB_CHANGE':
       return {
         ...state,
-        activeTabKey: action.payload.tabIndex
+        activeTabKey: action.payload.tabIndex,
+        activeTabKeyFromUrl: false
       };
     case 'CHART_CHANGE_OVERALL':
       return {
@@ -177,6 +218,11 @@ const reducer = (state, action) => {
           game: action.payload.value
         }
       };
+    case 'GAME_MONTH_YEAR_CHANGE':
+      return {
+        ...state,
+        selectedGameMonthYear: action.payload.value
+      };
     case 'SEASON_SELECT_TOGGLE':
       return {
         ...state,
@@ -186,6 +232,12 @@ const reducer = (state, action) => {
       return {
         ...state,
         selectedSeasons: action.payload.selectedSeasons
+      };
+    case 'GAME_SELECTED':
+      return {
+        ...state,
+        selectedGame: action.payload.game,
+        selectedGameID: action.payload.game.id
       };
     case 'SEASON_SELECT_CLEAR':
       return {
@@ -206,9 +258,16 @@ const reducer = (state, action) => {
   }
 };
 
+const tabNameToId = {
+  Overall: 0,
+  BySeason: 1,
+  ByGame: 2
+};
+
 const PlayerAnalysis = props => {
   const { state: authState } = React.useContext(AuthContext);
   const [data, dispatch] = React.useReducer(reducer, initialState);
+  const urlParams = queryString.parse(useLocation().search);
 
   // Load data from the backend and thesportsdb.com as soon as a player has been seleted
   React.useEffect(() => {
@@ -220,9 +279,38 @@ const PlayerAnalysis = props => {
   }, [data.selectedPlayer]);
 
   React.useEffect(() => {
-    if (_.isEmpty(data.selectedPlayer)) return;
+    if (_.isEmpty(data.selectedPlayer) || data.activeTabKeyFromUrl) return;
     fetchTabData();
   }, [data.activeTabKey]);
+
+  React.useEffect(() => {
+    if (_.isNil(data.selectedGameID)) return;
+    dispatch({ type: 'FETCH_PLAYER_STATS_BY_GAME_REQUEST' });
+    fetchPlayerStatsData(data.selectedPlayer.id, false, data.selectedGameID);
+  }, [data.selectedGameID]);
+
+  React.useEffect(() => {
+    if (!_.isNil(urlParams.id) && !_.isNil(urlParams.name)) {
+      dispatch({
+        type: 'FETCH_PLAYER_REQUEST',
+        payload: {
+          playerId: _.toInteger(urlParams.id),
+          playerName: urlParams.name,
+          tabIndex: tabNameToId[_.get(urlParams, 'tab', 0)]
+        }
+      });
+    }
+    if (!_.isNil(urlParams.gameId) && !_.isNil(urlParams.gameMonthYear)) {
+      dispatch({
+        type: 'FETCH_GAME_REQUEST',
+        payload: {
+          selectedGameID: _.get(urlParams, 'gameId'),
+          selectedGameMonthYear: _.get(urlParams, 'gameMonthYear')
+        }
+      });
+      fetchGameData(_.get(urlParams, 'gameId'));
+    }
+  }, []);
 
   const fetchTabData = () => {
     switch (data.activeTabKey) {
@@ -257,6 +345,28 @@ const PlayerAnalysis = props => {
       )
       .catch(error => {
         props.showAlert('Could not load player data from TheSportsDB.com 😔', 'danger');
+      });
+  };
+
+  const fetchGameData = gameId => {
+    if (!gameId) return;
+    fetch(`${BACKEND}/api/game/${gameId}`, {
+      headers: {
+        Authorization: `Bearer ${authState.token}`
+      }
+    })
+      .then(response => {
+        if (!response.ok) throw new Error(response.status);
+        else return response.json();
+      })
+      .then(game =>
+        dispatch({
+          type: 'FETCH_GAME_SUCCESS',
+          payload: { game }
+        })
+      )
+      .catch(error => {
+        props.showAlert('Could not load game data 😔', 'danger');
       });
   };
 
@@ -359,25 +469,25 @@ const PlayerAnalysis = props => {
     </Bullseye>
   );
 
-  const tabPlaceholder = (
+  const tabPlaceholder = text => (
     <Card>
       <CardBody>
         <EmptyState variant={EmptyStateVariant.full}>
           <EmptyStateIcon icon={SearchIcon} />
           <Title headingLevel="h5" size="lg">
-            No Player Selected
+            {text ? text : 'No Player Selected.'}
           </Title>
         </EmptyState>
       </CardBody>
     </Card>
   );
 
-  const loadingPlaceholder = (
+  const loadingPlaceholder = text => (
     <Card>
       <CardBody>
         <EmptyState variant={EmptyStateVariant.full}>
           <EmptyStateIcon variant="container" component={Spinner} />
-          <Title size="lg">Loading Player Stats.</Title>
+          <Title size="lg">{text ? text : 'Loading Player Stats.'}</Title>
         </EmptyState>
       </CardBody>
     </Card>
@@ -399,6 +509,20 @@ const PlayerAnalysis = props => {
   const onSeasonClear = () => {
     dispatch({
       type: 'SEASON_SELECT_CLEAR'
+    });
+  };
+
+  const onGameSelect = game => {
+    dispatch({
+      type: 'GAME_SELECTED',
+      payload: { game }
+    });
+  };
+
+  const onGameMonthYearChange = value => {
+    dispatch({
+      type: 'GAME_MONTH_YEAR_CHANGE',
+      payload: { value }
     });
   };
 
@@ -430,6 +554,47 @@ const PlayerAnalysis = props => {
             <SelectOption key={el.season} value={`${el.season}`} />
           ))}
         </Select>
+      </CardBody>
+    </Card>
+  );
+
+  const gameSelect = (
+    <Card isCompact>
+      <CardBody>
+        <Stack gutter="md">
+          <StackItem style={{ minHeight: '2.25rem' }}>
+            <Title headingLevel="h6" size="md">
+              Step 1: Select a year and month
+            </Title>
+            <InputGroup>
+              <InputGroupText component="label" htmlFor="month-year">
+                <CalendarAltIcon />
+              </InputGroupText>
+              <TextInput
+                name="month-year"
+                id="month-year"
+                type="month"
+                aria-label="Month and Year"
+                min="2003-10"
+                max="2020-03"
+                onChange={onGameMonthYearChange}
+              />
+            </InputGroup>
+          </StackItem>
+          <StackItem>
+            <Title headingLevel="h6" size="md">
+              Step 2: Select a game from your selected time range
+            </Title>
+            <GameSearch
+              onGameSelect={onGameSelect}
+              onError={error => props.showAlert(error, 'danger')}
+              width="100%"
+              filterByPlayer
+              selectedMonthYear={data.selectedGameMonthYear}
+              selectedPlayer={data.selectedPlayer}
+            />
+          </StackItem>
+        </Stack>
       </CardBody>
     </Card>
   );
@@ -548,9 +713,10 @@ const PlayerAnalysis = props => {
                       </StackItem>
                       <StackItem isFilled>
                         <TextContent>
+                          <Title headingLevel="h3" size="2xl">
+                            {_.get(data.playerData, 'name', '...')}
+                          </Title>
                           <TextList component="dl">
-                            <TextListItem component="dt">Player ID</TextListItem>
-                            <TextListItem component="dd">{_.get(data.playerData, 'id', '')}</TextListItem>
                             <TextListItem component="dt">Favorite</TextListItem>
                             <TextListItem component="dd">
                               {_.has(data.playerData, 'isFavorite') ? (
@@ -596,19 +762,19 @@ const PlayerAnalysis = props => {
           <StackItem>
             <Card>
               <CardBody style={{ padding: 0 }}>
-                <Tabs isFilled mountOnEnter activeKey={data.activeTabKey} onSelect={onTabClick}>
+                <Tabs isFilled activeKey={_.isNil(data.activeTabKey) ? 0 : data.activeTabKey} onSelect={onTabClick}>
                   <Tab eventKey={0} title="Overall">
                     {data.loading.playerStatsOverall
-                      ? loadingPlaceholder
+                      ? loadingPlaceholder()
                       : _.isEmpty(data.playerStatsOverall)
-                      ? tabPlaceholder
+                      ? tabPlaceholder()
                       : charts(data.expanded.overall, data.playerStatsOverall, onToggle, 'overall')}
                   </Tab>
                   <Tab eventKey={1} title="By Season">
                     {data.loading.playerStatsBySeason ? (
-                      loadingPlaceholder
+                      loadingPlaceholder()
                     ) : _.isEmpty(data.playerStatsBySeason) ? (
-                      tabPlaceholder
+                      tabPlaceholder()
                     ) : (
                       <React.Fragment>
                         {seasonSelect}
@@ -622,11 +788,25 @@ const PlayerAnalysis = props => {
                     )}
                   </Tab>
                   <Tab eventKey={2} title="By Game">
-                    {data.loading.playerStatsByGame
-                      ? loadingPlaceholder
-                      : _.isEmpty(data.playerStatsByGame)
-                      ? tabPlaceholder
-                      : charts(data.expanded.game, data.playerStatsByGame, onToggle, 'byGame')}
+                    <Stack gutter="md">
+                      <StackItem>{gameSelect}</StackItem>
+                      <StackItem isFilled>
+                        {data.loading.playerStatsByGame ? (
+                          loadingPlaceholder()
+                        ) : _.isEmpty(data.playerStatsByGame) ? (
+                          tabPlaceholder('No Player / Game Selected.')
+                        ) : (
+                          <React.Fragment>
+                            <Bullseye>
+                              <Title headingLevel="h3" size="2xl">
+                                {_.isEmpty(data.selectedGame) ? '...' : formatGame(data.selectedGame)}
+                              </Title>
+                            </Bullseye>
+                            {charts(data.expanded.game, data.playerStatsByGame, onToggle, 'byGame')}
+                          </React.Fragment>
+                        )}
+                      </StackItem>
+                    </Stack>
                   </Tab>
                 </Tabs>
               </CardBody>

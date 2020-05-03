@@ -15,6 +15,7 @@ import _ from 'lodash';
 
 const initialState = {
   players: [],
+  filteredPlayers: [],
   selectedPlayer: null,
   searchInput: '',
   dropdownIsOpen: false,
@@ -23,16 +24,28 @@ const initialState = {
 
 const reducer = (state, action) => {
   switch (action.type) {
-    case 'FETCH_PLAYERS_REQUEST':
-      return {
-        ...state,
-        loading: true
-      };
     case 'FETCH_PLAYERS_SUCCESS':
       return {
         ...state,
         loading: false,
-        players: action.payload.players
+        filteredPlayers: action.payload.players
+      };
+    case 'SET_PLAYERS':
+      return {
+        ...state,
+        loading: false,
+        players: action.payload.players,
+        filteredPlayers: action.payload.players
+      };
+    case 'FILTER_PLAYERS':
+      return {
+        ...state,
+        filteredPlayers: _.filter(state.players, player =>
+          _.includes(
+            _.toLower(_.join(_.split(player.name, /\s+/), '')),
+            _.toLower(_.join(_.split(action.payload.filter, /\s+/), ''))
+          )
+        )
       };
     case 'FETCH_PLAYERS_FAILURE':
       return {
@@ -69,10 +82,17 @@ const PlayerSearch = props => {
   const [data, dispatch] = React.useReducer(reducer, initialState);
 
   React.useEffect(() => {
-    dispatch({
-      type: 'FETCH_PLAYERS_REQUEST'
-    });
-    fetchPlayers();
+    if (!props.useLocal) {
+      // In case no players are provided, load them dynamically from then backend
+      fetchPlayers();
+    } else {
+      dispatch({
+        type: 'SET_PLAYERS',
+        payload: {
+          players: props.players
+        }
+      });
+    }
   }, []);
 
   const fetchPlayers = (limit = 10) => {
@@ -95,8 +115,7 @@ const PlayerSearch = props => {
           payload: {
             players: _.inRange(_.size(players), 0, 10)
               ? players
-              : _.union(players, [{ id: new Date().getTime(), name: '...' }]),
-            loading: false
+              : _.union(players, [{ id: new Date().getTime(), name: '...' }])
           }
         })
       )
@@ -134,6 +153,19 @@ const PlayerSearch = props => {
     props.onPlayerSelect(player.props.id, player.props.name);
   };
 
+  const onSearchButtonClick = () => {
+    if (_.isNil(props.players)) {
+      fetchPlayers();
+    } else {
+      dispatch({
+        type: 'FILTER_PLAYERS',
+        payload: {
+          filter: data.searchInput
+        }
+      });
+    }
+  };
+
   return data.loading ? (
     <Bullseye>
       <Spinner size="md" />
@@ -146,11 +178,11 @@ const PlayerSearch = props => {
       searchInputValue={data.searchInput}
       onToggle={onDropdownToggle}
       onSelect={onDropdownSelect}
-      onSearchButtonClick={() => fetchPlayers()}
+      onSearchButtonClick={onSearchButtonClick}
       screenReaderLabel="Selected Player:"
       style={{ width: props.width }}
     >
-      {data.players.map(player => (
+      {data.filteredPlayers.map(player => (
         <ContextSelectorItem key={player.id}>
           <Player id={player.id} name={player.name} />
         </ContextSelectorItem>

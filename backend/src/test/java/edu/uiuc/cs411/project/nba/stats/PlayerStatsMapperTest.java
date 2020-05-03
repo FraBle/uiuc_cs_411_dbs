@@ -61,7 +61,7 @@ public class PlayerStatsMapperTest {
 
     @Test
     public void getGame() {
-        final PlayerStats stats = playerStatsMapper.getPlayerStatsByGameById(3, 100);
+        final PlayerStats stats = playerStatsMapper.getPlayerStatsByGameId(3, 100);
 
         assertThat(stats).isNotNull();
         assertThat(stats.getAssists()).isEqualTo(10);

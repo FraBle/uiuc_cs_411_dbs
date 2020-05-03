@@ -19,7 +19,8 @@ const reducer = (state, action) => {
     case 'FETCH_GAMES_REQUEST':
       return {
         ...state,
-        loading: true
+        loading: true,
+        selectedGame: null
       };
     case 'FETCH_GAMES_SUCCESS':
       return {
@@ -64,7 +65,7 @@ const reducer = (state, action) => {
   }
 };
 
-const formatGame = gameData =>
+export const formatGame = gameData =>
   `${moment(gameData.date).format('ll')}: ${gameData.homeCity} ${gameData.homeNickname} vs. ${gameData.visitorCity} ${
     gameData.visitorNickname
   }`;
@@ -78,12 +79,14 @@ const GameSearch = props => {
   const [data, dispatch] = React.useReducer(reducer, initialState);
 
   React.useEffect(() => {
-    if (_.isNil(props.selectedMonthYear)) return;
+    if (_.isNil(props.selectedMonthYear) || (props.filterByPlayer && _.isEmpty(props.selectedPlayer))) return;
+    dispatch({ type: 'FETCH_GAMES_REQUEST' });
     _.spread(fetchGames)(_.split(props.selectedMonthYear, '-'));
-  }, [props.selectedMonthYear]);
+  }, [props.selectedMonthYear, props.selectedPlayer]);
 
   const fetchGames = (year, month) => {
-    fetch(`${BACKEND}/api/game?month=${month}&year=${year}`, {
+    const url = `${BACKEND}/api/game?month=${month}&year=${year}`;
+    fetch(_.isEmpty(props.selectedPlayer) ? url : url + `&playerId=${props.selectedPlayer.id}`, {
       headers: {
         Authorization: `Bearer ${authState.token}`
       }

@@ -1,6 +1,7 @@
 package edu.uiuc.cs411.project.nba.stats.rest;
 
 import edu.uiuc.cs411.project.nba.stats.domain.Game;
+import edu.uiuc.cs411.project.nba.stats.domain.GamePlayer;
 import edu.uiuc.cs411.project.nba.stats.query.GameMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
@@ -24,13 +25,23 @@ public class GameController {
   }
 
   @GetMapping(value = { "", "/" })
-  public List<Game> getGamesByMonthYear(@RequestParam String month, @RequestParam String year) {
+  public List<Game> getGamesByMonthYear(@RequestParam String month, @RequestParam String year,
+      @RequestParam(required = false) String playerId) {
+    if (!StringUtils.isEmpty(playerId)) {
+      return gameMapper.getGamesByMonthYearForPlayerId(Integer.parseInt(month), Integer.parseInt(year),
+          Integer.parseInt(playerId));
+    }
     return gameMapper.getGamesByMonthYear(Integer.parseInt(month), Integer.parseInt(year));
   }
 
   @GetMapping("/{id}")
   public Game fetchGameById(@PathVariable("id") String id) {
     return gameMapper.getGameById(Integer.parseInt(id));
+  }
+
+  @GetMapping("/{id}/players")
+  public List<GamePlayer> fetchPlayersByGameId(@PathVariable("id") String id) {
+    return gameMapper.getPlayersByGameById(Integer.parseInt(id));
   }
 
   @GetMapping("head-to-head")
