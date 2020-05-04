@@ -150,3 +150,12 @@ SELECT Player,
        SUM(PersonalFouls) as PersonalFouls
 FROM PlayerGameStats
 GROUP BY Player, Franchise;
+
+DROP INDEX IDXURLSHORT IF EXISTS;
+DROP TABLE ShortURL IF EXISTS;
+CREATE TABLE ShortURL(
+    `ID` INT auto_increment PRIMARY KEY,
+    `Url` VARCHAR(300) NOT NULL
+);
+
+CREATE INDEX IDXURLSHORT ON ShortURL(Url);
