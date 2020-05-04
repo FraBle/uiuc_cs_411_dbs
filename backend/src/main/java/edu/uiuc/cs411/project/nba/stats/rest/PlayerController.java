@@ -75,7 +75,7 @@ public class PlayerController {
         return playerStatsMapper.getPlayerStatsGroupedBySeason(Integer.parseInt(id));
     }
 
-    @GetMapping(value = { "/stats/top/", "/stats/top/all" })
+    @GetMapping("/stats/top")
     public List<PlayerStats> topPlayerStats(@RequestParam("topN") String topN,
             @RequestParam("sortType") String sortType) {
         return playerStatsMapper.topPlayerStats(sortType, Integer.parseInt(topN));

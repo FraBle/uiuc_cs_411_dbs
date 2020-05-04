@@ -38,6 +38,7 @@ import PlayerAnalysis from './components/PlayerAnalysis';
 import FranchiseAnalysis from './components/FranchiseAnalysis';
 import GameAnalysis from './components/GameAnalysis';
 import Players from './components/Players';
+import Search from './components/Search';
 
 const DashboardRoutes = {
   'overview-dashboard': '/dashboard',
@@ -56,11 +57,11 @@ const DashboardRoutes = {
 const RoutesToNavMapping = {
   '/dashboard': {
     activeGroup: 'overview',
-    activeItem: 'dashboard'
+    activeItem: 'overview-dashboard'
   },
   '/dashboard/search': {
     activeGroup: 'overview',
-    activeItem: 'search'
+    activeItem: 'overview-search'
   },
   '/dashboard/data/players': {
     activeGroup: 'raw-data',
@@ -367,7 +368,7 @@ const Dashboard = props => {
         mainContainerId={pageId}
       >
         <ProtectedRoute path={props.match.path} exact component={Overview} componentProps={{ showAlert }} />
-        {/* <ProtectedRoute path={`${props.match.path}/search`} component={Search} componentProps={{ showAlert }} /> */}
+        <ProtectedRoute path={`${props.match.path}/search`} component={Search} componentProps={{ showAlert }} />
         <ProtectedRoute path={`${props.match.path}/data/players`} component={Players} componentProps={{ showAlert }} />
         <ProtectedRoute
           path={`${props.match.path}/data/franchises`}
