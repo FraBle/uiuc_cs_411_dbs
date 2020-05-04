@@ -140,7 +140,7 @@ const PlayerDetail = props => {
                 />
               </TextListItem>
               <TextListItem component="dt">Birthdate</TextListItem>
-              <TextListItem component="dd">{moment(props.player.birthDate).format('ll')}</TextListItem>
+              <TextListItem component="dd">{moment.utc(props.player.birthDate).format('ll')}</TextListItem>
               <TextListItem component="dt">Position</TextListItem>
               <TextListItem component="dd">{props.player.position}</TextListItem>
               <TextListItem component="dt">Height</TextListItem>

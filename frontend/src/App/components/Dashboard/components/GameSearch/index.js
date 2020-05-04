@@ -66,9 +66,9 @@ const reducer = (state, action) => {
 };
 
 export const formatGame = gameData =>
-  `${moment(gameData.date).format('ll')}: ${gameData.homeCity} ${gameData.homeNickname} vs. ${gameData.visitorCity} ${
-    gameData.visitorNickname
-  }`;
+  `${moment.utc(gameData.date).format('ll')}: ${gameData.homeCity} ${gameData.homeNickname} vs. ${
+    gameData.visitorCity
+  } ${gameData.visitorNickname}`;
 
 const Game = props => {
   return formatGame(props.data);

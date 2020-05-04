@@ -348,11 +348,11 @@ const PlayerComparison = props => {
     {
       cells: [
         data.selectedPlayerData[0].hasOwnProperty('birthDate')
-          ? moment(data.selectedPlayerData[0].birthDate).format('ll')
+          ? moment.utc(data.selectedPlayerData[0].birthDate).format('ll')
           : '',
         'Birthdate',
         data.selectedPlayerData[1].hasOwnProperty('birthDate')
-          ? moment(data.selectedPlayerData[1].birthDate).format('ll')
+          ? moment.utc(data.selectedPlayerData[1].birthDate).format('ll')
           : ''
       ]
     },

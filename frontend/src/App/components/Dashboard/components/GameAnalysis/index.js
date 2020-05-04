@@ -272,7 +272,7 @@ const GamesAnalysis = props => {
       history.push(
         `/dashboard/analysis/player?id=${data.selectedPlayer[tab].id}&name=${
           data.selectedPlayer[tab].name
-        }&tab=ByGame&gameId=${data.selectedGame.id}&gameMonthYear=${moment(data.selectedGame.date).format('YYYY-MM')}`
+        }&tab=ByGame&gameId=${data.selectedGame.id}&gameMonthYear=${moment.utc(data.selectedGame.date).format('YYYY-MM')}`
       );
     }
   };
@@ -593,7 +593,7 @@ const GamesAnalysis = props => {
                             <TextListItem component="dd">{_.get(data.selectedGame, 'season', '')}</TextListItem>
                             <TextListItem component="dt">Date</TextListItem>
                             <TextListItem component="dd">
-                              {_.has(data.selectedGame, 'date') ? moment(data.selectedGame.date).format('ll') : ''}
+                              {_.has(data.selectedGame, 'date') ? moment.utc(data.selectedGame.date).format('ll') : ''}
                             </TextListItem>
                             <TextListItem component="dt">Home</TextListItem>
                             <TextListItem component="dd">

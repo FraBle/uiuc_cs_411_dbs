@@ -458,7 +458,7 @@ const Players = props => {
               </React.Fragment>,
               player.id,
               player.name,
-              moment(player.birthDate).format('ll'),
+              moment.utc(player.birthDate).format('ll'),
               player.position,
               `${player.height.split('-')[0]}' ${player.height.split('-')[1]}"`,
               `${player.weight} lbs`,

@@ -732,7 +732,7 @@ const PlayerAnalysis = props => {
                             <TextListItem component="dt">Birthdate</TextListItem>
                             <TextListItem component="dd">
                               {_.has(data.playerData, 'birthDate')
-                                ? moment(data.playerData.birthDate).format('ll')
+                                ? moment.utc(data.playerData.birthDate).format('ll')
                                 : ''}
                             </TextListItem>
                             <TextListItem component="dt">Position</TextListItem>
