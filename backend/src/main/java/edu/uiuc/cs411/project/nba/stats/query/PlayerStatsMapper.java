@@ -1,6 +1,5 @@
 package edu.uiuc.cs411.project.nba.stats.query;
 
-import edu.uiuc.cs411.project.nba.stats.domain.Player;
 import edu.uiuc.cs411.project.nba.stats.domain.PlayerSeasonStats;
 import edu.uiuc.cs411.project.nba.stats.domain.PlayerStats;
 import org.apache.ibatis.annotations.Param;

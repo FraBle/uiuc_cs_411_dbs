@@ -26,10 +26,13 @@ public class GameController {
 
   @GetMapping(value = { "", "/" })
   public List<Game> getGamesByMonthYear(@RequestParam String month, @RequestParam String year,
-      @RequestParam(required = false) String playerId) {
+      @RequestParam(required = false) String playerId, @RequestParam(required = false) String franchiseId) {
     if (!StringUtils.isEmpty(playerId)) {
       return gameMapper.getGamesByMonthYearForPlayerId(Integer.parseInt(month), Integer.parseInt(year),
           Integer.parseInt(playerId));
+    } else if (!StringUtils.isEmpty(franchiseId)) {
+      return gameMapper.getGamesByMonthYearForFranchiseId(Integer.parseInt(month), Integer.parseInt(year),
+          Integer.parseInt(franchiseId));
     }
     return gameMapper.getGamesByMonthYear(Integer.parseInt(month), Integer.parseInt(year));
   }

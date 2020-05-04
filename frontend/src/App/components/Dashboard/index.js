@@ -35,24 +35,32 @@ import Franchises from './components/Franchises';
 import Overview from './components/Overview';
 import PlayerComparison from './components/PlayerComparison';
 import PlayerAnalysis from './components/PlayerAnalysis';
+import FranchiseAnalysis from './components/FranchiseAnalysis';
 import GameAnalysis from './components/GameAnalysis';
 import Players from './components/Players';
 
 const DashboardRoutes = {
-  overview: '/dashboard',
+  'overview-dashboard': '/dashboard',
+  'overview-search': '/dashboard/search',
   'raw-players': '/dashboard/data/players',
   'raw-franchises': '/dashboard/data/franchises',
   'comparison-players': '/dashboard/comparison/players',
   'comparison-franchises': '/dashboard/comparison/franchises',
   'analysis-player': '/dashboard/analysis/player',
   'analysis-franchise': '/dashboard/analysis/franchise',
-  'analysis-game': '/dashboard/analysis/game'
+  'analysis-game': '/dashboard/analysis/game',
+  'top-players': '/dashboard/top/players',
+  'top-franchises': '/dashboard/top/franchises'
 };
 
 const RoutesToNavMapping = {
   '/dashboard': {
-    activeGroup: null,
-    activeItem: 'overview'
+    activeGroup: 'overview',
+    activeItem: 'dashboard'
+  },
+  '/dashboard/search': {
+    activeGroup: 'overview',
+    activeItem: 'search'
   },
   '/dashboard/data/players': {
     activeGroup: 'raw-data',
@@ -81,6 +89,14 @@ const RoutesToNavMapping = {
   '/dashboard/analysis/game': {
     activeGroup: 'analysis',
     activeItem: 'analysis-game'
+  },
+  '/dashboard/top/players': {
+    activeGroup: 'top',
+    activeItem: 'top-players'
+  },
+  '/dashboard/top/franchises': {
+    activeGroup: 'top',
+    activeItem: 'top-franchises'
   }
 };
 
@@ -89,6 +105,12 @@ const RoutesToBreadcrumbs = {
     <Breadcrumb>
       <BreadcrumbItem>Overview</BreadcrumbItem>
       <BreadcrumbItem isActive>Dashboard</BreadcrumbItem>
+    </Breadcrumb>
+  ),
+  '/dashboard/search': (
+    <Breadcrumb>
+      <BreadcrumbItem>Overview</BreadcrumbItem>
+      <BreadcrumbItem isActive>Search</BreadcrumbItem>
     </Breadcrumb>
   ),
   '/dashboard/data/players': (
@@ -131,6 +153,18 @@ const RoutesToBreadcrumbs = {
     <Breadcrumb>
       <BreadcrumbItem>Analysis</BreadcrumbItem>
       <BreadcrumbItem isActive>Game</BreadcrumbItem>
+    </Breadcrumb>
+  ),
+  '/dashboard/top/players': (
+    <Breadcrumb>
+      <BreadcrumbItem>Top</BreadcrumbItem>
+      <BreadcrumbItem isActive>Players</BreadcrumbItem>
+    </Breadcrumb>
+  ),
+  '/dashboard/top/franchises': (
+    <Breadcrumb>
+      <BreadcrumbItem>Top</BreadcrumbItem>
+      <BreadcrumbItem isActive>Franchises</BreadcrumbItem>
     </Breadcrumb>
   )
 };
@@ -215,9 +249,14 @@ const Dashboard = props => {
   const PageNav = (
     <Nav onSelect={onNavSelect} aria-label="Nav" theme="dark">
       <NavList>
-        <NavItem itemId="overview" isActive={data.activeItem === 'overview'}>
-          Overview
-        </NavItem>
+        <NavExpandable title="Overview" groupId="overview" isActive={data.activeGroup === 'overview'} isExpanded>
+          <NavItem groupId="overview" itemId="overview-dashboard" isActive={data.activeItem === 'overview-dashboard'}>
+            Overview
+          </NavItem>
+          <NavItem groupId="overview" itemId="overview-search" isActive={data.activeItem === 'overview-search'}>
+            Search
+          </NavItem>
+        </NavExpandable>
         <NavExpandable title="Analysis" groupId="analysis" isActive={data.activeGroup === 'analysis'} isExpanded>
           <NavItem groupId="analysis" itemId="analysis-player" isActive={data.activeItem === 'analysis-player'}>
             Player
@@ -238,6 +277,14 @@ const Dashboard = props => {
             itemId="comparison-franchises"
             isActive={data.activeItem === 'comparison-franchises'}
           >
+            Franchises
+          </NavItem>
+        </NavExpandable>
+        <NavExpandable title="Top Lists" groupId="top" isActive={data.activeGroup === 'top'} isExpanded>
+          <NavItem groupId="top" itemId="top-players" isActive={data.activeItem === 'top-players'}>
+            Players
+          </NavItem>
+          <NavItem groupId="top" itemId="top-franchises" isActive={data.activeItem === 'top-franchises'}>
             Franchises
           </NavItem>
         </NavExpandable>
@@ -320,6 +367,7 @@ const Dashboard = props => {
         mainContainerId={pageId}
       >
         <ProtectedRoute path={props.match.path} exact component={Overview} componentProps={{ showAlert }} />
+        {/* <ProtectedRoute path={`${props.match.path}/search`} component={Search} componentProps={{ showAlert }} /> */}
         <ProtectedRoute path={`${props.match.path}/data/players`} component={Players} componentProps={{ showAlert }} />
         <ProtectedRoute
           path={`${props.match.path}/data/franchises`}
@@ -339,6 +387,11 @@ const Dashboard = props => {
         <ProtectedRoute
           path={`${props.match.path}/analysis/player`}
           component={PlayerAnalysis}
+          componentProps={{ showAlert }}
+        />
+        <ProtectedRoute
+          path={`${props.match.path}/analysis/franchise`}
+          component={FranchiseAnalysis}
           componentProps={{ showAlert }}
         />
         <ProtectedRoute

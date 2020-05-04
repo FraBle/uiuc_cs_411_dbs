@@ -79,14 +79,26 @@ const GameSearch = props => {
   const [data, dispatch] = React.useReducer(reducer, initialState);
 
   React.useEffect(() => {
-    if (_.isNil(props.selectedMonthYear) || (props.filterByPlayer && _.isEmpty(props.selectedPlayer))) return;
+    if (
+      _.isNil(props.selectedMonthYear) ||
+      (props.filterByPlayer && _.isEmpty(props.selectedPlayer)) ||
+      (props.filterByFranchise && _.isEmpty(props.selectedFranchise))
+    )
+      return;
     dispatch({ type: 'FETCH_GAMES_REQUEST' });
     _.spread(fetchGames)(_.split(props.selectedMonthYear, '-'));
-  }, [props.selectedMonthYear, props.selectedPlayer]);
+  }, [props.selectedMonthYear, props.selectedPlayer, props.selectedFranchise]);
 
   const fetchGames = (year, month) => {
-    const url = `${BACKEND}/api/game?month=${month}&year=${year}`;
-    fetch(_.isEmpty(props.selectedPlayer) ? url : url + `&playerId=${props.selectedPlayer.id}`, {
+    let url = `${BACKEND}/api/game?month=${month}&year=${year}`;
+
+    if (props.filterByPlayer) {
+      url += `&playerId=${props.selectedPlayer.id}`;
+    } else if (props.filterByFranchise) {
+      url += `&franchiseId=${props.selectedFranchise.id}`;
+    }
+
+    fetch(url, {
       headers: {
         Authorization: `Bearer ${authState.token}`
       }
