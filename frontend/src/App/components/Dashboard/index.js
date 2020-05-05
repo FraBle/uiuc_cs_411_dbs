@@ -39,6 +39,8 @@ import FranchiseAnalysis from './components/FranchiseAnalysis';
 import GameAnalysis from './components/GameAnalysis';
 import Players from './components/Players';
 import Search from './components/Search';
+import TopFranchises from './components/TopFranchises';
+import TopPlayers from './components/TopPlayers';
 
 const DashboardRoutes = {
   'overview-dashboard': '/dashboard',
@@ -398,6 +400,16 @@ const Dashboard = props => {
         <ProtectedRoute
           path={`${props.match.path}/analysis/game`}
           component={GameAnalysis}
+          componentProps={{ showAlert }}
+        />
+        <ProtectedRoute
+          path={`${props.match.path}/top/players`}
+          component={TopPlayers}
+          componentProps={{ showAlert }}
+        />
+        <ProtectedRoute
+          path={`${props.match.path}/top/franchises`}
+          component={TopFranchises}
           componentProps={{ showAlert }}
         />
       </Page>

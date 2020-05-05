@@ -20,14 +20,14 @@ public interface FranchiseStatsMapper {
         @Select("SELECT Franchise, FieldGoalsMade, FieldGoalsAttempted, ThreePointersMade, ThreePointersAttempted, FreeThrowsMade, FreeThrowsAttempted, OffensiveRebounds, DefensiveRebounds, Points, Assists, Steals, Blocks, Turnovers, PersonalFouls FROM FranchiseGameStats WHERE Franchise = ${id} and Game=${game} LIMIT 1")
         FranchiseStats getFranchiseStatsByGameId(@Param("id") Integer id, @Param("game") Integer game);
 
-        @Select("SELECT Franchise, FieldGoalsMade, FieldGoalsAttempted, ThreePointersMade, ThreePointersAttempted, FreeThrowsMade, FreeThrowsAttempted, OffensiveRebounds, DefensiveRebounds, Points, Assists, Steals, Blocks, Turnovers, PersonalFouls FROM FranchiseAllStats ORDER by ${sortType} DESC LIMIT ${topN}")
+        @Select("SELECT Franchise.ID as Franchise, CONCAT(Franchise.City, ' ', Franchise.Nickname) as FranchiseName, FieldGoalsMade, FieldGoalsAttempted, ThreePointersMade, ThreePointersAttempted, FreeThrowsMade, FreeThrowsAttempted, OffensiveRebounds, DefensiveRebounds, Points, Assists, Steals, Blocks, Turnovers, PersonalFouls FROM FranchiseAllStats JOIN Franchise ON (FranchiseAllStats.Franchise = Franchise.ID) ORDER by ${sortType} DESC LIMIT ${topN}")
         List<FranchiseStats> topFranchiseStats(@Param("sortType") String sortType, @Param("topN") Integer n);
 
-        @Select("SELECT Franchise, FieldGoalsMade, FieldGoalsAttempted, ThreePointersMade, ThreePointersAttempted, FreeThrowsMade, FreeThrowsAttempted, OffensiveRebounds, DefensiveRebounds, Points, Assists, Steals, Blocks, Turnovers, PersonalFouls FROM FranchiseGameStats WHERE Game = ${game} ORDER by ${sortType} DESC LIMIT ${topN}")
+        @Select("SELECT Franchise.ID as Franchise, CONCAT(Franchise.City, ' ', Franchise.Nickname) as FranchiseName, FieldGoalsMade, FieldGoalsAttempted, ThreePointersMade, ThreePointersAttempted, FreeThrowsMade, FreeThrowsAttempted, OffensiveRebounds, DefensiveRebounds, Points, Assists, Steals, Blocks, Turnovers, PersonalFouls FROM FranchiseGameStats JOIN Franchise ON (FranchiseGameStats.Franchise = Franchise.ID) WHERE Game = ${game} ORDER by ${sortType} DESC LIMIT ${topN}")
         List<FranchiseStats> topFranchiseStatsByGame(@Param("game") Integer game, @Param("sortType") String sortType,
                         @Param("topN") Integer n);
 
-        @Select("SELECT Franchise, FieldGoalsMade, FieldGoalsAttempted, ThreePointersMade, ThreePointersAttempted, FreeThrowsMade, FreeThrowsAttempted, OffensiveRebounds, DefensiveRebounds, Points, Assists, Steals, Blocks, Turnovers, PersonalFouls FROM FranchiseSeasonStats WHERE Season = ${season} ORDER by ${sortType} DESC LIMIT ${topN}")
+        @Select("SELECT Franchise.ID as Franchise, CONCAT(Franchise.City, ' ', Franchise.Nickname) as FranchiseName, FieldGoalsMade, FieldGoalsAttempted, ThreePointersMade, ThreePointersAttempted, FreeThrowsMade, FreeThrowsAttempted, OffensiveRebounds, DefensiveRebounds, Points, Assists, Steals, Blocks, Turnovers, PersonalFouls FROM FranchiseSeasonStats JOIN Franchise ON (FranchiseSeasonStats.Franchise = Franchise.ID) WHERE Season = ${season} ORDER by ${sortType} DESC LIMIT ${topN}")
         List<FranchiseStats> topFranchiseStatsBySeason(@Param("season") Integer season,
                         @Param("sortType") String sortType, @Param("topN") Integer n);
 }

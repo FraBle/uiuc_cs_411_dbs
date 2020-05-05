@@ -118,7 +118,7 @@ public class FranchiseController {
         return franchiseStatsMapper.getFranchiseStatsGroupedBySeason(Integer.parseInt(id));
     }
 
-    @GetMapping(value = { "/stats/top/", "/stats/top/all" })
+    @GetMapping("/stats/top")
     public List<FranchiseStats> topFranchiseStats(@RequestParam("topN") String topN,
             @RequestParam("sortType") String sortType) {
         return franchiseStatsMapper.topFranchiseStats(sortType, Integer.parseInt(topN));
