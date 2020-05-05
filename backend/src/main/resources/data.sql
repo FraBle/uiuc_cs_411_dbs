@@ -19,6 +19,10 @@ INSERT INTO Player
 VALUES
     (5, 'Kevin Durant', parseDateTime('19630217000000','yyyyMMddHHmmss'), 'F', '6.10', 240, NULL);
 
+INSERT INTO Player
+VALUES
+(6, 'Shaquille O''Neal', parseDateTime('19720306000000','yyyyMMddHHmmss'), 'F', '7.2', 324, NULL);
+
 INSERT INTO Games
 VALUES
     (100, 2018, 1, 2, parseDateTime('20180218000000','yyyyMMddHHmmss'), 100, 80);

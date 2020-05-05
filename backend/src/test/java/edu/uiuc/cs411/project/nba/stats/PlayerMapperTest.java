@@ -37,31 +37,33 @@ public class PlayerMapperTest {
     public void count_shouldReturn_how_many_records_exists() {
         final Long count = playerMapper.count("");
 
-        assertThat(count).isEqualTo(5);
+        assertThat(count).isEqualTo(6);
     }
 
     @Test
     public void sort_players_by_name() {
-        List<Player> players = playerMapper.fetchAll(5, 0, "Name", "ASC", "", null);
-        assertThat(players.size()).isEqualTo(5);
+        List<Player> players = playerMapper.fetchAll(6, 0, "Name", "ASC", "", null);
+        assertThat(players.size()).isEqualTo(6);
 
         assertThat(players.get(0).getName()).isEqualTo("Kevin Durant");
         assertThat(players.get(1).getName()).isEqualTo("Kobe Bryant");
         assertThat(players.get(2).getName()).isEqualTo("LeBron James");
         assertThat(players.get(3).getName()).isEqualTo("Michael Jordan");
-        assertThat(players.get(4).getName()).isEqualTo("Stephen Curry");
+        assertThat(players.get(4).getName()).isEqualTo("Shaquille O'Neal");
+        assertThat(players.get(5).getName()).isEqualTo("Stephen Curry");
     }
 
     @Test
     public void sort_players_by_name_desc() {
-        List<Player> players = playerMapper.fetchAll(5, 0, "Name", "DESC", "", null);
-        assertThat(players.size()).isEqualTo(5);
+        List<Player> players = playerMapper.fetchAll(6, 0, "Name", "DESC", "", null);
+        assertThat(players.size()).isEqualTo(6);
 
         assertThat(players.get(0).getName()).isEqualTo("Stephen Curry");
-        assertThat(players.get(1).getName()).isEqualTo("Michael Jordan");
-        assertThat(players.get(2).getName()).isEqualTo("LeBron James");
-        assertThat(players.get(3).getName()).isEqualTo("Kobe Bryant");
-        assertThat(players.get(4).getName()).isEqualTo("Kevin Durant");
+        assertThat(players.get(1).getName()).isEqualTo("Shaquille O'Neal");
+        assertThat(players.get(2).getName()).isEqualTo("Michael Jordan");
+        assertThat(players.get(3).getName()).isEqualTo("LeBron James");
+        assertThat(players.get(4).getName()).isEqualTo("Kobe Bryant");
+        assertThat(players.get(5).getName()).isEqualTo("Kevin Durant");
     }
 
     @Test
@@ -73,9 +75,10 @@ public class PlayerMapperTest {
         assertThat(players.get(2).getName()).isEqualTo("LeBron James");
 
         players = playerMapper.fetchAll(3, 3, "Name", "ASC", "", null);
-        assertThat(players.size()).isEqualTo(2);
+        assertThat(players.size()).isEqualTo(3);
         assertThat(players.get(0).getName()).isEqualTo("Michael Jordan");
-        assertThat(players.get(1).getName()).isEqualTo("Stephen Curry");
+        assertThat(players.get(1).getName()).isEqualTo("Shaquille O'Neal");
+        assertThat(players.get(2).getName()).isEqualTo("Stephen Curry");
     }
 
     @Test
@@ -84,6 +87,16 @@ public class PlayerMapperTest {
         assertThat(searchResult.size()).isEqualTo(1);
 
         assertThat(searchResult.get(0).getName()).isEqualTo("Michael Jordan");
+    }
+
+    @Test
+    public void specialCaseTest() {
+        List<Player> searchResult = playerMapper.fetchAll(50, 0, "Name", "ASC", "O'Neal", null);
+        assertThat(searchResult.size()).isEqualTo(1);
+        assertThat(searchResult.get(0).getName()).isEqualTo("Shaquille O'Neal");
+
+        final Long count = playerMapper.count("Shaquille O'Neal");
+        assertThat(count).isEqualTo(1);
     }
 
 }
