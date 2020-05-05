@@ -31,3 +31,5 @@ LOAD DATA LOCAL INFILE './PlayerGameStats.csv'
   OPTIONALLY ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 1 LINES;
+
+CREATE INDEX ix_PlayerGameStats_Points ON PlayerGameStats (Points);

@@ -6,15 +6,17 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 public interface TableMapper {
-    @Select("SELECT TABLE_NAME, TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '${tableName}'")
+    @Select("CALL TableByName('${tableName}')")
     Table getTableByNameMySql(String tableName);
 
+    // Used only for testing env. Cannot use Stored Procedure as H2 does not support it.
     @Select("SELECT TABLE_NAME, ROW_COUNT_ESTIMATE FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '${tableName}'")
     Table getTableByNameH2(String tableName);
 
-    @Select("SELECT TABLE_NAME, TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'")
+    @Select("CALL AllTables()")
     List<Table> fetchAllMySql();
 
+    // Used only for testing env. Cannot use Stored Procedure as H2 does not support it.
     @Select("SELECT TABLE_NAME, ROW_COUNT_ESTIMATE FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'TABLE'")
     List<Table> fetchAllH2();
 }

@@ -29,3 +29,5 @@ LOAD DATA LOCAL INFILE './Games.csv'
   OPTIONALLY ENCLOSED BY '"'
   LINES TERMINATED BY '\r\n'
   IGNORE 1 LINES;
+
+CREATE INDEX ix_Games_Season ON Games (Season);
