@@ -1,45 +1,81 @@
 import React from 'react';
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionToggle,
   Bullseye,
   Button,
   Card,
   CardBody,
-  ContextSelector,
-  ContextSelectorItem,
   EmptyState,
   EmptyStateIcon,
+  EmptyStateVariant,
   Grid,
   GridItem,
+  InputGroup,
+  InputGroupText,
   PageSection,
   PageSectionVariants,
+  Select,
+  SelectOption,
+  SelectVariant,
   Spinner,
+  Split,
+  SplitItem,
   Stack,
   StackItem,
+  Switch,
+  Tab,
+  Tabs,
   Text,
   TextContent,
+  TextInput,
+  TextList,
+  TextListItem,
+  TextVariants,
   Title
 } from '@patternfly/react-core';
 
 import { Table, cellWidth, TableBody, TableHeader, textCenter } from '@patternfly/react-table';
-import { ExclamationTriangleIcon, StarIcon, OutlinedStarIcon } from '@patternfly/react-icons';
+import { SearchIcon, StarIcon, OutlinedStarIcon } from '@patternfly/react-icons';
 import { AuthContext } from '../../../../Auth';
 import moment from 'moment';
 import _ from 'lodash';
 import Avatar from 'react-avatar';
-import PlaceholderChart from '../../charts/PlaceholderChart';
+import PlayerSearch from '../PlayerSearch';
+import FieldGoalsComparisonAreaChart from '../../charts/FieldGoalsComparisonAreaChart';
+import FieldGoalsComparisonChart from '../../charts/FieldGoalsComparisonChart';
+import ThreePointersComparisonAreaChart from '../../charts/ThreePointersComparisonAreaChart';
+import ThreePointersComparisonChart from '../../charts/ThreePointersComparisonChart';
+import FreeThrowsComparisonAreaChart from '../../charts/FreeThrowsComparisonAreaChart';
+import FreeThrowsComparisonChart from '../../charts/FreeThrowsComparisonChart';
+import GeneralStatsComparisonAreaChart from '../../charts/GeneralStatsComparisonAreaChart';
+import GeneralStatsComparisonChart from '../../charts/GeneralStatsComparisonChart';
 
 const initialState = {
-  players: [],
-  filteredPlayers: [[], []],
-  selectedPlayer: [null, null],
-  selectedPlayerData: [{}, {}],
-  searchPlayer: ['', ''],
-  dropdownIsOpen: [false, false],
-  error: null,
-  loading: true,
-  sportDbLoading: [false, false],
-  sportDbError: [null, null],
-  selectedPlayerSportsDb: [{}, {}]
+  selectedPlayer1: null,
+  selectedPlayer2: null,
+  playerData1: {},
+  playerData2: {},
+  sportDbLoading1: false,
+  sportDbLoading2: false,
+  sportDbError1: false,
+  sportDbError2: false,
+  loadingPlayer1: false,
+  loadingPlayer2: false,
+  errorPlayer1: null,
+  errorPlayer2: null,
+  sportDbData1: {},
+  sportDbData2: {},
+  activeTabKey: 0,
+  loadingStatsPlayer1: false,
+  loadingStatsPlayer2: false,
+  statsPlayer1: {},
+  statsPlayer2: {},
+  seasonSelectIsExpanded: false,
+  selectedSeasons: [],
+  expanded: 'field-goals'
 };
 
 const playerDataColumns = [
@@ -62,124 +98,145 @@ const playerDataColumns = [
 
 const reducer = (state, action) => {
   switch (action.type) {
-    case 'FETCH_PLAYERS_REQUEST':
+    case 'SELECT_PLAYER_1':
       return {
         ...state,
-        loading: true,
-        error: null
+        selectedPlayer1: {
+          id: action.payload.id,
+          name: action.payload.name
+        }
       };
-    case 'FETCH_PLAYERS_SUCCESS':
+    case 'SELECT_PLAYER_2':
       return {
         ...state,
-        loading: false,
-        error: null,
-        players: action.payload.players,
-        filteredPlayers: [action.payload.players, action.payload.players]
+        selectedPlayer2: {
+          id: action.payload.id,
+          name: action.payload.name
+        }
       };
-    case 'FETCH_PLAYERS_FAILURE':
+    case 'FETCH_PLAYER_1_REQUEST':
       return {
         ...state,
-        loading: false,
-        error: action.payload.error
+        loadingPlayer1: true
       };
-    case 'SEARCH_PLAYER_INPUT':
+    case 'FETCH_PLAYER_2_REQUEST':
       return {
         ...state,
-        searchPlayer: Object.assign([...state.searchPlayer], { [action.payload.pos]: action.payload.value })
+        loadingPlayer2: true
       };
-    case 'TOGGLE_PLAYER_DROPDOWN':
+    case 'FETCH_PLAYER_1_SUCCESS':
       return {
         ...state,
-        dropdownIsOpen: Object.assign([...state.dropdownIsOpen], {
-          [action.payload.pos]: action.payload.isOpen
-        })
+        playerData1: action.payload.player
       };
-    case 'SELECT_PLAYER':
+    case 'FETCH_PLAYER_2_SUCCESS':
       return {
         ...state,
-        selectedPlayer: Object.assign([...state.selectedPlayer], { [action.payload.pos]: action.payload.value }),
-        selectedPlayerData: Object.assign([...state.selectedPlayerData], {
-          [action.payload.pos]: state.players.find(player => player.name === action.payload.value)
-        }),
-        dropdownIsOpen: Object.assign([...state.dropdownIsOpen], {
-          [action.payload.pos]: !state.dropdownIsOpen[action.payload.pos]
-        })
+        playerData2: action.payload.player
       };
-    case 'SEARCH_PLAYER':
+    case 'FETCH_SPORTSDB_PLAYER_1_SUCCESS':
       return {
         ...state,
-        filteredPlayers: Object.assign([...state.filteredPlayers], {
-          [action.payload.pos]:
-            state.searchPlayer[action.payload.pos] === ''
-              ? state.players
-              : state.players.filter(player =>
-                  _.includes(
-                    _.toLower(_.join(_.split(player.name, /\s+/), '')),
-                    _.toLower(_.join(_.split(state.searchPlayer[action.payload.pos], /\s+/), ''))
-                  )
-                )
-        })
+        loadingPlayer1: false,
+        sportDbData1: action.payload.player
       };
-    case 'FAVORITE_TOGGLED':
-      const player = action.payload.player;
-      player.isFavorite = !player.isFavorite;
+    case 'FETCH_SPORTSDB_PLAYER_2_SUCCESS':
       return {
         ...state,
-        players: Object.assign([...state.players], { [state.players.findIndex(el => el.id === player.id)]: player }),
-        selectedPlayerData: Object.assign([...state.selectedPlayerData], {
-          [action.payload.pos]: player
-        })
+        loadingPlayer2: false,
+        sportDbData2: action.payload.player
       };
-    case 'FETCH_SPORTSDB_REQUEST':
+    case 'FAVORITE_TOGGLED_1':
       return {
         ...state,
-        sportDbLoading: [true, true],
-        sportDbError: [null, null]
+        playerData1: {
+          ...state.playerData1,
+          isFavorite: action.payload.isFavorite
+        }
       };
-    case 'FETCH_SPORTSDB_SUCCESS':
+    case 'FAVORITE_TOGGLED_2':
       return {
         ...state,
-        sportDbLoading: [false, false],
-        sportDbError: [null, null],
-        selectedPlayerSportsDb: Object.assign([...state.selectedPlayerSportsDb], {
-          [action.payload.pos]: action.payload.player
-        })
+        playerData2: {
+          ...state.playerData2,
+          isFavorite: action.payload.isFavorite
+        }
       };
-    case 'FETCH_SPORTSDB_FAILURE':
+    case 'FETCH_PLAYER_1_STATS_LOADING':
       return {
         ...state,
-        sportDbLoading: [false, false],
-        sportDbError: Object.assign([...state.sportDbError], {
-          [action.payload.pos]: action.payload.error
-        })
+        loadingStatsPlayer1: true
+      };
+    case 'FETCH_PLAYER_2_STATS_LOADING':
+      return {
+        ...state,
+        loadingStatsPlayer2: true
+      };
+    case 'FETCH_PLAYER_1_STATS_SUCCESS':
+      return {
+        ...state,
+        loadingStatsPlayer1: false,
+        statsPlayer1: action.payload.stats
+      };
+    case 'FETCH_PLAYER_2_STATS_SUCCESS':
+      return {
+        ...state,
+        loadingStatsPlayer2: false,
+        statsPlayer2: action.payload.stats
+      };
+    case 'TAB_CHANGE':
+      return {
+        ...state,
+        activeTabKey: action.payload.tabIndex
+      };
+    case 'SEASON_SELECT_TOGGLE':
+      return {
+        ...state,
+        seasonSelectIsExpanded: action.payload.isExpanded
+      };
+    case 'UPDATE_SELECTED_SEASONS':
+      return {
+        ...state,
+        selectedSeasons: action.payload.selectedSeasons
+      };
+    case 'SEASON_SELECT_CLEAR':
+      return {
+        ...state,
+        selectedSeasons: [],
+        seasonSelectIsExpanded: false
+      };
+    case 'CHART_CHANGE':
+      return {
+        ...state,
+        expanded: action.payload.value
       };
     default:
       return state;
   }
 };
 const PlayerComparison = props => {
-  const { state: authState, dispatch: authDispatch } = React.useContext(AuthContext);
+  const { state: authState } = React.useContext(AuthContext);
   const [data, dispatch] = React.useReducer(reducer, initialState);
 
   React.useEffect(() => {
-    dispatch({
-      type: 'FETCH_PLAYERS_REQUEST'
-    });
-    fetchPlayers();
-  }, []);
+    fetchPlayerData(1, data.selectedPlayer1);
+    fetchPlayerStatsData(1, _.get(data.selectedPlayer1, 'id'));
+  }, [data.selectedPlayer1]);
 
   React.useEffect(() => {
-    dispatch({
-      type: 'FETCH_SPORTSDB_REQUEST'
-    });
-    if (data.selectedPlayer[0] !== _.get(data.selectedPlayerSportsDb[0], 'strPlayer', null))
-      fetchSportsDb(data.selectedPlayer[0], 0);
-    if (data.selectedPlayer[1] !== _.get(data.selectedPlayerSportsDb[1], 'strPlayer', null))
-      fetchSportsDb(data.selectedPlayer[1], 1);
-  }, [data.selectedPlayer]);
+    fetchPlayerData(2, data.selectedPlayer2);
+    fetchPlayerStatsData(2, _.get(data.selectedPlayer2, 'id'));
+  }, [data.selectedPlayer2]);
 
-  const fetchPlayers = () => {
-    fetch(`${BACKEND}/api/player?pageSize=2000&page=1&order=name&orderType=ASC`, {
+  React.useEffect(() => {
+    if (_.isNil(data.selectedPlayer1) || _.isNil(data.selectedPlayer2)) return;
+    fetchTabData();
+  }, [data.activeTabKey]);
+
+  const fetchPlayerData = (number, player) => {
+    if (_.isNil(player)) return;
+    dispatch({ type: `FETCH_PLAYER_${number}_REQUEST` });
+    return fetch(`${BACKEND}/api/player/${player.id}`, {
       headers: {
         Authorization: `Bearer ${authState.token}`
       }
@@ -188,156 +245,91 @@ const PlayerComparison = props => {
         if (!response.ok) throw new Error(response.status);
         else return response.json();
       })
-      .then(players =>
+      .then(player => {
         dispatch({
-          type: 'FETCH_PLAYERS_SUCCESS',
-          payload: {
-            players,
-            loading: false
-          }
-        })
-      )
-      .catch(error =>
-        dispatch({
-          type: 'FETCH_PLAYERS_FAILURE',
-          payload: {
-            error
-          }
-        })
-      );
-  };
-
-  const fetchSportsDb = (playerName, pos) => {
-    if (!playerName) return;
-    fetch(`https://www.thesportsdb.com/api/v1/json/1/searchplayers.php?p=${playerName}`)
+          type: `FETCH_PLAYER_${number}_SUCCESS`,
+          payload: { player }
+        });
+        return player;
+      })
+      .then(player => fetch(`https://www.thesportsdb.com/api/v1/json/1/searchplayers.php?p=${_.get(player, 'name')}`))
       .then(response => {
         if (!response.ok) throw new Error(response.status);
         else return response.json();
       })
       .then(players =>
         dispatch({
-          type: 'FETCH_SPORTSDB_SUCCESS',
+          type: `FETCH_SPORTSDB_PLAYER_${number}_SUCCESS`,
           payload: {
-            player: _.head(players.player),
-            pos
+            player: _.head(players.player)
           }
         })
       )
-      .catch(error =>
+      .catch(error => {
+        props.showAlert('Could not load player data 😔', 'danger');
+      });
+  };
+
+  const fetchPlayerStatsData = (pos, playerId) => {
+    if (!playerId) return;
+
+    dispatch({
+      type: `FETCH_PLAYER_${pos}_STATS_LOADING`
+    });
+
+    fetch(`${BACKEND}/api/player/${playerId}/stats/season`, {
+      headers: {
+        Authorization: `Bearer ${authState.token}`
+      }
+    })
+      .then(response => {
+        if (!response.ok) throw new Error(response.status);
+        else return response.json();
+      })
+      .then(stats =>
         dispatch({
-          type: 'FETCH_SPORTSDB_FAILURE',
-          payload: {
-            error,
-            pos
-          }
+          type: `FETCH_PLAYER_${pos}_STATS_SUCCESS`,
+          payload: { stats }
         })
-      );
+      )
+      .catch(error => {
+        props.showAlert('Could not load player stats data 😔', 'danger');
+      });
   };
 
-  const selectedPlayer = pos => (data.selectedPlayer[pos] ? data.selectedPlayer[pos] : 'Select a Player');
-
-  const onSearchInputChange = (pos, value) => {
+  const onPlayerSelect = (pos, id, name) => {
     dispatch({
-      type: 'SEARCH_PLAYER_INPUT',
+      type: `SELECT_PLAYER_${pos}`,
       payload: {
-        pos,
-        value
-      }
-    });
-  };
-
-  const onDropdownToggle = (pos, isOpen) =>
-    dispatch({
-      type: 'TOGGLE_PLAYER_DROPDOWN',
-      payload: {
-        pos,
-        isOpen
-      }
-    });
-
-  const onDropdownSelect = (pos, value) => {
-    dispatch({
-      type: 'SELECT_PLAYER',
-      payload: {
-        pos,
-        value
+        id,
+        name
       }
     });
   };
 
-  const onSearchButtonClick = pos =>
-    dispatch({
-      type: 'SEARCH_PLAYER',
-      payload: {
-        pos
-      }
-    });
-
-  const dropdown = pos =>
-    data.loading ? (
-      <Bullseye>
-        <Spinner />
-      </Bullseye>
-    ) : data.error ? (
-      <Bullseye>
-        <EmptyState>
-          <EmptyStateIcon icon={ExclamationTriangleIcon} />
-          <Title size="lg">Could not load data.</Title>
-        </EmptyState>
-      </Bullseye>
-    ) : (
-      <ContextSelector
-        toggleText={selectedPlayer(pos)}
-        onSearchInputChange={value => onSearchInputChange(pos, value)}
-        isOpen={data.dropdownIsOpen[pos]}
-        searchInputValue={data.searchPlayer[pos]}
-        onToggle={(_, isOpen) => onDropdownToggle(pos, isOpen)}
-        onSelect={(_, value) => onDropdownSelect(pos, value)}
-        onSearchButtonClick={() => onSearchButtonClick(pos)}
-        screenReaderLabel="Selected Player:"
-      >
-        {data.filteredPlayers[pos].map(player => (
-          <ContextSelectorItem key={player.id}>{player.name}</ContextSelectorItem>
-        ))}
-      </ContextSelector>
-    );
-
-  const photo = pos =>
-    _.get(data.selectedPlayerSportsDb[pos], 'strThumb') ? (
-      <Bullseye>
-        <Avatar src={data.selectedPlayerSportsDb[pos].strThumb} color="#ecedec" size="250px" round />
-      </Bullseye>
-    ) : (
-      <Bullseye>
-        <Avatar value={`P${pos + 1}`} color="#ecedec" size="250px" round />
-      </Bullseye>
-    );
+  const photo = pos => (
+    <Bullseye>
+      <Avatar src={_.get(data, `sportDbData${pos}.strThumb`)} color="#ecedec" size="250px" round />
+    </Bullseye>
+  );
 
   const playerDataRows = [
     {
       cells: [
-        data.selectedPlayerData[0].hasOwnProperty('isFavorite') ? (
+        _.has(data.playerData1, 'isFavorite') ? (
           <React.Fragment>
-            <Button
-              variant="plain"
-              aria-label="Favorite"
-              onClick={() => onToggleFavorite(data.selectedPlayerData[0], 0)}
-            >
-              {data.selectedPlayerData[0].isFavorite ? <StarIcon /> : <OutlinedStarIcon />}
+            <Button variant="plain" aria-label="Favorite" onClick={() => onToggleFavorite(data.playerData1, 1)}>
+              {data.playerData1.isFavorite ? <StarIcon /> : <OutlinedStarIcon />}
             </Button>
           </React.Fragment>
         ) : (
           ''
         ),
         'Favorite',
-        data.selectedPlayerData[1].hasOwnProperty('isFavorite') ? (
+        _.has(data.playerData2, 'isFavorite') ? (
           <React.Fragment>
-            <Button
-              variant="plain"
-              aria-label="Favorite"
-              onClick={() => onToggleFavorite(data.selectedPlayerData[1], 1)}
-            >
-              {data.selectedPlayerData[1].isFavorite ? <StarIcon /> : <OutlinedStarIcon />}
+            <Button variant="plain" aria-label="Favorite" onClick={() => onToggleFavorite(data.playerData2, 2)}>
+              {data.playerData2.isFavorite ? <StarIcon /> : <OutlinedStarIcon />}
             </Button>
           </React.Fragment>
         ) : (
@@ -347,34 +339,30 @@ const PlayerComparison = props => {
     },
     {
       cells: [
-        data.selectedPlayerData[0].hasOwnProperty('birthDate')
-          ? moment.utc(data.selectedPlayerData[0].birthDate).format('ll')
-          : '',
+        _.has(data.playerData1, 'birthDate') ? moment.utc(data.playerData1.birthDate).format('ll') : '',
         'Birthdate',
-        data.selectedPlayerData[1].hasOwnProperty('birthDate')
-          ? moment.utc(data.selectedPlayerData[1].birthDate).format('ll')
-          : ''
+        _.has(data.playerData2, 'birthDate') ? moment.utc(data.playerData2.birthDate).format('ll') : ''
       ]
     },
     {
-      cells: [data.selectedPlayerData[0].position || '', 'Position', data.selectedPlayerData[1].position || '']
+      cells: [_.get(data.playerData1, 'position', ''), 'Position', _.get(data.playerData2, 'position', '')]
     },
     {
       cells: [
-        data.selectedPlayerData[0].hasOwnProperty('height')
-          ? `${data.selectedPlayerData[0].height.split('-')[0]}' ${data.selectedPlayerData[0].height.split('-')[1]}"`
+        _.has(data.playerData1, 'height')
+          ? `${data.playerData1.height.split('-')[0]}' ${data.playerData1.height.split('-')[1]}"`
           : '',
         'Height',
-        data.selectedPlayerData[1].hasOwnProperty('height')
-          ? `${data.selectedPlayerData[1].height.split('-')[0]}' ${data.selectedPlayerData[1].height.split('-')[1]}"`
+        _.has(data.playerData2, 'birthDate')
+          ? `${data.playerData2.height.split('-')[0]}' ${data.playerData2.height.split('-')[1]}"`
           : ''
       ]
     },
     {
       cells: [
-        data.selectedPlayerData[0].hasOwnProperty('weight') ? `${data.selectedPlayerData[0].weight} lbs` : '',
+        _.has(data.playerData1, 'weight') ? `${data.playerData1.weight} lbs` : '',
         'Weight',
-        data.selectedPlayerData[1].hasOwnProperty('weight') ? `${data.selectedPlayerData[1].weight} lbs` : ''
+        _.has(data.playerData2, 'birthDate') ? `${data.playerData2.weight} lbs` : ''
       ]
     }
   ];
@@ -389,8 +377,8 @@ const PlayerComparison = props => {
       .then(res => {
         if (res.ok)
           dispatch({
-            type: 'FAVORITE_TOGGLED',
-            payload: { player, pos }
+            type: `FAVORITE_TOGGLED_${pos}`,
+            payload: { isFavorite: !player.isFavorite }
           });
         else props.showAlert("Ooops, looks like that didn't work 😔");
       })
@@ -399,12 +387,230 @@ const PlayerComparison = props => {
       });
   };
 
+  const onToggle = (type, value) => {
+    dispatch({
+      type,
+      payload: { value }
+    });
+  };
+
+  const onSeasonToggle = isExpanded => {
+    dispatch({
+      type: 'SEASON_SELECT_TOGGLE',
+      payload: { isExpanded }
+    });
+  };
+
+  const onSeasonClear = () => {
+    dispatch({
+      type: 'SEASON_SELECT_CLEAR'
+    });
+  };
+
+  const onSeasonSelect = (evt, selection) => {
+    dispatch({
+      type: 'UPDATE_SELECTED_SEASONS',
+      payload: {
+        selectedSeasons: _.includes(data.selectedSeasons, selection)
+          ? _.filter(data.selectedSeasons, season => season !== selection)
+          : _.union(data.selectedSeasons, [selection])
+      }
+    });
+  };
+
+  const filterBySelectedSeason = seasonData => {
+    if (_.isEmpty(data.selectedSeasons)) return seasonData;
+    const result = _.filter(seasonData, el => _.includes(data.selectedSeasons, _.toString(el.season)));
+    if (_.eq(_.size(result), 1)) return _.head(result);
+    return result;
+  };
+  const loadingPlaceholder = text => (
+    <Card>
+      <CardBody>
+        <EmptyState variant={EmptyStateVariant.full}>
+          <EmptyStateIcon variant="container" component={Spinner} />
+          <Title size="lg">{text ? text : 'Loading Player Stats.'}</Title>
+        </EmptyState>
+      </CardBody>
+    </Card>
+  );
+
+  const tabPlaceholder = text => (
+    <Card>
+      <CardBody>
+        <EmptyState variant={EmptyStateVariant.full}>
+          <EmptyStateIcon icon={SearchIcon} />
+          <Title headingLevel="h5" size="lg">
+            {text ? text : 'No Player Selected.'}
+          </Title>
+        </EmptyState>
+      </CardBody>
+    </Card>
+  );
+
+  const seasons = _.sortBy(
+    _.uniq(
+      _.concat(
+        _.map(data.statsPlayer1, seasonStats => seasonStats.season),
+        _.map(data.statsPlayer2, seasonStats => seasonStats.season)
+      )
+    )
+  );
+
+  const seasonSelect = (
+    <Card isCompact>
+      <CardBody>
+        <Select
+          variant={SelectVariant.typeaheadMulti}
+          ariaLabelTypeAhead="Select a season"
+          onToggle={onSeasonToggle}
+          onSelect={onSeasonSelect}
+          onClear={onSeasonClear}
+          selections={data.selectedSeasons}
+          isExpanded={data.seasonSelectIsExpanded}
+          placeholderText="Select a season"
+        >
+          {_.map(seasons, season => (
+            <SelectOption key={season} value={`${season}`} />
+          ))}
+        </Select>
+      </CardBody>
+    </Card>
+  );
+
+  const charts = () => {
+    const statsPlayer1 = filterBySelectedSeason(data.statsPlayer1);
+    const statsPlayer2 = filterBySelectedSeason(data.statsPlayer2);
+    return (
+      <React.Fragment>
+        <Accordion asDefinitionList noBoxShadow>
+          <AccordionItem>
+            <AccordionToggle
+              onClick={() => {
+                onToggle('CHART_CHANGE', 'field-goals');
+              }}
+              isExpanded={data.expanded === 'field-goals'}
+              id="field-goals"
+            >
+              Field Goals
+            </AccordionToggle>
+            <AccordionContent id="field-goals" isHidden={data.expanded !== 'field-goals'}>
+              {(!_.isArray(statsPlayer1) || _.isEmpty(statsPlayer1)) &&
+              (!_.isArray(statsPlayer2) || _.isEmpty(statsPlayer2)) ? (
+                <FieldGoalsComparisonChart
+                  playerData1={statsPlayer1}
+                  playerData2={statsPlayer2}
+                  playerName1={_.get(data.selectedPlayer1, 'name', '')}
+                  playerName2={_.get(data.selectedPlayer2, 'name', '')}
+                />
+              ) : (
+                <FieldGoalsComparisonAreaChart
+                  playerData1={statsPlayer1}
+                  playerData2={statsPlayer2}
+                  playerName1={_.get(data.selectedPlayer1, 'name', '')}
+                  playerName2={_.get(data.selectedPlayer2, 'name', '')}
+                />
+              )}
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem>
+            <AccordionToggle
+              onClick={() => {
+                onToggle('CHART_CHANGE', 'three-pointers');
+              }}
+              isExpanded={data.expanded === 'three-pointers'}
+              id="three-pointers"
+            >
+              Three Pointers
+            </AccordionToggle>
+            <AccordionContent id="three-pointers" isHidden={data.expanded !== 'three-pointers'}>
+              {(!_.isArray(statsPlayer1) || _.isEmpty(statsPlayer1)) &&
+              (!_.isArray(statsPlayer2) || _.isEmpty(statsPlayer2)) ? (
+                <ThreePointersComparisonChart
+                  playerData1={statsPlayer1}
+                  playerData2={statsPlayer2}
+                  playerName1={_.get(data.selectedPlayer1, 'name', '')}
+                  playerName2={_.get(data.selectedPlayer2, 'name', '')}
+                />
+              ) : (
+                <ThreePointersComparisonAreaChart
+                  playerData1={statsPlayer1}
+                  playerData2={statsPlayer2}
+                  playerName1={_.get(data.selectedPlayer1, 'name', '')}
+                  playerName2={_.get(data.selectedPlayer2, 'name', '')}
+                />
+              )}
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem>
+            <AccordionToggle
+              onClick={() => {
+                onToggle('CHART_CHANGE', 'free-throws');
+              }}
+              isExpanded={data.expanded === 'free-throws'}
+              id="free-throws"
+            >
+              Free Throws
+            </AccordionToggle>
+            <AccordionContent id="free-throws" isHidden={data.expanded !== 'free-throws'}>
+              {(!_.isArray(statsPlayer1) || _.isEmpty(statsPlayer1)) &&
+              (!_.isArray(statsPlayer2) || _.isEmpty(statsPlayer2)) ? (
+                <FreeThrowsComparisonChart
+                  playerData1={statsPlayer1}
+                  playerData2={statsPlayer2}
+                  playerName1={_.get(data.selectedPlayer1, 'name', '')}
+                  playerName2={_.get(data.selectedPlayer2, 'name', '')}
+                />
+              ) : (
+                <FreeThrowsComparisonAreaChart
+                  playerData1={statsPlayer1}
+                  playerData2={statsPlayer2}
+                  playerName1={_.get(data.selectedPlayer1, 'name', '')}
+                  playerName2={_.get(data.selectedPlayer2, 'name', '')}
+                />
+              )}
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem>
+            <AccordionToggle
+              onClick={() => {
+                onToggle('CHART_CHANGE', 'general-stats');
+              }}
+              isExpanded={data.expanded === 'general-stats'}
+              id="general-stats"
+            >
+              General Stats
+            </AccordionToggle>
+            <AccordionContent id="general-stats" isHidden={data.expanded !== 'general-stats'}>
+              {(!_.isArray(statsPlayer1) || _.isEmpty(statsPlayer1)) &&
+              (!_.isArray(statsPlayer2) || _.isEmpty(statsPlayer2)) ? (
+                <GeneralStatsComparisonChart
+                  playerData1={statsPlayer1}
+                  playerData2={statsPlayer2}
+                  playerName1={_.get(data.selectedPlayer1, 'name', '')}
+                  playerName2={_.get(data.selectedPlayer2, 'name', '')}
+                />
+              ) : (
+                <GeneralStatsComparisonAreaChart
+                  playerData1={statsPlayer1}
+                  playerData2={statsPlayer2}
+                  playerName1={_.get(data.selectedPlayer1, 'name', '')}
+                  playerName2={_.get(data.selectedPlayer2, 'name', '')}
+                />
+              )}
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </React.Fragment>
+    );
+  };
+
   return (
     <React.Fragment>
       <PageSection variant={PageSectionVariants.light}>
         <TextContent>
           <Text component="h1">Players</Text>
-          <Text component="p">Choose two players and compare their statistics.</Text>
+          <Text component="p">Choose two players and compare their stats.</Text>
         </TextContent>
       </PageSection>
       <PageSection>
@@ -414,7 +620,13 @@ const PlayerComparison = props => {
               <CardBody>
                 <Grid gutter="md">
                   <GridItem span={5}>
-                    <Bullseye>{dropdown(0)}</Bullseye>
+                    <Bullseye>
+                      <PlayerSearch
+                        onPlayerSelect={(id, name) => onPlayerSelect(1, id, name)}
+                        onError={error => props.showAlert(error, 'danger')}
+                        width="100%"
+                      />
+                    </Bullseye>
                   </GridItem>
                   <GridItem span={2}>
                     <Bullseye>
@@ -422,14 +634,20 @@ const PlayerComparison = props => {
                     </Bullseye>
                   </GridItem>
                   <GridItem span={5}>
-                    <Bullseye>{dropdown(1)}</Bullseye>
+                    <Bullseye>
+                      <PlayerSearch
+                        onPlayerSelect={(id, name) => onPlayerSelect(2, id, name)}
+                        onError={error => props.showAlert(error, 'danger')}
+                        width="100%"
+                      />
+                    </Bullseye>
                   </GridItem>
                   <GridItem span={5}>
-                    <Bullseye>{photo(0)}</Bullseye>
+                    <Bullseye>{photo(1)}</Bullseye>
                   </GridItem>
                   <GridItem span={2}></GridItem>
                   <GridItem span={5}>
-                    <Bullseye>{photo(1)}</Bullseye>
+                    <Bullseye>{photo(2)}</Bullseye>
                   </GridItem>
                   <GridItem span={12}>
                     <Bullseye>
@@ -445,8 +663,17 @@ const PlayerComparison = props => {
           </StackItem>
           <StackItem>
             <Card>
-              <CardBody>
-                <PlaceholderChart />
+              <CardBody style={{ padding: 0 }}>
+                {data.loadingStatsPlayer1 || data.loadingStatsPlayer2 ? (
+                  loadingPlaceholder()
+                ) : !_.isEmpty(data.statsPlayer1) || !_.isEmpty(data.statsPlayer1) ? (
+                  <React.Fragment>
+                    {seasonSelect}
+                    {charts()}
+                  </React.Fragment>
+                ) : (
+                  tabPlaceholder()
+                )}
               </CardBody>
             </Card>
           </StackItem>
