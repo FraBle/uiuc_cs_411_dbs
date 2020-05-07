@@ -224,7 +224,7 @@ const LatestFavorites = props => {
                 key={'franchise-' + franchise.id}
                 onClick={() => onToggleDetailModal('FRANCHISE', franchise)}
               >
-                {franchise.nickname}
+                {franchise.city} {franchise.nickname}
               </SimpleListItem>
             ))
           ) : (

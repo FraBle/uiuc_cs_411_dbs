@@ -17,46 +17,46 @@ const ThreePointersComparisonAreaChart = props => {
     const result = {
       assists1: {
         datapoints: [],
-        legendItem: { name: `${!props.playerName1 ? 'N/A' : props.playerName1}: Assists` }
+        legendItem: { name: `${!props.opponentName1 ? 'N/A' : props.opponentName1}: Assists` }
       },
       steals1: {
         datapoints: [],
-        legendItem: { name: `${!props.playerName1 ? 'N/A' : props.playerName1}: Steals` }
+        legendItem: { name: `${!props.opponentName1 ? 'N/A' : props.opponentName1}: Steals` }
       },
       blocks1: {
         datapoints: [],
-        legendItem: { name: `${!props.playerName1 ? 'N/A' : props.playerName1}: Blocks` }
+        legendItem: { name: `${!props.opponentName1 ? 'N/A' : props.opponentName1}: Blocks` }
       },
       turnovers1: {
         datapoints: [],
-        legendItem: { name: `${!props.playerName1 ? 'N/A' : props.playerName1}: Turnovers` }
+        legendItem: { name: `${!props.opponentName1 ? 'N/A' : props.opponentName1}: Turnovers` }
       },
       fouls1: {
         datapoints: [],
-        legendItem: { name: `${!props.playerName1 ? 'N/A' : props.playerName1}: Fouls` }
+        legendItem: { name: `${!props.opponentName1 ? 'N/A' : props.opponentName1}: Fouls` }
       },
       assists2: {
         datapoints: [],
-        legendItem: { name: `${!props.playerName2 ? 'N/A' : props.playerName2}: Assists` }
+        legendItem: { name: `${!props.opponentName2 ? 'N/A' : props.opponentName2}: Assists` }
       },
       steals2: {
         datapoints: [],
-        legendItem: { name: `${!props.playerName2 ? 'N/A' : props.playerName2}: Steals` }
+        legendItem: { name: `${!props.opponentName2 ? 'N/A' : props.opponentName2}: Steals` }
       },
       blocks2: {
         datapoints: [],
-        legendItem: { name: `${!props.playerName2 ? 'N/A' : props.playerName2}: Blocks` }
+        legendItem: { name: `${!props.opponentName2 ? 'N/A' : props.opponentName2}: Blocks` }
       },
       turnovers2: {
         datapoints: [],
-        legendItem: { name: `${!props.playerName2 ? 'N/A' : props.playerName2}: Turnovers` }
+        legendItem: { name: `${!props.opponentName2 ? 'N/A' : props.opponentName2}: Turnovers` }
       },
       fouls2: {
         datapoints: [],
-        legendItem: { name: `${!props.playerName2 ? 'N/A' : props.playerName2}: Fouls` }
+        legendItem: { name: `${!props.opponentName2 ? 'N/A' : props.opponentName2}: Fouls` }
       }
     };
-    _.map(props.playerData1, el => {
+    _.map(props.opponentData1, el => {
       result.assists1.datapoints.push({
         name: result.assists1.legendItem.name,
         x: `${el.season}`,
@@ -83,7 +83,7 @@ const ThreePointersComparisonAreaChart = props => {
         y: el.personalFouls
       });
     });
-    _.map(props.playerData2, el => {
+    _.map(props.opponentData2, el => {
       result.assists2.datapoints.push({
         name: result.assists2.legendItem.name,
         x: `${el.season}`,

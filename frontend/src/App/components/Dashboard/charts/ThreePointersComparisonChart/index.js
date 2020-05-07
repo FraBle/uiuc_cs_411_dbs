@@ -24,7 +24,7 @@ const ThreePointersComparisonChart = props => {
           />
         }
         domainPadding={{ x: [60, 60] }}
-        legendData={[{ name: _.get(props, 'playerName1', 'N/A') }, { name: _.get(props, 'playerName2', 'N/A') }]}
+        legendData={[{ name: _.get(props, 'opponentName1', 'N/A') }, { name: _.get(props, 'opponentName2', 'N/A') }]}
         legendOrientation="vertical"
         legendPosition="right"
         height={225}
@@ -42,28 +42,28 @@ const ThreePointersComparisonChart = props => {
           <ChartBar
             data={[
               {
-                name: _.get(props, 'playerName1', 'N/A'),
+                name: _.get(props, 'opponentName1', 'N/A'),
                 x: 'Three Pointers Made',
-                y: _.get(props, 'playerData1.threePointersMade', 0)
+                y: _.get(props, 'opponentData1.threePointersMade', 0)
               },
               {
-                name: _.get(props, 'playerName1', 'N/A'),
+                name: _.get(props, 'opponentName1', 'N/A'),
                 x: 'Three Pointers Attempted',
-                y: _.get(props, 'playerData1.threePointersAttempted', 0)
+                y: _.get(props, 'opponentData1.threePointersAttempted', 0)
               }
             ]}
           />
           <ChartBar
             data={[
               {
-                name: _.get(props, 'playerName2', 'N/A'),
+                name: _.get(props, 'opponentName2', 'N/A'),
                 x: 'Three Pointers Made',
-                y: _.get(props, 'playerData2.threePointersMade', 0)
+                y: _.get(props, 'opponentData2.threePointersMade', 0)
               },
               {
-                name: _.get(props, 'playerName2', 'N/A'),
+                name: _.get(props, 'opponentName2', 'N/A'),
                 x: 'Three Pointers Attempted',
-                y: _.get(props, 'playerData2.threePointersAttempted', 0)
+                y: _.get(props, 'opponentData2.threePointersAttempted', 0)
               }
             ]}
           />

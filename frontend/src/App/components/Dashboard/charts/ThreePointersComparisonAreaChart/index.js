@@ -17,22 +17,22 @@ const ThreePointersComparisonAreaChart = props => {
     const result = {
       threePointersMade1: {
         datapoints: [],
-        legendItem: { name: `${!props.playerName1 ? 'N/A' : props.playerName1}: Three Pointers Made` }
+        legendItem: { name: `${!props.opponentName1 ? 'N/A' : props.opponentName1}: Three Pointers Made` }
       },
       threePointersAttempted1: {
         datapoints: [],
-        legendItem: { name: `${!props.playerName1 ? 'N/A' : props.playerName1}: Three Pointers Attempted` }
+        legendItem: { name: `${!props.opponentName1 ? 'N/A' : props.opponentName1}: Three Pointers Attempted` }
       },
       threePointersMade2: {
         datapoints: [],
-        legendItem: { name: `${!props.playerName2 ? 'N/A' : props.playerName2}: Three Pointers Made` }
+        legendItem: { name: `${!props.opponentName2 ? 'N/A' : props.opponentName2}: Three Pointers Made` }
       },
       threePointersAttempted2: {
         datapoints: [],
-        legendItem: { name: `${!props.playerName2 ? 'N/A' : props.playerName2}: Three Pointers Attempted` }
+        legendItem: { name: `${!props.opponentName2 ? 'N/A' : props.opponentName2}: Three Pointers Attempted` }
       }
     };
-    _.map(props.playerData1, el => {
+    _.map(props.opponentData1, el => {
       result.threePointersMade1.datapoints.push({
         name: result.threePointersMade1.legendItem.name,
         x: `${el.season}`,
@@ -44,7 +44,7 @@ const ThreePointersComparisonAreaChart = props => {
         y: el.threePointersAttempted
       });
     });
-    _.map(props.playerData2, el => {
+    _.map(props.opponentData2, el => {
       result.threePointersMade2.datapoints.push({
         name: result.threePointersMade2.legendItem.name,
         x: `${el.season}`,
