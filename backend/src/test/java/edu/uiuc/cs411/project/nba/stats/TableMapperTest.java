@@ -26,6 +26,6 @@ public class TableMapperTest {
 
         assertThat(table).isNotNull();
         assertThat(table.getName()).isEqualTo("PLAYER");
-        assertThat(table.getnRows()).isEqualTo(5);
+        assertThat(table.getnRows()).isEqualTo(6);
     }
 }
