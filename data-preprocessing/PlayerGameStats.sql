@@ -1,4 +1,4 @@
-  CREATE TABLE `PlayerGameStats` (
+CREATE TABLE `PlayerGameStats` (
   `Game` int(11) NOT NULL,
   `Player` int(11) NOT NULL,
   `Franchise` int(11) NOT NULL,
@@ -17,6 +17,7 @@
   `Blocks` tinyint(4) NOT NULL,
   `Turnovers` tinyint(4) NOT NULL,
   `PersonalFouls` tinyint(4) NOT NULL,
+  UNIQUE KEY `Player_Game_Franchise` (`Player`,`Game`,`Franchise`),
   KEY `Game` (`Game`),
   KEY `Player` (`Player`),
   KEY `Franchise` (`Franchise`),
