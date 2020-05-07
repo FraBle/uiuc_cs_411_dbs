@@ -17,22 +17,22 @@ const FieldGoalsComparisonAreaChart = props => {
     const result = {
       fieldGoalsMade1: {
         datapoints: [],
-        legendItem: { name: `${!props.playerName1 ? 'N/A' : props.playerName1}: Field Goals Made` }
+        legendItem: { name: `${!props.opponentName1 ? 'N/A' : props.opponentName1}: Field Goals Made` }
       },
       fieldGoalsAttempted1: {
         datapoints: [],
-        legendItem: { name: `${!props.playerName1 ? 'N/A' : props.playerName1}: Field Goals Attempted` }
+        legendItem: { name: `${!props.opponentName1 ? 'N/A' : props.opponentName1}: Field Goals Attempted` }
       },
       fieldGoalsMade2: {
         datapoints: [],
-        legendItem: { name: `${!props.playerName2 ? 'N/A' : props.playerName2}: Field Goals Made` }
+        legendItem: { name: `${!props.opponentName2 ? 'N/A' : props.opponentName2}: Field Goals Made` }
       },
       fieldGoalsAttempted2: {
         datapoints: [],
-        legendItem: { name: `${!props.playerName2 ? 'N/A' : props.playerName2}: Field Goals Attempted` }
+        legendItem: { name: `${!props.opponentName2 ? 'N/A' : props.opponentName2}: Field Goals Attempted` }
       }
     };
-    _.map(props.playerData1, el => {
+    _.map(props.opponentData1, el => {
       result.fieldGoalsMade1.datapoints.push({
         name: result.fieldGoalsMade1.legendItem.name,
         x: `${el.season}`,
@@ -44,7 +44,7 @@ const FieldGoalsComparisonAreaChart = props => {
         y: el.fieldGoalsAttempted
       });
     });
-    _.map(props.playerData2, el => {
+    _.map(props.opponentData2, el => {
       result.fieldGoalsMade2.datapoints.push({
         name: result.fieldGoalsMade2.legendItem.name,
         x: `${el.season}`,

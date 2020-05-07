@@ -24,7 +24,7 @@ const FieldGoalsComparisonChart = props => {
           />
         }
         domainPadding={{ x: [60, 60] }}
-        legendData={[{ name: _.get(props, 'playerName1', 'N/A') }, { name: _.get(props, 'playerName2', 'N/A') }]}
+        legendData={[{ name: _.get(props, 'opponentName1', 'N/A') }, { name: _.get(props, 'opponentName2', 'N/A') }]}
         legendOrientation="vertical"
         legendPosition="right"
         height={225}
@@ -42,28 +42,28 @@ const FieldGoalsComparisonChart = props => {
           <ChartBar
             data={[
               {
-                name: _.get(props, 'playerName1', 'N/A'),
+                name: _.get(props, 'opponentName1', 'N/A'),
                 x: 'Field Goals Made',
-                y: _.get(props, 'playerData1.fieldGoalsMade', 0)
+                y: _.get(props, 'opponentData1.fieldGoalsMade', 0)
               },
               {
-                name: _.get(props, 'playerName1', 'N/A'),
+                name: _.get(props, 'opponentName1', 'N/A'),
                 x: 'Field Goals Attempted',
-                y: _.get(props, 'playerData1.fieldGoalsAttempted', 0)
+                y: _.get(props, 'opponentData1.fieldGoalsAttempted', 0)
               }
             ]}
           />
           <ChartBar
             data={[
               {
-                name: _.get(props, 'playerName2', 'N/A'),
+                name: _.get(props, 'opponentName2', 'N/A'),
                 x: 'Field Goals Made',
-                y: _.get(props, 'playerData2.fieldGoalsMade', 0)
+                y: _.get(props, 'opponentData2.fieldGoalsMade', 0)
               },
               {
-                name: _.get(props, 'playerName2', 'N/A'),
+                name: _.get(props, 'opponentName2', 'N/A'),
                 x: 'Field Goals Attempted',
-                y: _.get(props, 'playerData2.fieldGoalsAttempted', 0)
+                y: _.get(props, 'opponentData2.fieldGoalsAttempted', 0)
               }
             ]}
           />

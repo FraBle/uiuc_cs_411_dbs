@@ -125,15 +125,17 @@ const DBSizeChart = props => {
       </EmptyState>
     </Bullseye>
   ) : (
-    <ChartDonut
-      ariaDesc={METADATA.ariaDescription}
-      ariaTitle={METADATA.ariaTitle}
-      constrainToVisibleArea={true}
-      data={state.chartData}
-      labels={labels}
-      subTitle={METADATA.subTitle}
-      title={numbro(state.chartData.reduce((total, { y }) => total + y, 0)).format({ thousandSeparated: true })}
-    />
+    <Bullseye>
+      <ChartDonut
+        ariaDesc={METADATA.ariaDescription}
+        ariaTitle={METADATA.ariaTitle}
+        constrainToVisibleArea={true}
+        data={state.chartData}
+        labels={labels}
+        subTitle={METADATA.subTitle}
+        title={numbro(state.chartData.reduce((total, { y }) => total + y, 0)).format({ thousandSeparated: true })}
+      />
+    </Bullseye>
   );
 };
 
