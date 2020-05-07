@@ -3,6 +3,7 @@ package edu.uiuc.cs411.project.nba.stats.rest;
 import edu.uiuc.cs411.project.nba.stats.domain.Franchise;
 import edu.uiuc.cs411.project.nba.stats.domain.FranchiseStats;
 import edu.uiuc.cs411.project.nba.stats.domain.FranchiseSeasonStats;
+import edu.uiuc.cs411.project.nba.stats.domain.FranchiseWins;
 import edu.uiuc.cs411.project.nba.stats.domain.Game;
 import edu.uiuc.cs411.project.nba.stats.domain.User;
 import edu.uiuc.cs411.project.nba.stats.query.FranchiseMapper;
@@ -127,14 +128,23 @@ public class FranchiseController {
     @GetMapping("/stats/top/season/{season}")
     public List<FranchiseStats> topFranchiseStatsBySeason(@RequestParam("topN") String topN,
             @RequestParam("sortType") String sortType, @PathVariable("season") String season) {
-        return franchiseStatsMapper.topFranchiseStatsBySeason(Integer.parseInt(season), sortType,
-                Integer.parseInt(topN));
+        return franchiseStatsMapper.topFranchiseStatsBySeason(Integer.parseInt(season), sortType, Integer.parseInt(topN));
     }
 
     @GetMapping("/stats/top/game/{game}")
     public List<FranchiseStats> topFranchiseStatsByGame(@RequestParam("topN") String topN,
             @RequestParam("sortType") String sortType, @PathVariable("game") String game) {
         return franchiseStatsMapper.topFranchiseStatsByGame(Integer.parseInt(game), sortType, Integer.parseInt(topN));
+    }
+
+    @GetMapping("/stats/top/victories")
+    public List<FranchiseWins> topFranchiseStatsByVictory(@RequestParam(value = "topN", defaultValue = "10") String topN) {
+        return franchiseStatsMapper.getTopFranchiseByVictories(Integer.parseInt(topN));
+    }
+
+    @GetMapping("/stats/top/season/{season}/victories")
+    public List<FranchiseWins> topFranchiseStatsByVictoryOnSeason(@RequestParam(value = "topN", defaultValue = "10") String topN, @PathVariable("season") String season) {
+        return franchiseStatsMapper.getTopFranchiseByVictoriesOnSeason(Integer.parseInt(topN), Integer.parseInt(season));
     }
 
 }

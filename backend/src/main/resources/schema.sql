@@ -50,6 +50,8 @@ CREATE TABLE `Franchise` (
     PRIMARY KEY (`ID`)
 );
 
+DROP VIEW FranchiseWinsBySeason IF EXISTS;
+DROP VIEW FranchiseWins IF EXISTS;
 DROP TABLE Games IF EXISTS;
 CREATE TABLE `Games` (
   `ID` int(11) PRIMARY KEY,
@@ -150,6 +152,17 @@ SELECT Player,
        SUM(PersonalFouls) as PersonalFouls
 FROM PlayerGameStats
 GROUP BY Player, Franchise;
+
+CREATE VIEW `FranchiseWinsBySeason` AS
+SELECT FRANCHISE, Season, COUNT(*) AS VICTORIES FROM
+    (SELECT HomeFranchise AS FRANCHISE, Season FROM Games WHERE HomePoints > AwayPoints
+    UNION ALL
+    SELECT VisitorFranchise AS FRANCHISE, Season FROM Games WHERE AwayPoints > HomePoints)
+GROUP BY FRANCHISE, Season;
+
+CREATE VIEW `FranchiseWins` AS
+SELECT FRANCHISE, SUM(VICTORIES) AS VICTORIES FROM FranchiseWinsBySeason
+GROUP BY FRANCHISE;
 
 DROP INDEX IDXURLSHORT IF EXISTS;
 DROP TABLE ShortURL IF EXISTS;
