@@ -206,9 +206,9 @@ const Top10Chart = props => {
       <SimpleList>
         <SimpleListGroup title={`${_.startCase(props.type)}s`} id="toplist">
           {!_.isEmpty(state.data) ? (
-            state.data.map(entry => (
+            state.data.map((entry, i) => (
               <SimpleListItem key={'entry-' + entry[props.type]} onClick={() => onClick(props.type, entry[props.type])}>
-                {_.get(entry, `${props.type}Name`)}
+                {i + 1}. {_.get(entry, `${props.type}Name`)}
               </SimpleListItem>
             ))
           ) : (
