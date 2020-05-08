@@ -431,7 +431,7 @@ const FranchiseAnalysis = props => {
 
   const photo = _.get(data.sportsDbData, 'strTeamBadge') ? (
     <Bullseye>
-      <Avatar src={data.sportsDbData.strTeamBadge} color="#ecedec" size="250px" round />
+      <Avatar src={data.sportsDbData.strTeamBadge} color="#ecedec" size="250px" />
     </Bullseye>
   ) : (
     <Bullseye>

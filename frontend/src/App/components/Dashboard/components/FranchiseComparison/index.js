@@ -260,7 +260,7 @@ const FranchiseComparison = props => {
 
   const photo = pos => (
     <Bullseye>
-      <Avatar src={_.get(data, `sportDbData${pos}.strTeamBadge`)} color="#ecedec" size="250px" round />
+      <Avatar src={_.get(data, `sportDbData${pos}.strTeamBadge`)} color="#ecedec" size="250px" />
     </Bullseye>
   );
 

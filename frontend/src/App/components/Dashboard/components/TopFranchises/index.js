@@ -174,7 +174,7 @@ const TopFranchises = props => {
   const photo =
     !_.isNil(data.franchisePhoto) && !data.loading ? (
       <Bullseye>
-        <Avatar src={data.franchisePhoto} color="#ecedec" size="250px" round />
+        <Avatar src={data.franchisePhoto} color="#ecedec" size="250px" />
       </Bullseye>
     ) : (
       <Bullseye>
