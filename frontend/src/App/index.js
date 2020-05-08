@@ -3,6 +3,7 @@ import { AuthProvider, ProtectedRoute, AuthConsumer } from './Auth';
 import { BrowserRouter as Router, Route, Switch, Redirect, useLocation } from 'react-router-dom';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
+import ShareUrlRedirect from './components/ShareUrlRedirect';
 import queryString from 'query-string';
 import { Title, Bullseye, EmptyState, EmptyStateIcon } from '@patternfly/react-core';
 import { withGoogleAnalytics } from './Analytics';
@@ -43,6 +44,7 @@ const App = () => {
               component={() => <LoadingPlaceHolder isReady={state.isReady} isAuthenticated={state.isAuthenticated} />}
             />
             <ProtectedRoute path="/dashboard" component={Dashboard} />
+            <ProtectedRoute path="/go/:url" component={ShareUrlRedirect} />
             <Route path="/signin" component={Login} />
           </Switch>
         )}

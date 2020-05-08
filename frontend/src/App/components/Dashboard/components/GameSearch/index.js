@@ -82,7 +82,7 @@ const GameSearch = props => {
     if (
       _.isNil(props.selectedMonthYear) ||
       (props.filterByPlayer && _.isEmpty(props.selectedPlayer)) ||
-      (props.filterByFranchise && _.isEmpty(props.selectedFranchise))
+      (props.filterByFranchise && _.isNil(props.selectedFranchise))
     )
       return;
     dispatch({ type: 'FETCH_GAMES_REQUEST' });
@@ -95,7 +95,7 @@ const GameSearch = props => {
     if (props.filterByPlayer) {
       url += `&playerId=${props.selectedPlayer.id}`;
     } else if (props.filterByFranchise) {
-      url += `&franchiseId=${props.selectedFranchise.id}`;
+      url += `&franchiseId=${props.selectedFranchise}`;
     }
 
     fetch(url, {

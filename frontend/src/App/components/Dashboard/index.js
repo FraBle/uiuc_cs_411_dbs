@@ -8,9 +8,10 @@ import {
   Brand,
   Breadcrumb,
   BreadcrumbItem,
+  Button,
+  ButtonVariant,
   Dropdown,
   DropdownItem,
-  DropdownSeparator,
   DropdownToggle,
   Nav,
   NavExpandable,
@@ -26,6 +27,7 @@ import {
 } from '@patternfly/react-core';
 import accessibleStyles from '@patternfly/react-styles/css/utilities/Accessibility/accessibility';
 import { css } from '@patternfly/react-styles';
+import { ShareAltIcon } from '@patternfly/react-icons';
 import gravatarUrl from 'gravatar-url';
 
 import { AuthContext, ProtectedRoute } from '../../Auth';
@@ -41,6 +43,7 @@ import Players from './components/Players';
 import Search from './components/Search';
 import TopFranchises from './components/TopFranchises';
 import TopPlayers from './components/TopPlayers';
+import ShareURL from './components/ShareURL';
 
 const DashboardRoutes = {
   'overview-dashboard': '/dashboard',
@@ -304,8 +307,6 @@ const Dashboard = props => {
   );
 
   const userDropdownItems = [
-    <DropdownItem component="button">Profile</DropdownItem>,
-    <DropdownSeparator />,
     <DropdownItem component="button" onClick={onLogout}>
       Logout
     </DropdownItem>
@@ -313,6 +314,11 @@ const Dashboard = props => {
 
   const PageToolbar = (
     <Toolbar>
+      <ToolbarGroup className={css(accessibleStyles.screenReader, accessibleStyles.visibleOnMd)}>
+        <ToolbarItem>
+          <ShareURL />
+        </ToolbarItem>
+      </ToolbarGroup>
       <ToolbarGroup>
         <ToolbarItem className={css(accessibleStyles.screenReader, accessibleStyles.visibleOnMd)}>
           <Dropdown
