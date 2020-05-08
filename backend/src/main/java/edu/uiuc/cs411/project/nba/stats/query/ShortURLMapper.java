@@ -7,14 +7,13 @@ import org.apache.ibatis.annotations.Select;
 
 public interface ShortURLMapper {
 
-    @Select("SELECT id FROM ShortURL WHERE url = #{url}")
-    Integer find(String url);
+    @Select("SELECT * FROM ShortURL WHERE url = #{url}")
+    ShortURL find(String url);
 
     @Select("SELECT * FROM ShortURL WHERE id = #{id}")
     ShortURL findById(Integer id);
 
     @Insert("INSERT INTO ShortURL(url) values (#{url})")
-    @Options(useGeneratedKeys = true, keyProperty = "id")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     int insert(ShortURL shortURL);
-
 }

@@ -4,11 +4,17 @@ public class ShortURL {
 
     private int id;
     private String url;
+    private String shortUrl;
 
     public ShortURL() {
     }
 
     public ShortURL(String url) {
+        this.url = url;
+    }
+
+    public ShortURL(int id, String url) {
+        this.id = id;
         this.url = url;
     }
 
@@ -26,6 +32,14 @@ public class ShortURL {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getShortUrl() {
+        return this.shortUrl;
+    }
+
+    public void setShortUrl(String shortUrl) {
+        this.shortUrl = shortUrl;
     }
 
 }
