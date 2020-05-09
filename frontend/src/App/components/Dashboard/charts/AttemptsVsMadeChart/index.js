@@ -26,7 +26,7 @@ const AttemptsVsMadeChart = props => {
             constrainToVisibleArea
           />
         }
-        domainPadding={{ x: [30, 25] }}
+        domainPadding={{ x: 120 }}
         legendData={LEGEND}
         legendOrientation="vertical"
         legendPosition="right"
@@ -43,6 +43,7 @@ const AttemptsVsMadeChart = props => {
         <ChartAxis dependentAxis showGrid />
         <ChartStack>
           <ChartBar
+            barWidth={60}
             data={[
               {
                 name: 'Made',
@@ -65,6 +66,7 @@ const AttemptsVsMadeChart = props => {
             ]}
           />
           <ChartBar
+            barWidth={60}
             data={[
               {
                 name: 'Attempted',

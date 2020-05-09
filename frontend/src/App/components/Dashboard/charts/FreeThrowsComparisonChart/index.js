@@ -23,7 +23,7 @@ const FreeThrowsComparisonChart = props => {
             constrainToVisibleArea
           />
         }
-        domainPadding={{ x: [60, 60] }}
+        domainPadding={{ x: 120 }}
         legendData={[{ name: _.get(props, 'opponentName1', 'N/A') }, { name: _.get(props, 'opponentName2', 'N/A') }]}
         legendOrientation="vertical"
         legendPosition="right"
@@ -38,8 +38,9 @@ const FreeThrowsComparisonChart = props => {
       >
         <ChartAxis />
         <ChartAxis dependentAxis showGrid />
-        <ChartGroup offset={11}>
+        <ChartGroup offset={35}>
           <ChartBar
+            barWidth={30}
             data={[
               {
                 name: _.get(props, 'opponentName1', 'N/A'),
@@ -54,6 +55,7 @@ const FreeThrowsComparisonChart = props => {
             ]}
           />
           <ChartBar
+            barWidth={30}
             data={[
               {
                 name: _.get(props, 'opponentName2', 'N/A'),
