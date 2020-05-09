@@ -81,7 +81,7 @@ const GameSearch = props => {
   React.useEffect(() => {
     if (
       _.isNil(props.selectedMonthYear) ||
-      (props.filterByPlayer && _.isEmpty(props.selectedPlayer)) ||
+      (props.filterByPlayer && _.isNil(props.selectedPlayer)) ||
       (props.filterByFranchise && _.isNil(props.selectedFranchise))
     )
       return;
@@ -93,7 +93,7 @@ const GameSearch = props => {
     let url = `${BACKEND}/api/game?month=${month}&year=${year}`;
 
     if (props.filterByPlayer) {
-      url += `&playerId=${props.selectedPlayer.id}`;
+      url += `&playerId=${props.selectedPlayer}`;
     } else if (props.filterByFranchise) {
       url += `&franchiseId=${props.selectedFranchise}`;
     }
