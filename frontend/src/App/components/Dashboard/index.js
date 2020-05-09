@@ -299,7 +299,7 @@ const Dashboard = props => {
   );
 
   const userDropdownItems = [
-    <DropdownItem component="button" onClick={onLogout}>
+    <DropdownItem component="button" onClick={onLogout} key="logout">
       Logout
     </DropdownItem>
   ];
