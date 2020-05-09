@@ -8,8 +8,6 @@ import {
   Brand,
   Breadcrumb,
   BreadcrumbItem,
-  Button,
-  ButtonVariant,
   Dropdown,
   DropdownItem,
   DropdownToggle,
@@ -25,9 +23,9 @@ import {
   ToolbarGroup,
   ToolbarItem
 } from '@patternfly/react-core';
-import accessibleStyles from '@patternfly/react-styles/css/utilities/Accessibility/accessibility';
+import { useLocation } from 'react-router-dom';
 import { css } from '@patternfly/react-styles';
-import { ShareAltIcon } from '@patternfly/react-icons';
+import accessibleStyles from '@patternfly/react-styles/css/utilities/Accessibility/accessibility';
 import gravatarUrl from 'gravatar-url';
 
 import { AuthContext, ProtectedRoute } from '../../Auth';
@@ -175,16 +173,25 @@ const RoutesToBreadcrumbs = {
   )
 };
 
+const initialState = {
+  isDropdownOpen: false,
+  activeGroup: null,
+  activeItem: null,
+  alerts: []
+};
+
 const Dashboard = props => {
-  const initialState = {
-    isDropdownOpen: false,
-    isKebabDropdownOpen: false,
-    activeGroup: RoutesToNavMapping[props.location.pathname].activeGroup,
-    activeItem: RoutesToNavMapping[props.location.pathname].activeItem,
-    alerts: []
-  };
   const { state: authState, dispatch } = React.useContext(AuthContext);
   const [data, setData] = React.useState(initialState);
+  const location = useLocation();
+
+  React.useEffect(() => {
+    setData({
+      ...data,
+      activeGroup: RoutesToNavMapping[location.pathname].activeGroup,
+      activeItem: RoutesToNavMapping[location.pathname].activeItem
+    });
+  }, [location]);
 
   const onDropdownToggle = isDropdownOpen => {
     setData({
@@ -198,21 +205,6 @@ const Dashboard = props => {
     setData({
       ...data,
       isDropdownOpen: !data.isDropdownOpen
-    });
-  };
-
-  const onKebabDropdownToggle = isKebabDropdownOpen => {
-    setData({
-      ...data,
-      isKebabDropdownOpen
-    });
-  };
-
-  const onKebabDropdownSelect = event => {
-    event.preventDefault();
-    setData({
-      ...data,
-      isKebabDropdownOpen: !data.isKebabDropdownOpen
     });
   };
 
