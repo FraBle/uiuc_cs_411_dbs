@@ -34,11 +34,13 @@ import {
   TextVariants,
   Title
 } from '@patternfly/react-core';
-import { CalendarAltIcon, SearchIcon, ExternalLinkSquareAltIcon } from '@patternfly/react-icons';
-import { useHistory } from 'react-router-dom';
-import moment from 'moment';
-import _ from 'lodash';
 import Avatar from 'react-avatar';
+import { CalendarAltIcon, SearchIcon, ExternalLinkSquareAltIcon } from '@patternfly/react-icons';
+import { useQueryParam, NumberParam, StringParam } from 'use-query-params';
+import { useHistory } from 'react-router-dom';
+import _ from 'lodash';
+import moment from 'moment';
+
 import { AuthContext } from '../../../../Auth';
 import GameSearch from '../GameSearch';
 import PlayerSearch from '../PlayerSearch';
@@ -47,16 +49,6 @@ import AssistsReboundsChart from '../../charts/AssistsReboundsChart';
 import AssistsReboundsComparisonChart from '../../charts/AssistsReboundsComparisonChart';
 
 const initialState = {
-  activeTabKey: 1,
-  selectedGame: {},
-  selectedGamePlayers: {},
-  selectedPlayer: {
-    home: null,
-    visitor: null
-  },
-  selectedMonthYear: null,
-  sportsDbDataHome: {},
-  sportsDbDataVisitor: {},
   loading: {
     sportsDbHome: false,
     sportsDbVisitor: false,
@@ -66,21 +58,19 @@ const initialState = {
     home: 'percentages',
     comparison: 'field-goals',
     visitor: 'percentages'
-  }
+  },
+  selectedGame: {},
+  selectedGamePlayers: {},
+  selectedPlayer: {
+    home: null,
+    visitor: null
+  },
+  sportsDbDataHome: {},
+  sportsDbDataVisitor: {}
 };
 
 const reducer = (state, action) => {
   switch (action.type) {
-    case 'MONTH_YEAR_CHANGE':
-      return {
-        ...state,
-        selectedMonthYear: action.payload.value
-      };
-    case 'GAME_SELECTED':
-      return {
-        ...state,
-        selectedGame: action.payload.game
-      };
     case 'FETCH_SPORTSDB_REQUEST':
       return {
         ...state,
@@ -102,6 +92,23 @@ const reducer = (state, action) => {
         },
         sportsDbDataHome: _.eq(action.payload.type, 'home') ? action.payload.franchise : state.sportsDbDataHome,
         sportsDbDataVisitor: _.eq(action.payload.type, 'visitor') ? action.payload.franchise : state.sportsDbDataVisitor
+      };
+    case 'FETCH_GAME_REQUEST':
+      return {
+        ...state,
+        loading: {
+          ...state.loading,
+          game: true
+        }
+      };
+    case 'FETCH_GAME_SUCCESS':
+      return {
+        ...state,
+        loading: {
+          ...state.loading,
+          game: false
+        },
+        selectedGame: action.payload.game
       };
     case 'FETCH_PLAYERS_REQUEST':
       return {
@@ -137,11 +144,6 @@ const reducer = (state, action) => {
           visitor: action.payload.player
         }
       };
-    case 'TAB_CHANGE':
-      return {
-        ...state,
-        activeTabKey: action.payload.tabIndex
-      };
     case 'CHART_CHANGE_HOME':
       return {
         ...state,
@@ -171,21 +173,46 @@ const reducer = (state, action) => {
   }
 };
 
+const tabNameToId = {
+  Home: 0,
+  Comparison: 1,
+  Visitor: 2
+};
+
+const tabIdToName = {
+  0: 'Home',
+  1: 'Comparison',
+  2: 'Visitor'
+};
+
 const GamesAnalysis = props => {
   const { state: authState } = React.useContext(AuthContext);
   const [data, dispatch] = React.useReducer(reducer, initialState);
+  const [gameId, setGameId] = useQueryParam('gameId', NumberParam);
+  const [gameMonthYear, setGameMonthYear] = useQueryParam('gameMonthYear', StringParam);
+  const [activeTabName, setActiveTabName] = useQueryParam('tab', StringParam);
   const history = useHistory();
 
   React.useEffect(() => {
-    if (_.isEmpty(data.selectedGame)) return;
+    if (_.isNil(gameId)) return;
     dispatch({ type: 'FETCH_SPORTSDB_REQUEST' });
     dispatch({ type: 'FETCH_PLAYERS_REQUEST' });
-    Promise.all([fetchSportsDb('home'), fetchSportsDb('visitor'), fetchPlayers(data.selectedGame.id)]);
-  }, [data.selectedGame]);
+    Promise.all([fetchPlayers(gameId), fetchGameData(gameId)]).then(([players, game]) =>
+      Promise.all([
+        fetchSportsDb(`${game.homeCity} ${game.homeNickname}`, 'home'),
+        fetchSportsDb(`${game.visitorCity} ${game.visitorNickname}`, 'visitor')
+      ])
+    );
+  }, [gameId]);
 
-  const fetchSportsDb = type => {
+  // Set default for activeTabName
+  React.useEffect(() => {
+    if (!activeTabName) setActiveTabName('Comparison');
+  }, []);
+
+  const fetchSportsDb = (franchiseName, type) => {
     if (!type) return;
-    fetch(`https://www.thesportsdb.com/api/v1/json/1/searchteams.php?t=${formatFranchise(type)}`)
+    fetch(`https://www.thesportsdb.com/api/v1/json/1/searchteams.php?t=${franchiseName}`)
       .then(response => {
         if (!response.ok) throw new Error(response.status);
         else return response.json();
@@ -200,14 +227,13 @@ const GamesAnalysis = props => {
         })
       )
       .catch(error => {
-        dispatch({ type: 'FETCH_SPORTSDB_FAILURE' });
         props.showAlert('Could not load franchise data from TheSportsDB.com 😔', 'danger');
       });
   };
 
   const fetchPlayers = gameId => {
     if (!gameId) return;
-    fetch(`${BACKEND}/api/game/${gameId}/players`, {
+    return fetch(`${BACKEND}/api/game/${gameId}/players`, {
       headers: {
         Authorization: `Bearer ${authState.token}`
       }
@@ -216,14 +242,39 @@ const GamesAnalysis = props => {
         if (!response.ok) throw new Error(response.status);
         else return response.json();
       })
-      .then(players =>
+      .then(players => {
         dispatch({
           type: 'FETCH_PLAYERS_SUCCESS',
           payload: { players }
-        })
-      )
+        });
+        return players;
+      })
       .catch(error => {
         props.showAlert('Could not load players 😔', 'danger');
+      });
+  };
+
+  const fetchGameData = gameId => {
+    if (!gameId) return;
+    dispatch({ type: 'FETCH_GAME_REQUEST' });
+    return fetch(`${BACKEND}/api/game/${gameId}`, {
+      headers: {
+        Authorization: `Bearer ${authState.token}`
+      }
+    })
+      .then(response => {
+        if (!response.ok) throw new Error(response.status);
+        else return response.json();
+      })
+      .then(game => {
+        dispatch({
+          type: 'FETCH_GAME_SUCCESS',
+          payload: { game }
+        });
+        return game;
+      })
+      .catch(error => {
+        props.showAlert('Could not load game data 😔', 'danger');
       });
   };
 
@@ -232,25 +283,8 @@ const GamesAnalysis = props => {
       ? `${data.selectedGame.homeCity} ${data.selectedGame.homeNickname}`
       : `${data.selectedGame.visitorCity} ${data.selectedGame.visitorNickname}`;
 
-  const onMonthYearChange = value => {
-    dispatch({
-      type: 'MONTH_YEAR_CHANGE',
-      payload: { value }
-    });
-  };
-
   const onTabClick = (_, tabIndex) => {
-    dispatch({
-      type: 'TAB_CHANGE',
-      payload: { tabIndex }
-    });
-  };
-
-  const onGameSelect = game => {
-    dispatch({
-      type: 'GAME_SELECTED',
-      payload: { game }
-    });
+    setActiveTabName(tabIdToName[tabIndex]);
   };
 
   const onPlayerSelect = (player, tab) => {
@@ -272,7 +306,9 @@ const GamesAnalysis = props => {
       history.push(
         `/dashboard/analysis/player?id=${data.selectedPlayer[tab].id}&name=${
           data.selectedPlayer[tab].name
-        }&tab=ByGame&gameId=${data.selectedGame.id}&gameMonthYear=${moment.utc(data.selectedGame.date).format('YYYY-MM')}`
+        }&tab=ByGame&gameId=${data.selectedGame.id}&gameMonthYear=${moment
+          .utc(data.selectedGame.date)
+          .format('YYYY-MM')}`
       );
     }
   };
@@ -571,7 +607,7 @@ const GamesAnalysis = props => {
                             aria-label="Month and Year"
                             min="2003-10"
                             max="2020-03"
-                            onChange={onMonthYearChange}
+                            onChange={val => setGameMonthYear(val)}
                           />
                         </InputGroup>
                       </StackItem>
@@ -580,10 +616,10 @@ const GamesAnalysis = props => {
                           Step 2: Select a game from your selected time range
                         </Title>
                         <GameSearch
-                          onGameSelect={onGameSelect}
+                          onGameSelect={game => setGameId(game.id)}
                           onError={error => props.showAlert(error, 'danger')}
                           width="100%"
-                          selectedMonthYear={data.selectedMonthYear}
+                          selectedMonthYear={gameMonthYear}
                         />
                       </StackItem>
                       <StackItem isFilled>
@@ -658,7 +694,7 @@ const GamesAnalysis = props => {
           <StackItem>
             <Card>
               <CardBody style={{ padding: 0 }}>
-                <Tabs isFilled mountOnEnter activeKey={data.activeTabKey} onSelect={onTabClick}>
+                <Tabs isFilled activeKey={!activeTabName ? 1 : tabNameToId[activeTabName]} onSelect={onTabClick}>
                   <Tab
                     eventKey={0}
                     title={_.isEmpty(data.sportsDbDataHome) ? 'Home' : `Home: ${formatFranchise('home')}`}
