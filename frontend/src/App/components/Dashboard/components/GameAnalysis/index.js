@@ -304,9 +304,7 @@ const GamesAnalysis = props => {
   const onInspectByPlayerClick = tab => {
     if (!_.isNil(data.selectedPlayer[tab])) {
       history.push(
-        `/dashboard/analysis/player?id=${data.selectedPlayer[tab].id}&name=${
-          data.selectedPlayer[tab].name
-        }&tab=ByGame&gameId=${data.selectedGame.id}&gameMonthYear=${moment
+        `/dashboard/analysis/player?id=${data.selectedPlayer[tab].id}&tab=ByGame&gameId=${data.selectedGame.id}&gameMonthYear=${moment
           .utc(data.selectedGame.date)
           .format('YYYY-MM')}`
       );
