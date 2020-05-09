@@ -316,7 +316,7 @@ const Dashboard = props => {
     <Toolbar>
       <ToolbarGroup className={css(accessibleStyles.screenReader, accessibleStyles.visibleOnMd)}>
         <ToolbarItem>
-          <ShareURL />
+          <ShareURL showAlert={showAlert} />
         </ToolbarItem>
       </ToolbarGroup>
       <ToolbarGroup>

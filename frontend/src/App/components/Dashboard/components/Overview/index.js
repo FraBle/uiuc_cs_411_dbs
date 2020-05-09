@@ -14,7 +14,7 @@ import {
 import DBSizeChart from '../../charts/DBSizeChart';
 import LatestFavorites from '../../charts/LatestFavorites';
 import Top10Chart from '../../charts/Top10Chart';
-import PlaceholderChart from '../../charts/PlaceholderChart';
+import Top10WinsChart from '../../charts/Top10WinsChart';
 
 const Overview = props => {
   return (
@@ -71,9 +71,9 @@ const Overview = props => {
           </GalleryItem>
           <GalleryItem>
             <Card isHoverable style={{ minHeight: '26rem' }}>
-              <CardHeader>Another Chart</CardHeader>
+              <CardHeader>Top 10 Franchises by Victories</CardHeader>
               <CardBody>
-                <PlaceholderChart />
+                <Top10WinsChart showAlert={props.showAlert} type="franchise" />
               </CardBody>
             </Card>
           </GalleryItem>
