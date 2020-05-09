@@ -197,8 +197,9 @@ const GamesAnalysis = props => {
     if (_.isNil(gameId)) return;
     dispatch({ type: 'FETCH_SPORTSDB_REQUEST' });
     dispatch({ type: 'FETCH_PLAYERS_REQUEST' });
-    Promise.all([fetchPlayers(gameId), fetchGameData(gameId)]).then(([players, game]) =>
+    fetchGameData(gameId).then(game =>
       Promise.all([
+        fetchPlayers(gameId),
         fetchSportsDb(`${game.homeCity} ${game.homeNickname}`, 'home'),
         fetchSportsDb(`${game.visitorCity} ${game.visitorNickname}`, 'visitor')
       ])
@@ -304,9 +305,9 @@ const GamesAnalysis = props => {
   const onInspectByPlayerClick = tab => {
     if (!_.isNil(data.selectedPlayer[tab])) {
       history.push(
-        `/dashboard/analysis/player?id=${data.selectedPlayer[tab].id}&tab=ByGame&gameId=${data.selectedGame.id}&gameMonthYear=${moment
-          .utc(data.selectedGame.date)
-          .format('YYYY-MM')}`
+        `/dashboard/analysis/player?id=${data.selectedPlayer[tab].id}&tab=ByGame&gameId=${
+          data.selectedGame.id
+        }&gameMonthYear=${moment.utc(data.selectedGame.date).format('YYYY-MM')}`
       );
     }
   };

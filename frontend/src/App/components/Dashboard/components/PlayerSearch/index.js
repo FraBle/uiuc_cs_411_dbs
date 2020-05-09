@@ -93,7 +93,7 @@ const PlayerSearch = props => {
         }
       });
     }
-  }, []);
+  }, [props.players]);
 
   const fetchPlayers = (limit = 10) => {
     fetch(
