@@ -6,8 +6,12 @@ import edu.uiuc.cs411.project.nba.stats.security.JwtResponse;
 import edu.uiuc.cs411.project.nba.stats.security.JwtUtils;
 import edu.uiuc.cs411.project.nba.stats.security.LoginRequest;
 import edu.uiuc.cs411.project.nba.stats.security.SignupRequest;
+import org.apache.ibatis.exceptions.IbatisException;
+import org.apache.ibatis.exceptions.PersistenceException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,6 +22,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.sql.SQLException;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -61,7 +67,12 @@ public class AuthController {
 
 		User user = new User(signUpRequest.getUsername(), signUpRequest.getEmail(),
 				encoder.encode(signUpRequest.getPassword()));
-		userMapper.save(user);
+
+		try {
+			userMapper.save(user);
+		} catch (final UncategorizedSQLException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getSQLException().getMessage());
+		}
 
 		return ResponseEntity.ok("User registered successfully!");
 	}
