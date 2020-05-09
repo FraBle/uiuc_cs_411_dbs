@@ -182,7 +182,7 @@ const PlayerSearch = props => {
       screenReaderLabel="Selected Player:"
       style={{ width: props.width }}
     >
-      {data.filteredPlayers.map(player => (
+      {_.get(data, 'filteredPlayers', []).map(player => (
         <ContextSelectorItem key={player.id}>
           <Player id={player.id} name={player.name} />
         </ContextSelectorItem>

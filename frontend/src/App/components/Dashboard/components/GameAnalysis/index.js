@@ -311,6 +311,12 @@ const GamesAnalysis = props => {
     }
   };
 
+  const onFranchiseClick = franchiseId => {
+    if (franchiseId) {
+      history.push(`/dashboard/analysis/franchise?id=${franchiseId}`);
+    }
+  };
+
   const photo = (sportsDbData, defaultValue) =>
     _.get(sportsDbData, 'strTeamBadge') ? (
       <Bullseye>
@@ -637,6 +643,7 @@ const GamesAnalysis = props => {
                                   isInline
                                   icon={<ExternalLinkSquareAltIcon />}
                                   iconPosition="right"
+                                  onClick={() => onFranchiseClick(data.selectedGame.homeFranchise)}
                                 >
                                   {formatFranchise('home')}
                                 </Button>
@@ -652,6 +659,7 @@ const GamesAnalysis = props => {
                                   isInline
                                   icon={<ExternalLinkSquareAltIcon />}
                                   iconPosition="right"
+                                  onClick={() => onFranchiseClick(data.selectedGame.visitorFranchise)}
                                 >
                                   {formatFranchise('visitor')}
                                 </Button>
