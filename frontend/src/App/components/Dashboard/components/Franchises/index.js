@@ -27,8 +27,10 @@ import {
   SortAlphaUpIcon,
   StarIcon,
   OutlinedStarIcon,
-  SearchIcon
+  SearchIcon,
+  ChartLineIcon
 } from '@patternfly/react-icons';
+import { useHistory } from 'react-router-dom';
 import { global_danger_color_200 as globalDangerColor200 } from '@patternfly/react-tokens';
 import { Table, TableHeader, TableBody } from '@patternfly/react-table';
 import { Spinner } from '@patternfly/react-core';
@@ -156,6 +158,7 @@ const reducer = (state, action) => {
 const Franchises = props => {
   const { state: authState } = React.useContext(AuthContext);
   const [data, dispatch] = React.useReducer(reducer, initialState);
+  const history = useHistory();
 
   React.useEffect(() => {
     dispatch({
@@ -286,6 +289,12 @@ const Franchises = props => {
     });
   };
 
+  const onFranchiseAnalysisClick = franchiseId => {
+    if (franchiseId) {
+      history.push(`/dashboard/analysis/franchise?id=${franchiseId}`);
+    }
+  };
+
   if (data.error) {
     const noResultsRows = [
       {
@@ -387,7 +396,7 @@ const Franchises = props => {
 
         {!data.loading && (
           <Table
-            cells={[...cells, 'Details']}
+            cells={[...cells, 'Details', 'Analysis']}
             rows={data.franchises.map(franchise => [
               <React.Fragment>
                 <Button
@@ -407,6 +416,11 @@ const Franchises = props => {
               <React.Fragment>
                 <Button variant="plain" aria-label="Details" onClick={() => onToggleDetailModal(franchise)}>
                   <SearchIcon />
+                </Button>
+              </React.Fragment>,
+              <React.Fragment>
+                <Button variant="plain" aria-label="Analysis" onClick={() => onFranchiseAnalysisClick(franchise.id)}>
+                  <ChartLineIcon />
                 </Button>
               </React.Fragment>
             ])}

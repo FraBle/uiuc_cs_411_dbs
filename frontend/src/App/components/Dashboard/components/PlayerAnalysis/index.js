@@ -33,28 +33,29 @@ import {
   TextVariants,
   Title
 } from '@patternfly/react-core';
-import _ from 'lodash';
-import { AuthContext } from '../../../../Auth';
-import { CalendarAltIcon, SearchIcon } from '@patternfly/react-icons';
-import { useLocation } from 'react-router-dom';
-import AttemptsVsMadeAreaChart from '../../charts/AttemptsVsMadeAreaChart';
-import AttemptsVsMadeChart from '../../charts/AttemptsVsMadeChart';
 import Avatar from 'react-avatar';
+import { CalendarAltIcon, SearchIcon } from '@patternfly/react-icons';
+import { useQueryParam, NumberParam, StringParam } from 'use-query-params';
+import _ from 'lodash';
+import moment from 'moment';
+
+import { AuthContext } from '../../../../Auth';
+import PlayerSearch from '../PlayerSearch';
 import GameSearch from '../GameSearch';
 import { formatGame } from '../GameSearch';
+import AttemptsVsMadeAreaChart from '../../charts/AttemptsVsMadeAreaChart';
+import AttemptsVsMadeChart from '../../charts/AttemptsVsMadeChart';
 import GeneralStatsAreaChart from '../../charts/GeneralStatsAreaChart';
 import GeneralStatsChart from '../../charts/GeneralStatsChart';
-import moment from 'moment';
-import PlayerSearch from '../PlayerSearch';
 import PointsVsAssistsAreaChart from '../../charts/PointsVsAssistsAreaChart';
 import PointsVsAssistsChart from '../../charts/PointsVsAssistsChart';
-import queryString from 'query-string';
 import ReboundsAreaChart from '../../charts/ReboundsAreaChart';
 import ReboundsChart from '../../charts/ReboundsChart';
 
 const initialState = {
   loading: {
     player: false,
+    game: false,
     sportsDb: false,
     playerStatsOverall: false,
     playerStatsBySeason: false,
@@ -65,18 +66,12 @@ const initialState = {
     season: 'attempts-vs-made',
     game: 'attempts-vs-made'
   },
-  loadingSportsDb: false,
   playerData: {},
   playerStatsOverall: {},
   playerStatsBySeason: {},
   playerStatsByGame: {},
-  selectedPlayer: {},
-  selectedGameID: null,
   selectedGame: null,
-  selectedGameMonthYear: null,
   sportsDbData: {},
-  activeTabKey: 0,
-  activeTabKeyFromUrl: false,
   seasonSelectIsExpanded: false,
   selectedSeasons: []
 };
@@ -88,42 +83,14 @@ const reducer = (state, action) => {
         ...state,
         loading: {
           ...state.loading,
-          player: true,
-          sportsDb: true,
-          playerStatsOverall: _.isNil(action.payload.tabIndex) || action.payload.tabIndex === 0,
-          playerStatsBySeason: action.payload.tabIndex === 1,
-          playerStatsByGame: action.payload.tabIndex === 2
+          player: true
         },
+        // Reset everything when a new player gets selected
         playerData: {},
         playerStatsOverall: {},
         playerStatsBySeason: {},
         playerStatsByGame: {},
-        selectedSeasons: [],
-        selectedPlayer: {
-          id: action.payload.playerId,
-          name: action.payload.playerName
-        },
-        activeTabKey: _.isNil(action.payload.tabIndex) ? state.activeTabKey : action.payload.tabIndex,
-        activeTabKeyFromUrl: !_.isNil(action.payload.tabIndex)
-      };
-    case 'FETCH_SPORTSDB_SUCCESS':
-      return {
-        ...state,
-        loading: {
-          ...state.loading,
-          sportsDb: false
-        },
-        loadingSportsDb: false,
-        sportsDbData: action.payload.player
-      };
-    case 'FETCH_PLAYER_SUCCESS':
-      return {
-        ...state,
-        loading: {
-          ...state.loading,
-          player: false
-        },
-        playerData: action.payload.player
+        selectedSeasons: []
       };
     case 'FETCH_PLAYER_SUCCESS':
       return {
@@ -137,13 +104,44 @@ const reducer = (state, action) => {
     case 'FETCH_GAME_REQUEST':
       return {
         ...state,
-        selectedGameID: action.payload.selectedGameID,
-        selectedGameMonthYear: action.payload.selectedGameMonthYear
+        loading: {
+          ...state.loading,
+          game: true
+        }
       };
     case 'FETCH_GAME_SUCCESS':
       return {
         ...state,
+        loading: {
+          ...state.loading,
+          game: false
+        },
         selectedGame: action.payload.game
+      };
+    case 'FETCH_SPORTSDB_REQUEST':
+      return {
+        ...state,
+        loading: {
+          ...state.loading,
+          sportsDb: true
+        }
+      };
+    case 'FETCH_SPORTSDB_SUCCESS':
+      return {
+        ...state,
+        loading: {
+          ...state.loading,
+          sportsDb: false
+        },
+        sportsDbData: action.payload.player
+      };
+    case 'FETCH_PLAYER_STATS_OVERALL_REQUEST':
+      return {
+        ...state,
+        loading: {
+          ...state.loading,
+          playerStatsOverall: true
+        }
       };
     case 'FETCH_PLAYER_STATS_OVERALL_SUCCESS':
       return {
@@ -188,12 +186,6 @@ const reducer = (state, action) => {
         },
         playerStatsByGame: action.payload.stats
       };
-    case 'TAB_CHANGE':
-      return {
-        ...state,
-        activeTabKey: action.payload.tabIndex,
-        activeTabKeyFromUrl: false
-      };
     case 'CHART_CHANGE_OVERALL':
       return {
         ...state,
@@ -218,11 +210,6 @@ const reducer = (state, action) => {
           game: action.payload.value
         }
       };
-    case 'GAME_MONTH_YEAR_CHANGE':
-      return {
-        ...state,
-        selectedGameMonthYear: action.payload.value
-      };
     case 'SEASON_SELECT_TOGGLE':
       return {
         ...state,
@@ -232,12 +219,6 @@ const reducer = (state, action) => {
       return {
         ...state,
         selectedSeasons: action.payload.selectedSeasons
-      };
-    case 'GAME_SELECTED':
-      return {
-        ...state,
-        selectedGame: action.payload.game,
-        selectedGameID: action.payload.game.id
       };
     case 'SEASON_SELECT_CLEAR':
       return {
@@ -264,65 +245,64 @@ const tabNameToId = {
   ByGame: 2
 };
 
+const tabIdToName = {
+  0: 'Overall',
+  1: 'BySeason',
+  2: 'ByGame'
+};
+
 const PlayerAnalysis = props => {
   const { state: authState } = React.useContext(AuthContext);
   const [data, dispatch] = React.useReducer(reducer, initialState);
-  const urlParams = queryString.parse(useLocation().search);
+  const [playerId, setPlayerId] = useQueryParam('id', NumberParam);
+  const [gameId, setGameId] = useQueryParam('gameId', NumberParam);
+  const [gameMonthYear, setGameMonthYear] = useQueryParam('gameMonthYear', StringParam);
+  const [activeTabName, setActiveTabName] = useQueryParam('tab', StringParam);
 
-  // Load data from the backend and thesportsdb.com as soon as a player has been seleted
+  // Load player data from the backend based on the provided ID in the URL query params or PlayerSearch
   React.useEffect(() => {
-    Promise.all([
-      fetchPlayerData(_.get(data.selectedPlayer, 'id')),
-      fetchSportsDb(_.get(data.selectedPlayer, 'name')),
-      fetchTabData()
-    ]);
-  }, [data.selectedPlayer]);
+    if (!playerId) return;
+    fetchPlayerData(playerId);
+  }, [playerId]);
 
+  // Load stats data and from thesportsdb.com as soon as the player data has been retrieved from the backend
   React.useEffect(() => {
-    if (_.isEmpty(data.selectedPlayer) || data.activeTabKeyFromUrl) return;
+    if (_.isEmpty(data.playerData)) return;
+    fetchSportsDb(_.get(data.playerData, 'name'));
     fetchTabData();
-  }, [data.activeTabKey]);
+  }, [data.playerData]);
 
+  // Load stats data again when the tab changes
   React.useEffect(() => {
-    if (_.isNil(data.selectedGameID)) return;
+    if (!playerId) return;
+    fetchTabData();
+  }, [activeTabName]);
+
+  // Load game data from the backend based on the provided ID in the URL query params or GameSearch
+  React.useEffect(() => {
+    if (_.isNil(gameId)) return;
+    fetchGameData(gameId);
     dispatch({ type: 'FETCH_PLAYER_STATS_BY_GAME_REQUEST' });
-    fetchPlayerStatsData(data.selectedPlayer.id, false, data.selectedGameID);
-  }, [data.selectedGameID]);
+    fetchPlayerStatsData(playerId, false, gameId);
+  }, [gameId]);
 
+  // Set default for activeTabName
   React.useEffect(() => {
-    if (!_.isNil(urlParams.id) && !_.isNil(urlParams.name)) {
-      dispatch({
-        type: 'FETCH_PLAYER_REQUEST',
-        payload: {
-          playerId: _.toInteger(urlParams.id),
-          playerName: urlParams.name,
-          tabIndex: tabNameToId[_.get(urlParams, 'tab', 0)]
-        }
-      });
-    }
-    if (!_.isNil(urlParams.gameId) && !_.isNil(urlParams.gameMonthYear)) {
-      dispatch({
-        type: 'FETCH_GAME_REQUEST',
-        payload: {
-          selectedGameID: _.get(urlParams, 'gameId'),
-          selectedGameMonthYear: _.get(urlParams, 'gameMonthYear')
-        }
-      });
-      fetchGameData(_.get(urlParams, 'gameId'));
-    }
+    if (!activeTabName) setActiveTabName('Overall');
   }, []);
 
   const fetchTabData = () => {
-    switch (data.activeTabKey) {
+    switch (tabNameToId[activeTabName]) {
       case 0:
         if (_.isEmpty(data.playerStatsOverall)) {
-          fetchPlayerStatsData(_.get(data.selectedPlayer, 'id'));
+          dispatch({ type: 'FETCH_PLAYER_STATS_OVERALL_REQUEST' });
+          fetchPlayerStatsData(playerId);
         }
         break;
       case 1:
         if (_.isEmpty(data.playerStatsBySeason)) {
           dispatch({ type: 'FETCH_PLAYER_STATS_BY_SEASON_REQUEST' });
-          fetchPlayerStatsData(_.get(data.selectedPlayer, 'id'), true);
+          fetchPlayerStatsData(playerId, true);
         }
         break;
     }
@@ -330,16 +310,17 @@ const PlayerAnalysis = props => {
 
   const fetchSportsDb = playerName => {
     if (!playerName) return;
+    dispatch({ type: 'FETCH_SPORTSDB_REQUEST' });
     fetch(`https://www.thesportsdb.com/api/v1/json/1/searchplayers.php?p=${playerName}`)
       .then(response => {
         if (!response.ok) throw new Error(response.status);
         else return response.json();
       })
-      .then(playerJson =>
+      .then(players =>
         dispatch({
           type: 'FETCH_SPORTSDB_SUCCESS',
           payload: {
-            player: playerJson.player ? playerJson.player[0] : null
+            player: _.head(players.player)
           }
         })
       )
@@ -350,6 +331,7 @@ const PlayerAnalysis = props => {
 
   const fetchGameData = gameId => {
     if (!gameId) return;
+    dispatch({ type: 'FETCH_GAME_REQUEST' });
     fetch(`${BACKEND}/api/game/${gameId}`, {
       headers: {
         Authorization: `Bearer ${authState.token}`
@@ -372,6 +354,8 @@ const PlayerAnalysis = props => {
 
   const fetchPlayerData = playerId => {
     if (!playerId) return;
+    dispatch({ type: 'FETCH_PLAYER_REQUEST' });
+
     fetch(`${BACKEND}/api/player/${playerId}`, {
       headers: {
         Authorization: `Bearer ${authState.token}`
@@ -442,21 +426,8 @@ const PlayerAnalysis = props => {
       });
   };
 
-  const onPlayerSelect = (playerId, playerName) => {
-    dispatch({
-      type: 'FETCH_PLAYER_REQUEST',
-      payload: {
-        playerId,
-        playerName
-      }
-    });
-  };
-
   const onTabClick = (_, tabIndex) => {
-    dispatch({
-      type: 'TAB_CHANGE',
-      payload: { tabIndex }
-    });
+    setActiveTabName(tabIdToName[tabIndex]);
   };
 
   const photo = _.get(data.sportsDbData, 'strThumb') ? (
@@ -512,20 +483,6 @@ const PlayerAnalysis = props => {
     });
   };
 
-  const onGameSelect = game => {
-    dispatch({
-      type: 'GAME_SELECTED',
-      payload: { game }
-    });
-  };
-
-  const onGameMonthYearChange = value => {
-    dispatch({
-      type: 'GAME_MONTH_YEAR_CHANGE',
-      payload: { value }
-    });
-  };
-
   const onSeasonSelect = (evt, selection) => {
     dispatch({
       type: 'UPDATE_SELECTED_SEASONS',
@@ -577,7 +534,7 @@ const PlayerAnalysis = props => {
                 aria-label="Month and Year"
                 min="2003-10"
                 max="2020-03"
-                onChange={onGameMonthYearChange}
+                onChange={val => setGameMonthYear(val)}
               />
             </InputGroup>
           </StackItem>
@@ -586,12 +543,12 @@ const PlayerAnalysis = props => {
               Step 2: Select a game from your selected time range
             </Title>
             <GameSearch
-              onGameSelect={onGameSelect}
+              onGameSelect={game => setGameId(game.id)}
               onError={error => props.showAlert(error, 'danger')}
               width="100%"
               filterByPlayer
-              selectedMonthYear={data.selectedGameMonthYear}
-              selectedPlayer={data.selectedPlayer}
+              selectedMonthYear={gameMonthYear}
+              selectedPlayer={playerId}
             />
           </StackItem>
         </Stack>
@@ -706,7 +663,7 @@ const PlayerAnalysis = props => {
                     <Stack gutter="md">
                       <StackItem style={{ minHeight: '2.25rem' }}>
                         <PlayerSearch
-                          onPlayerSelect={onPlayerSelect}
+                          onPlayerSelect={playerId => setPlayerId(playerId)}
                           onError={error => props.showAlert(error, 'danger')}
                           width="100%"
                         />
@@ -714,7 +671,7 @@ const PlayerAnalysis = props => {
                       <StackItem isFilled>
                         <TextContent>
                           <Title headingLevel="h3" size="2xl">
-                            {_.get(data.playerData, 'name', '...')}
+                            {!_.isEmpty(data.playerData) ? data.playerData.name : '...'}
                           </Title>
                           <TextList component="dl">
                             <TextListItem component="dt">Favorite</TextListItem>
@@ -762,7 +719,7 @@ const PlayerAnalysis = props => {
           <StackItem>
             <Card>
               <CardBody style={{ padding: 0 }}>
-                <Tabs isFilled activeKey={_.isNil(data.activeTabKey) ? 0 : data.activeTabKey} onSelect={onTabClick}>
+                <Tabs isFilled activeKey={!activeTabName ? 0 : tabNameToId[activeTabName]} onSelect={onTabClick}>
                   <Tab eventKey={0} title="Overall">
                     {data.loading.playerStatsOverall
                       ? loadingPlaceholder()

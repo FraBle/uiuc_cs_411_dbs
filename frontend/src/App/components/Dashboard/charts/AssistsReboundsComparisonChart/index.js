@@ -23,7 +23,7 @@ const AssistsReboundsComparisonChart = props => {
             constrainToVisibleArea
           />
         }
-        domainPadding={{ x: [60, 60] }}
+        domainPadding={{ x: 120 }}
         legendData={[{ name: _.get(props, 'homeFranchise') }, { name: _.get(props, 'visitorFranchise') }]}
         legendOrientation="vertical"
         legendPosition="right"
@@ -38,8 +38,9 @@ const AssistsReboundsComparisonChart = props => {
       >
         <ChartAxis />
         <ChartAxis dependentAxis showGrid />
-        <ChartGroup offset={11}>
+        <ChartGroup offset={35}>
           <ChartBar
+            barWidth={30}
             data={[
               {
                 name: _.get(props, 'homeFranchise'),
@@ -54,6 +55,7 @@ const AssistsReboundsComparisonChart = props => {
             ]}
           />
           <ChartBar
+            barWidth={30}
             data={[
               {
                 name: _.get(props, 'visitorFranchise'),

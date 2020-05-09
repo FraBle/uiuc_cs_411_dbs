@@ -13,7 +13,8 @@ import {
 } from '@patternfly/react-core';
 import DBSizeChart from '../../charts/DBSizeChart';
 import LatestFavorites from '../../charts/LatestFavorites';
-import PlaceholderChart from '../../charts/PlaceholderChart';
+import Top10Chart from '../../charts/Top10Chart';
+import Top10WinsChart from '../../charts/Top10WinsChart';
 
 const Overview = props => {
   return (
@@ -29,7 +30,7 @@ const Overview = props => {
       <PageSection>
         <Gallery gutter="sm">
           <GalleryItem>
-            <Card isHoverable style={{ minHeight: '22em' }}>
+            <Card isHoverable style={{ minHeight: '26rem' }}>
               <CardHeader>DB Size</CardHeader>
               <CardBody>
                 <DBSizeChart />
@@ -37,7 +38,7 @@ const Overview = props => {
             </Card>
           </GalleryItem>
           <GalleryItem>
-            <Card isHoverable style={{ minHeight: '22em' }}>
+            <Card isHoverable style={{ minHeight: '26rem' }}>
               <CardHeader>Latest Favorites</CardHeader>
               <CardBody>
                 <LatestFavorites showAlert={props.showAlert} />
@@ -45,34 +46,34 @@ const Overview = props => {
             </Card>
           </GalleryItem>
           <GalleryItem>
-            <Card isHoverable style={{ minHeight: '22em' }}>
-              <CardHeader>Another Chart</CardHeader>
+            <Card isHoverable style={{ minHeight: '26rem' }}>
+              <CardHeader>Top 10 Players by Points</CardHeader>
               <CardBody>
-                <PlaceholderChart />
+                <Top10Chart showAlert={props.showAlert} type="player" category="points" />
               </CardBody>
             </Card>
           </GalleryItem>
           <GalleryItem>
-            <Card isHoverable style={{ minHeight: '22em' }}>
-              <CardHeader>Another Chart</CardHeader>
+            <Card isHoverable style={{ minHeight: '26rem' }}>
+              <CardHeader>Top 10 Players by Field Goals</CardHeader>
               <CardBody>
-                <PlaceholderChart />
+                <Top10Chart showAlert={props.showAlert} type="player" category="fieldGoalsMade" />
               </CardBody>
             </Card>
           </GalleryItem>
           <GalleryItem>
-            <Card isHoverable style={{ minHeight: '22em' }}>
-              <CardHeader>Another Chart</CardHeader>
+            <Card isHoverable style={{ minHeight: '26rem' }}>
+              <CardHeader>Top 10 Franchises by Points</CardHeader>
               <CardBody>
-                <PlaceholderChart />
+                <Top10Chart showAlert={props.showAlert} type="franchise" category="points" />
               </CardBody>
             </Card>
           </GalleryItem>
           <GalleryItem>
-            <Card isHoverable style={{ minHeight: '22em' }}>
-              <CardHeader>Another Chart</CardHeader>
+            <Card isHoverable style={{ minHeight: '26rem' }}>
+              <CardHeader>Top 10 Franchises by Victories</CardHeader>
               <CardBody>
-                <PlaceholderChart />
+                <Top10WinsChart showAlert={props.showAlert} type="franchise" />
               </CardBody>
             </Card>
           </GalleryItem>

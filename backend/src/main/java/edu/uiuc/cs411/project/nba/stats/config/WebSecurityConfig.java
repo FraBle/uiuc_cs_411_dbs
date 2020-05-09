@@ -64,7 +64,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				"/fonts/**" };
 
 		String[] frontendPaths = new String[] { "/", "/dashboard/**", "/forgot", "/h2-console/**", "/public/**",
-				"/signin", "/signup" };
+				"/signin", "/signup", "/go/**" };
 
 		String[] publicApiPaths = new String[] { "/api/auth/**", "/api/test/**" };
 

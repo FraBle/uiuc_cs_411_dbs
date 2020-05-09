@@ -32,8 +32,10 @@ import {
   SortAlphaUpIcon,
   StarIcon,
   OutlinedStarIcon,
-  SearchIcon
+  SearchIcon,
+  ChartLineIcon
 } from '@patternfly/react-icons';
+import { useHistory } from 'react-router-dom';
 import { global_danger_color_200 as globalDangerColor200 } from '@patternfly/react-tokens';
 import { Table, TableHeader, TableBody } from '@patternfly/react-table';
 import moment from 'moment';
@@ -167,6 +169,7 @@ const reducer = (state, action) => {
 const Players = props => {
   const { state: authState, dispatch: authDispatch } = React.useContext(AuthContext);
   const [data, dispatch] = React.useReducer(reducer, initialState);
+  const history = useHistory();
 
   React.useEffect(() => {
     dispatch({
@@ -323,6 +326,12 @@ const Players = props => {
     fetchData(1, data.perPage, mapping[data.sortSelected], data.sortOrder, data.search, true);
   };
 
+  const onPlayerAnalysisClick = playerId => {
+    if (playerId) {
+      history.push(`/dashboard/analysis/player?id=${playerId}`);
+    }
+  };
+
   if (data.error) {
     const noResultsRows = [
       {
@@ -445,7 +454,7 @@ const Players = props => {
 
         {!data.loading && (
           <Table
-            cells={[...cells, 'Details']}
+            cells={[...cells, 'Details', 'Analysis']}
             rows={data.players.map(player => [
               <React.Fragment>
                 <Button
@@ -465,6 +474,11 @@ const Players = props => {
               <React.Fragment>
                 <Button variant="plain" aria-label="Details" onClick={() => onToggleDetailModal(player)}>
                   <SearchIcon />
+                </Button>
+              </React.Fragment>,
+              <React.Fragment>
+                <Button variant="plain" aria-label="Analysis" onClick={() => onPlayerAnalysisClick(player.id)}>
+                  <ChartLineIcon />
                 </Button>
               </React.Fragment>
             ])}

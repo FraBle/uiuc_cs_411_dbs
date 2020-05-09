@@ -17,22 +17,22 @@ const FreeThrowsComparisonAreaChart = props => {
     const result = {
       freeThrowsMade1: {
         datapoints: [],
-        legendItem: { name: `${!props.playerName1 ? 'N/A' : props.playerName1}: Free Throws Made` }
+        legendItem: { name: `${!props.opponentName1 ? 'N/A' : props.opponentName1}: Free Throws Made` }
       },
       freeThrowsAttempted1: {
         datapoints: [],
-        legendItem: { name: `${!props.playerName1 ? 'N/A' : props.playerName1}: Free Throws Attempted` }
+        legendItem: { name: `${!props.opponentName1 ? 'N/A' : props.opponentName1}: Free Throws Attempted` }
       },
       freeThrowsMade2: {
         datapoints: [],
-        legendItem: { name: `${!props.playerName2 ? 'N/A' : props.playerName2}: Free Throws Made` }
+        legendItem: { name: `${!props.opponentName2 ? 'N/A' : props.opponentName2}: Free Throws Made` }
       },
       freeThrowsAttempted2: {
         datapoints: [],
-        legendItem: { name: `${!props.playerName2 ? 'N/A' : props.playerName2}: Free Throws Attempted` }
+        legendItem: { name: `${!props.opponentName2 ? 'N/A' : props.opponentName2}: Free Throws Attempted` }
       }
     };
-    _.map(props.playerData1, el => {
+    _.map(props.opponentData1, el => {
       result.freeThrowsMade1.datapoints.push({
         name: result.freeThrowsMade1.legendItem.name,
         x: `${el.season}`,
@@ -44,7 +44,7 @@ const FreeThrowsComparisonAreaChart = props => {
         y: el.freeThrowsAttempted
       });
     });
-    _.map(props.playerData2, el => {
+    _.map(props.opponentData2, el => {
       result.freeThrowsMade2.datapoints.push({
         name: result.freeThrowsMade2.legendItem.name,
         x: `${el.season}`,

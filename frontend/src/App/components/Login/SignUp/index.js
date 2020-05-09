@@ -1,49 +1,50 @@
 import React from 'react';
 import { Form, FormGroup, TextInput, Modal, Button, ActionGroup } from '@patternfly/react-core';
-import { AuthContext } from '../../../Auth';
+import EmailValidator from 'email-validator';
+import _ from 'lodash';
+
+const initialState = {
+  usernameValue: '',
+  isValidUsername: true,
+  isTakenUsername: false,
+  emailValue: '',
+  isValidEmail: true,
+  isTakenEmail: false,
+  passwordValue: '',
+  isValidPassword: true
+};
 
 const SignUp = props => {
-  const { dispatch } = React.useContext(AuthContext);
-  const initialState = {
-    usernameValue: '',
-    isValidUsername: true,
-    emailValue: '',
-    isValidEmail: true,
-    passwordValue: '',
-    isValidPassword: true,
-    signedUpSuccessfully: false
-  };
   const [data, setData] = React.useState(initialState);
 
   const handleUsernameChange = value => {
     setData({
       ...data,
-      usernameValue: value
+      usernameValue: value,
+      isTakenUsername: false,
+      isValidUsername: _.size(value) > 0
     });
   };
 
   const handleEmailChange = value => {
     setData({
       ...data,
-      emailValue: value
+      emailValue: value,
+      isTakenEmail: false,
+      isValidEmail: EmailValidator.validate(value)
     });
   };
 
   const handlePasswordChange = value => {
     setData({
       ...data,
-      passwordValue: value
+      passwordValue: value,
+      isValidPassword: _.size(value) > 0
     });
   };
 
   const onSubmit = event => {
     event.preventDefault();
-    setData({
-      ...data,
-      isValidUsername: !!data.usernameValue,
-      isValidEmail: !!data.isValidEmail,
-      isValidPassword: !!data.passwordValue
-    });
     if (!data.isValidUsername || !data.isValidEmail || !data.isValidPassword) return;
     fetch(`${BACKEND}/api/auth/signup`, {
       method: 'POST',
@@ -61,39 +62,24 @@ const SignUp = props => {
         return Promise.all([res, res.text()]);
       })
       .then(([res, resText]) => {
-        console.log(res);
-        console.log(resText);
         if (res.ok) {
-          setData({
-            ...data,
-            signedUpSuccessfully: true,
-            isValidUsername: true,
-            isValidEmail: true,
-            isValidPassword: true
-          });
-          props.handler(true);
+          props.onSuccess();
+          return;
         }
         if (resText === 'Error: Username is already taken!') {
           setData({
             ...data,
-            signedUpSuccessfully: false,
-            isValidUsername: false
+            isTakenUsername: true
           });
         } else if (resText === 'Error: Email is already in use!') {
           setData({
             ...data,
-            signedUpSuccessfully: false,
-            isValidEmail: false
+            isTakenEmail: true
           });
         }
       })
       .catch(error => {
-        setData({
-          ...data,
-          isValidUsername: false,
-          isValidEmail: false,
-          isValidPassword: false
-        });
+        console.error(error);
       });
   };
 
@@ -102,24 +88,25 @@ const SignUp = props => {
       ...data,
       usernameValue: '',
       isValidUsername: true,
+      isTakenUsername: false,
       emailValue: '',
       isValidEmail: true,
+      isTakenEmail: false,
       passwordValue: '',
-      isValidPassword: true,
-      signedUpSuccessfully: false
+      isValidPassword: true
     });
-    props.handler(false);
+    props.onCancel();
   };
 
   return (
-    <Modal isSmall title="Sign Up" isOpen={props.open} onClose={() => props.handler(false)} isFooterLeftAligned>
+    <Modal isSmall title="Sign Up" isOpen={props.open} onClose={onCancel} isFooterLeftAligned>
       <Form isHorizontal noValidate>
         <FormGroup
           label="Username"
           isRequired
           fieldId="form-username"
-          helperTextInvalid="Username is already taken :("
-          isValid={data.isValidUsername}
+          helperTextInvalid={data.isTakenUsername ? 'Username is already in use 😣' : 'Username is not valid 🧐'}
+          isValid={data.isValidUsername || data.isTakenUsername}
         >
           <TextInput
             value={data.usernameValue}
@@ -128,15 +115,15 @@ const SignUp = props => {
             type="text"
             id="form-username"
             name="form-username"
-            isValid={data.isValidUsername}
+            isValid={data.isValidUsername || data.isTakenUsername}
           />
         </FormGroup>
         <FormGroup
           label="Email"
           isRequired
           fieldId="form-email"
-          helperTextInvalid="Email is already in use :("
-          isValid={data.isValidEmail}
+          helperTextInvalid={data.isTakenEmail ? 'Email is already in use 😣' : 'Email is not valid 🧐'}
+          isValid={data.isValidEmail || data.isTakenEmail}
         >
           <TextInput
             value={data.emailValue}
@@ -145,10 +132,16 @@ const SignUp = props => {
             type="email"
             id="form-email"
             name="form-email"
-            isValid={data.isValidEmail}
+            isValid={data.isValidEmail || data.isTakenEmail}
           />
         </FormGroup>
-        <FormGroup label="Password" isRequired fieldId="form-password" isValid={data.isValidPassword}>
+        <FormGroup
+          label="Password"
+          isRequired
+          fieldId="form-password"
+          isValid={data.isValidPassword}
+          helperTextInvalid={'Password is not valid 🧐'}
+        >
           <TextInput
             value={data.passwordValue}
             onChange={handlePasswordChange}

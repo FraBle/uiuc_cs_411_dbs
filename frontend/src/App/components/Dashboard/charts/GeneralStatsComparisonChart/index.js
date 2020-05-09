@@ -23,8 +23,8 @@ const ThreePointersComparisonChart = props => {
             constrainToVisibleArea
           />
         }
-        domainPadding={{ x: [60, 60] }}
-        legendData={[{ name: _.get(props, 'playerName1', 'N/A') }, { name: _.get(props, 'playerName2', 'N/A') }]}
+        domainPadding={{ x: 60 }}
+        legendData={[{ name: _.get(props, 'opponentName1', 'N/A') }, { name: _.get(props, 'opponentName2', 'N/A') }]}
         legendOrientation="vertical"
         legendPosition="right"
         height={225}
@@ -38,62 +38,64 @@ const ThreePointersComparisonChart = props => {
       >
         <ChartAxis />
         <ChartAxis dependentAxis showGrid />
-        <ChartGroup offset={11}>
+        <ChartGroup offset={35}>
           <ChartBar
+            barWidth={30}
             data={[
               {
-                name: _.get(props, 'playerName1', 'N/A'),
+                name: _.get(props, 'opponentName1', 'N/A'),
                 x: 'Assists',
-                y: _.get(props, 'playerData1.assists', 0)
+                y: _.get(props, 'opponentData1.assists', 0)
               },
               {
-                name: _.get(props, 'playerName1', 'N/A'),
+                name: _.get(props, 'opponentName1', 'N/A'),
                 x: 'Steals',
-                y: _.get(props, 'playerData1.steals', 0)
+                y: _.get(props, 'opponentData1.steals', 0)
               },
               {
-                name: _.get(props, 'playerName1', 'N/A'),
+                name: _.get(props, 'opponentName1', 'N/A'),
                 x: 'Blocks',
-                y: _.get(props, 'playerData1.blocks', 0)
+                y: _.get(props, 'opponentData1.blocks', 0)
               },
               {
-                name: _.get(props, 'playerName1', 'N/A'),
+                name: _.get(props, 'opponentName1', 'N/A'),
                 x: 'Turnovers',
-                y: _.get(props, 'playerData1.turnovers', 0)
+                y: _.get(props, 'opponentData1.turnovers', 0)
               },
               {
-                name: _.get(props, 'playerName1', 'N/A'),
+                name: _.get(props, 'opponentName1', 'N/A'),
                 x: 'Fouls',
-                y: _.get(props, 'playerData1.personalFouls', 0)
+                y: _.get(props, 'opponentData1.personalFouls', 0)
               }
             ]}
           />
           <ChartBar
+            barWidth={30}
             data={[
               {
-                name: _.get(props, 'playerName2', 'N/A'),
+                name: _.get(props, 'opponentName2', 'N/A'),
                 x: 'Assists',
-                y: _.get(props, 'playerData2.assists', 0)
+                y: _.get(props, 'opponentData2.assists', 0)
               },
               {
-                name: _.get(props, 'playerName2', 'N/A'),
+                name: _.get(props, 'opponentName2', 'N/A'),
                 x: 'Steals',
-                y: _.get(props, 'playerData2.blocks', 0)
+                y: _.get(props, 'opponentData2.blocks', 0)
               },
               {
-                name: _.get(props, 'playerName2', 'N/A'),
+                name: _.get(props, 'opponentName2', 'N/A'),
                 x: 'Blocks',
-                y: _.get(props, 'playerData2.threePointersAttempted', 0)
+                y: _.get(props, 'opponentData2.threePointersAttempted', 0)
               },
               {
-                name: _.get(props, 'playerName2', 'N/A'),
+                name: _.get(props, 'opponentName2', 'N/A'),
                 x: 'Turnovers',
-                y: _.get(props, 'playerData2.turnovers', 0)
+                y: _.get(props, 'opponentData2.turnovers', 0)
               },
               {
-                name: _.get(props, 'playerName2', 'N/A'),
+                name: _.get(props, 'opponentName2', 'N/A'),
                 x: 'Fouls',
-                y: _.get(props, 'playerData2.personalFouls', 0)
+                y: _.get(props, 'opponentData2.personalFouls', 0)
               }
             ]}
           />

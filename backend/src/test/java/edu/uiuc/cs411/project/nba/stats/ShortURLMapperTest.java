@@ -26,11 +26,10 @@ public class ShortURLMapperTest {
     @Test
     public void insertURL() {
         String originalURL = "/player/name/example/id";
-        Integer id = shortURLMapper.insert(new ShortURL(originalURL));
-        assertNotNull(id);
-        assertTrue(id != 0);
-
-        ShortURL fetchedById = shortURLMapper.findById(id);
+        ShortURL shortUrl = new ShortURL(originalURL);
+        shortURLMapper.insert(shortUrl);
+        assertTrue(shortUrl.getId() > 0);
+        ShortURL fetchedById = shortURLMapper.findById(shortUrl.getId());
         assertEquals(originalURL, fetchedById.getUrl());
     }
 
@@ -38,11 +37,11 @@ public class ShortURLMapperTest {
     public void fetchUrl() {
         String url = "/sup/url/to/make/short";
         assertNull(shortURLMapper.find(url));
-
-        shortURLMapper.insert(new ShortURL(url));
-        Integer result = shortURLMapper.find(url);
-        assertNotNull(result);
-        assertTrue(result != 0);
+        ShortURL shortUrl = new ShortURL(url);
+        shortURLMapper.insert(shortUrl);
+        ShortURL newShortUrl = shortURLMapper.find(shortUrl.getUrl());
+        assertNotNull(newShortUrl);
+        assertTrue(newShortUrl.getId() > 0);
     }
 
 }

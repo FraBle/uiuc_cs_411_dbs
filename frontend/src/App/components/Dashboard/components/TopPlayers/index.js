@@ -25,11 +25,10 @@ import {
 } from '@patternfly/react-core';
 import { Table, TableHeader, TableBody } from '@patternfly/react-table';
 import { BasketballBallIcon, CalendarIcon, ExternalLinkSquareAltIcon } from '@patternfly/react-icons';
-import { useLocation } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import Avatar from 'react-avatar';
 import numbro from 'numbro';
 import _ from 'lodash';
-import queryString from 'query-string';
 import { AuthContext } from '../../../../Auth';
 
 const initialState = {
@@ -90,7 +89,7 @@ const reducer = (state, action) => {
 const TopPlayers = props => {
   const { state: authState } = React.useContext(AuthContext);
   const [data, dispatch] = React.useReducer(reducer, initialState);
-  const urlParams = queryString.parse(useLocation().search);
+  const history = useHistory();
 
   React.useEffect(() => {
     fetchTopPlayerData();
@@ -169,6 +168,12 @@ const TopPlayers = props => {
     });
   };
 
+  const onPlayerClick = playerId => {
+    if (playerId) {
+      history.push(`/dashboard/analysis/player?id=${playerId}`);
+    }
+  };
+
   const photo =
     !_.isNil(data.playerPhoto) && !data.loading ? (
       <Bullseye>
@@ -207,7 +212,13 @@ const TopPlayers = props => {
       i + 1,
       {
         title: (
-          <Button variant="link" isInline icon={<ExternalLinkSquareAltIcon />} iconPosition="right">
+          <Button
+            variant="link"
+            isInline
+            icon={<ExternalLinkSquareAltIcon />}
+            iconPosition="right"
+            onClick={() => onPlayerClick(player.player)}
+          >
             {player.playerName}
           </Button>
         )

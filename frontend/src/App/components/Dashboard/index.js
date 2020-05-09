@@ -10,7 +10,6 @@ import {
   BreadcrumbItem,
   Dropdown,
   DropdownItem,
-  DropdownSeparator,
   DropdownToggle,
   Nav,
   NavExpandable,
@@ -24,8 +23,9 @@ import {
   ToolbarGroup,
   ToolbarItem
 } from '@patternfly/react-core';
-import accessibleStyles from '@patternfly/react-styles/css/utilities/Accessibility/accessibility';
+import { useLocation } from 'react-router-dom';
 import { css } from '@patternfly/react-styles';
+import accessibleStyles from '@patternfly/react-styles/css/utilities/Accessibility/accessibility';
 import gravatarUrl from 'gravatar-url';
 
 import { AuthContext, ProtectedRoute } from '../../Auth';
@@ -41,6 +41,7 @@ import Players from './components/Players';
 import Search from './components/Search';
 import TopFranchises from './components/TopFranchises';
 import TopPlayers from './components/TopPlayers';
+import ShareURL from './components/ShareURL';
 
 const DashboardRoutes = {
   'overview-dashboard': '/dashboard',
@@ -172,16 +173,25 @@ const RoutesToBreadcrumbs = {
   )
 };
 
+const initialState = {
+  isDropdownOpen: false,
+  activeGroup: null,
+  activeItem: null,
+  alerts: []
+};
+
 const Dashboard = props => {
-  const initialState = {
-    isDropdownOpen: false,
-    isKebabDropdownOpen: false,
-    activeGroup: RoutesToNavMapping[props.location.pathname].activeGroup,
-    activeItem: RoutesToNavMapping[props.location.pathname].activeItem,
-    alerts: []
-  };
   const { state: authState, dispatch } = React.useContext(AuthContext);
   const [data, setData] = React.useState(initialState);
+  const location = useLocation();
+
+  React.useEffect(() => {
+    setData({
+      ...data,
+      activeGroup: RoutesToNavMapping[location.pathname].activeGroup,
+      activeItem: RoutesToNavMapping[location.pathname].activeItem
+    });
+  }, [location]);
 
   const onDropdownToggle = isDropdownOpen => {
     setData({
@@ -195,21 +205,6 @@ const Dashboard = props => {
     setData({
       ...data,
       isDropdownOpen: !data.isDropdownOpen
-    });
-  };
-
-  const onKebabDropdownToggle = isKebabDropdownOpen => {
-    setData({
-      ...data,
-      isKebabDropdownOpen
-    });
-  };
-
-  const onKebabDropdownSelect = event => {
-    event.preventDefault();
-    setData({
-      ...data,
-      isKebabDropdownOpen: !data.isKebabDropdownOpen
     });
   };
 
@@ -304,15 +299,18 @@ const Dashboard = props => {
   );
 
   const userDropdownItems = [
-    <DropdownItem component="button">Profile</DropdownItem>,
-    <DropdownSeparator />,
-    <DropdownItem component="button" onClick={onLogout}>
+    <DropdownItem component="button" onClick={onLogout} key="logout">
       Logout
     </DropdownItem>
   ];
 
   const PageToolbar = (
     <Toolbar>
+      <ToolbarGroup className={css(accessibleStyles.screenReader, accessibleStyles.visibleOnMd)}>
+        <ToolbarItem>
+          <ShareURL showAlert={showAlert} />
+        </ToolbarItem>
+      </ToolbarGroup>
       <ToolbarGroup>
         <ToolbarItem className={css(accessibleStyles.screenReader, accessibleStyles.visibleOnMd)}>
           <Dropdown

@@ -23,8 +23,8 @@ const FreeThrowsComparisonChart = props => {
             constrainToVisibleArea
           />
         }
-        domainPadding={{ x: [60, 60] }}
-        legendData={[{ name: _.get(props, 'playerName1', 'N/A') }, { name: _.get(props, 'playerName2', 'N/A') }]}
+        domainPadding={{ x: 120 }}
+        legendData={[{ name: _.get(props, 'opponentName1', 'N/A') }, { name: _.get(props, 'opponentName2', 'N/A') }]}
         legendOrientation="vertical"
         legendPosition="right"
         height={225}
@@ -38,32 +38,34 @@ const FreeThrowsComparisonChart = props => {
       >
         <ChartAxis />
         <ChartAxis dependentAxis showGrid />
-        <ChartGroup offset={11}>
+        <ChartGroup offset={35}>
           <ChartBar
+            barWidth={30}
             data={[
               {
-                name: _.get(props, 'playerName1', 'N/A'),
+                name: _.get(props, 'opponentName1', 'N/A'),
                 x: 'Free Throws Made',
-                y: _.get(props, 'playerData1.freeThrowsMade', 0)
+                y: _.get(props, 'opponentData1.freeThrowsMade', 0)
               },
               {
-                name: _.get(props, 'playerName1', 'N/A'),
+                name: _.get(props, 'opponentName1', 'N/A'),
                 x: 'FreeThrowsAttempted',
-                y: _.get(props, 'playerData1.freeThrowsAttempted', 0)
+                y: _.get(props, 'opponentData1.freeThrowsAttempted', 0)
               }
             ]}
           />
           <ChartBar
+            barWidth={30}
             data={[
               {
-                name: _.get(props, 'playerName2', 'N/A'),
+                name: _.get(props, 'opponentName2', 'N/A'),
                 x: 'Free Throws Made',
-                y: _.get(props, 'playerData2.freeThrowsMade', 0)
+                y: _.get(props, 'opponentData2.freeThrowsMade', 0)
               },
               {
-                name: _.get(props, 'playerName2', 'N/A'),
+                name: _.get(props, 'opponentName2', 'N/A'),
                 x: 'FreeThrowsAttempted',
-                y: _.get(props, 'playerData2.freeThrowsAttempted', 0)
+                y: _.get(props, 'opponentData2.freeThrowsAttempted', 0)
               }
             ]}
           />

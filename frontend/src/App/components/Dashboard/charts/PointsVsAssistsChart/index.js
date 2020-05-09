@@ -23,7 +23,7 @@ const PointsVsAssistsChart = props => {
             constrainToVisibleArea
           />
         }
-        domainPadding={{ x: [60, 60] }}
+        domainPadding={{ x: 120 }}
         height={225}
         padding={{
           bottom: 50,
@@ -35,8 +35,9 @@ const PointsVsAssistsChart = props => {
       >
         <ChartAxis />
         <ChartAxis dependentAxis showGrid />
-        <ChartGroup offset={11}>
+        <ChartGroup>
           <ChartBar
+            barWidth={60}
             data={[
               {
                 x: 'Points',

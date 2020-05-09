@@ -13,27 +13,16 @@ import {
   EmptyStateVariant,
   Grid,
   GridItem,
-  InputGroup,
-  InputGroupText,
   PageSection,
   PageSectionVariants,
   Select,
   SelectOption,
   SelectVariant,
   Spinner,
-  Split,
-  SplitItem,
   Stack,
   StackItem,
-  Switch,
-  Tab,
-  Tabs,
   Text,
   TextContent,
-  TextInput,
-  TextList,
-  TextListItem,
-  TextVariants,
   Title
 } from '@patternfly/react-core';
 
@@ -227,11 +216,6 @@ const PlayerComparison = props => {
     fetchPlayerData(2, data.selectedPlayer2);
     fetchPlayerStatsData(2, _.get(data.selectedPlayer2, 'id'));
   }, [data.selectedPlayer2]);
-
-  React.useEffect(() => {
-    if (_.isNil(data.selectedPlayer1) || _.isNil(data.selectedPlayer2)) return;
-    fetchTabData();
-  }, [data.activeTabKey]);
 
   const fetchPlayerData = (number, player) => {
     if (_.isNil(player)) return;
@@ -498,17 +482,17 @@ const PlayerComparison = props => {
               {(!_.isArray(statsPlayer1) || _.isEmpty(statsPlayer1)) &&
               (!_.isArray(statsPlayer2) || _.isEmpty(statsPlayer2)) ? (
                 <FieldGoalsComparisonChart
-                  playerData1={statsPlayer1}
-                  playerData2={statsPlayer2}
-                  playerName1={_.get(data.selectedPlayer1, 'name', '')}
-                  playerName2={_.get(data.selectedPlayer2, 'name', '')}
+                  opponentData1={statsPlayer1}
+                  opponentData2={statsPlayer2}
+                  opponentName1={_.get(data.selectedPlayer1, 'name', '')}
+                  opponentName2={_.get(data.selectedPlayer2, 'name', '')}
                 />
               ) : (
                 <FieldGoalsComparisonAreaChart
-                  playerData1={statsPlayer1}
-                  playerData2={statsPlayer2}
-                  playerName1={_.get(data.selectedPlayer1, 'name', '')}
-                  playerName2={_.get(data.selectedPlayer2, 'name', '')}
+                  opponentData1={statsPlayer1}
+                  opponentData2={statsPlayer2}
+                  opponentName1={_.get(data.selectedPlayer1, 'name', '')}
+                  opponentName2={_.get(data.selectedPlayer2, 'name', '')}
                 />
               )}
             </AccordionContent>
@@ -527,17 +511,17 @@ const PlayerComparison = props => {
               {(!_.isArray(statsPlayer1) || _.isEmpty(statsPlayer1)) &&
               (!_.isArray(statsPlayer2) || _.isEmpty(statsPlayer2)) ? (
                 <ThreePointersComparisonChart
-                  playerData1={statsPlayer1}
-                  playerData2={statsPlayer2}
-                  playerName1={_.get(data.selectedPlayer1, 'name', '')}
-                  playerName2={_.get(data.selectedPlayer2, 'name', '')}
+                  opponentData1={statsPlayer1}
+                  opponentData2={statsPlayer2}
+                  opponentName1={_.get(data.selectedPlayer1, 'name', '')}
+                  opponentName2={_.get(data.selectedPlayer2, 'name', '')}
                 />
               ) : (
                 <ThreePointersComparisonAreaChart
-                  playerData1={statsPlayer1}
-                  playerData2={statsPlayer2}
-                  playerName1={_.get(data.selectedPlayer1, 'name', '')}
-                  playerName2={_.get(data.selectedPlayer2, 'name', '')}
+                  opponentData1={statsPlayer1}
+                  opponentData2={statsPlayer2}
+                  opponentName1={_.get(data.selectedPlayer1, 'name', '')}
+                  opponentName2={_.get(data.selectedPlayer2, 'name', '')}
                 />
               )}
             </AccordionContent>
@@ -556,17 +540,17 @@ const PlayerComparison = props => {
               {(!_.isArray(statsPlayer1) || _.isEmpty(statsPlayer1)) &&
               (!_.isArray(statsPlayer2) || _.isEmpty(statsPlayer2)) ? (
                 <FreeThrowsComparisonChart
-                  playerData1={statsPlayer1}
-                  playerData2={statsPlayer2}
-                  playerName1={_.get(data.selectedPlayer1, 'name', '')}
-                  playerName2={_.get(data.selectedPlayer2, 'name', '')}
+                  opponentData1={statsPlayer1}
+                  opponentData2={statsPlayer2}
+                  opponentName1={_.get(data.selectedPlayer1, 'name', '')}
+                  opponentName2={_.get(data.selectedPlayer2, 'name', '')}
                 />
               ) : (
                 <FreeThrowsComparisonAreaChart
-                  playerData1={statsPlayer1}
-                  playerData2={statsPlayer2}
-                  playerName1={_.get(data.selectedPlayer1, 'name', '')}
-                  playerName2={_.get(data.selectedPlayer2, 'name', '')}
+                  opponentData1={statsPlayer1}
+                  opponentData2={statsPlayer2}
+                  opponentName1={_.get(data.selectedPlayer1, 'name', '')}
+                  opponentName2={_.get(data.selectedPlayer2, 'name', '')}
                 />
               )}
             </AccordionContent>
@@ -585,17 +569,17 @@ const PlayerComparison = props => {
               {(!_.isArray(statsPlayer1) || _.isEmpty(statsPlayer1)) &&
               (!_.isArray(statsPlayer2) || _.isEmpty(statsPlayer2)) ? (
                 <GeneralStatsComparisonChart
-                  playerData1={statsPlayer1}
-                  playerData2={statsPlayer2}
-                  playerName1={_.get(data.selectedPlayer1, 'name', '')}
-                  playerName2={_.get(data.selectedPlayer2, 'name', '')}
+                  opponentData1={statsPlayer1}
+                  opponentData2={statsPlayer2}
+                  opponentName1={_.get(data.selectedPlayer1, 'name', '')}
+                  opponentName2={_.get(data.selectedPlayer2, 'name', '')}
                 />
               ) : (
                 <GeneralStatsComparisonAreaChart
-                  playerData1={statsPlayer1}
-                  playerData2={statsPlayer2}
-                  playerName1={_.get(data.selectedPlayer1, 'name', '')}
-                  playerName2={_.get(data.selectedPlayer2, 'name', '')}
+                  opponentData1={statsPlayer1}
+                  opponentData2={statsPlayer2}
+                  opponentName1={_.get(data.selectedPlayer1, 'name', '')}
+                  opponentName2={_.get(data.selectedPlayer2, 'name', '')}
                 />
               )}
             </AccordionContent>

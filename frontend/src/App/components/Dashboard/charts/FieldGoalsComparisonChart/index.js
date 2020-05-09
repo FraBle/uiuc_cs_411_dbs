@@ -23,8 +23,8 @@ const FieldGoalsComparisonChart = props => {
             constrainToVisibleArea
           />
         }
-        domainPadding={{ x: [60, 60] }}
-        legendData={[{ name: _.get(props, 'playerName1', 'N/A') }, { name: _.get(props, 'playerName2', 'N/A') }]}
+        domainPadding={{ x: 120 }}
+        legendData={[{ name: _.get(props, 'opponentName1', 'N/A') }, { name: _.get(props, 'opponentName2', 'N/A') }]}
         legendOrientation="vertical"
         legendPosition="right"
         height={225}
@@ -38,32 +38,34 @@ const FieldGoalsComparisonChart = props => {
       >
         <ChartAxis />
         <ChartAxis dependentAxis showGrid />
-        <ChartGroup offset={11}>
+        <ChartGroup offset={35}>
           <ChartBar
+            barWidth={30}
             data={[
               {
-                name: _.get(props, 'playerName1', 'N/A'),
+                name: _.get(props, 'opponentName1', 'N/A'),
                 x: 'Field Goals Made',
-                y: _.get(props, 'playerData1.fieldGoalsMade', 0)
+                y: _.get(props, 'opponentData1.fieldGoalsMade', 0)
               },
               {
-                name: _.get(props, 'playerName1', 'N/A'),
+                name: _.get(props, 'opponentName1', 'N/A'),
                 x: 'Field Goals Attempted',
-                y: _.get(props, 'playerData1.fieldGoalsAttempted', 0)
+                y: _.get(props, 'opponentData1.fieldGoalsAttempted', 0)
               }
             ]}
           />
           <ChartBar
+            barWidth={30}
             data={[
               {
-                name: _.get(props, 'playerName2', 'N/A'),
+                name: _.get(props, 'opponentName2', 'N/A'),
                 x: 'Field Goals Made',
-                y: _.get(props, 'playerData2.fieldGoalsMade', 0)
+                y: _.get(props, 'opponentData2.fieldGoalsMade', 0)
               },
               {
-                name: _.get(props, 'playerName2', 'N/A'),
+                name: _.get(props, 'opponentName2', 'N/A'),
                 x: 'Field Goals Attempted',
-                y: _.get(props, 'playerData2.fieldGoalsAttempted', 0)
+                y: _.get(props, 'opponentData2.fieldGoalsAttempted', 0)
               }
             ]}
           />

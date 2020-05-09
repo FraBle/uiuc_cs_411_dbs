@@ -23,7 +23,7 @@ const GeneralStatsChart = props => {
             constrainToVisibleArea
           />
         }
-        domainPadding={{ x: [30, 25] }}
+        domainPadding={{ x: 120 }}
         height={225}
         padding={{
           bottom: 50,
@@ -37,6 +37,7 @@ const GeneralStatsChart = props => {
         <ChartAxis dependentAxis showGrid />
         <ChartGroup offset={11}>
           <ChartBar
+            barWidth={60}
             data={[
               {
                 x: 'Steals',

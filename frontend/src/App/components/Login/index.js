@@ -175,10 +175,12 @@ const Login = props => {
       loginTitle="Log in to your account"
       loginSubtitle="Let The Game Begin!"
       signUpForAccountMessage={signUpForAccountMessage}
-      // forgotCredentials={forgotCredentials}
     >
-      <SignUp open={data.isSignUpModalOpen} handler={toggleSignUpModal} />
-      {/* <ForgotCredentials open={data.isForgotCredentialsModalOpen} handler={toggleForgotCredentialsModal} /> */}
+      <SignUp
+        open={data.isSignUpModalOpen}
+        onSuccess={() => toggleSignUpModal(true)}
+        onCancel={() => toggleSignUpModal(false)}
+      />
       <AlertGroup isToast>
         {data.alerts.map(({ key, variant, title }) => (
           <Alert

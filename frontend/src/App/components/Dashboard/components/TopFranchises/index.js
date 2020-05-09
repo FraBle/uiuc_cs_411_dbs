@@ -25,11 +25,10 @@ import {
 } from '@patternfly/react-core';
 import { Table, TableHeader, TableBody } from '@patternfly/react-table';
 import { BasketballBallIcon, CalendarIcon, ExternalLinkSquareAltIcon } from '@patternfly/react-icons';
-import { useLocation } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import Avatar from 'react-avatar';
 import numbro from 'numbro';
 import _ from 'lodash';
-import queryString from 'query-string';
 import { AuthContext } from '../../../../Auth';
 
 const initialState = {
@@ -90,7 +89,7 @@ const reducer = (state, action) => {
 const TopFranchises = props => {
   const { state: authState } = React.useContext(AuthContext);
   const [data, dispatch] = React.useReducer(reducer, initialState);
-  const urlParams = queryString.parse(useLocation().search);
+  const history = useHistory();
 
   React.useEffect(() => {
     fetchTopFranchiseData();
@@ -171,10 +170,16 @@ const TopFranchises = props => {
     });
   };
 
+  const onFranchiseClick = franchiseId => {
+    if (franchiseId) {
+      history.push(`/dashboard/analysis/franchise?id=${franchiseId}`);
+    }
+  };
+
   const photo =
     !_.isNil(data.franchisePhoto) && !data.loading ? (
       <Bullseye>
-        <Avatar src={data.franchisePhoto} color="#ecedec" size="250px" round />
+        <Avatar src={data.franchisePhoto} color="#ecedec" size="250px" />
       </Bullseye>
     ) : (
       <Bullseye>
@@ -209,7 +214,13 @@ const TopFranchises = props => {
       i + 1,
       {
         title: (
-          <Button variant="link" isInline icon={<ExternalLinkSquareAltIcon />} iconPosition="right">
+          <Button
+            variant="link"
+            isInline
+            icon={<ExternalLinkSquareAltIcon />}
+            iconPosition="right"
+            onClick={() => onFranchiseClick(franchise.franchise)}
+          >
             {franchise.franchiseName}
           </Button>
         )
