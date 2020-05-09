@@ -2,16 +2,25 @@ package edu.uiuc.cs411.project.nba.stats.domain;
 
 public class FranchiseWins {
 
-    private int franchise;
+    private int franchiseId;
+    private String franchiseName;
     private int season;
     private Long victories;
 
-    public int getFranchise() {
-        return franchise;
+    public int getFranchiseId() {
+        return this.franchiseId;
     }
 
-    public void setFranchise(int franchise) {
-        this.franchise = franchise;
+    public void setFranchiseId(int franchiseId) {
+        this.franchiseId = franchiseId;
+    }
+
+    public String getFranchiseName() {
+        return this.franchiseName;
+    }
+
+    public void setFranchiseName(String franchiseName) {
+        this.franchiseName = franchiseName;
     }
 
     public Long getVictories() {

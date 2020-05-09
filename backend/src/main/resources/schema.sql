@@ -154,15 +154,17 @@ FROM PlayerGameStats
 GROUP BY Player, Franchise;
 
 CREATE VIEW `FranchiseWinsBySeason` AS
-SELECT FRANCHISE, Season, COUNT(*) AS VICTORIES FROM
-    (SELECT HomeFranchise AS FRANCHISE, Season FROM Games WHERE HomePoints > AwayPoints
+SELECT FranchiseId, CONCAT(Franchise.City, ' ', Franchise.Nickname) as FranchiseName, Season, COUNT(*) AS VICTORIES FROM
+    (SELECT HomeFranchise AS FranchiseId, Season FROM Games WHERE HomePoints > AwayPoints
     UNION ALL
-    SELECT VisitorFranchise AS FRANCHISE, Season FROM Games WHERE AwayPoints > HomePoints)
-GROUP BY FRANCHISE, Season;
+    SELECT VisitorFranchise AS FranchiseId, Season FROM Games WHERE AwayPoints > HomePoints) tmp
+JOIN Franchise ON (Franchise.ID=FranchiseId)
+GROUP BY FranchiseId, Season;
 
 CREATE VIEW `FranchiseWins` AS
-SELECT FRANCHISE, SUM(VICTORIES) AS VICTORIES FROM FranchiseWinsBySeason
-GROUP BY FRANCHISE;
+SELECT FranchiseId, FranchiseName, FranchiseWinsSUM(VICTORIES) AS VICTORIES FROM FranchiseWinsBySeason
+GROUP BY FranchiseId
+ORDER BY VICTORIES DESC;
 
 DROP INDEX IDXURLSHORT IF EXISTS;
 DROP TABLE ShortURL IF EXISTS;

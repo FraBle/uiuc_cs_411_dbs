@@ -26,12 +26,12 @@ public class FranchiseStatsMapperTest {
     public void getFranchiseWins() {
         FranchiseWins franchiseWins = franchiseStatsMapper.getFranchiseWins(1);
 
-        assertThat(franchiseWins.getFranchise()).isEqualTo(1);
+        assertThat(franchiseWins.getFranchiseId()).isEqualTo(1);
         assertThat(franchiseWins.getVictories()).isEqualTo(2);
 
         franchiseWins = franchiseStatsMapper.getFranchiseWins(2);
 
-        assertThat(franchiseWins.getFranchise()).isEqualTo(2);
+        assertThat(franchiseWins.getFranchiseId()).isEqualTo(2);
         assertThat(franchiseWins.getVictories()).isEqualTo(1);
     }
 
@@ -39,7 +39,7 @@ public class FranchiseStatsMapperTest {
     public void getTop1FranchiseByVictories() {
         List<FranchiseWins> top = franchiseStatsMapper.getTopFranchiseByVictories(1);
         assertThat(top.size()).isEqualTo(1);
-        assertThat(top.get(0).getFranchise()).isEqualTo(1);
+        assertThat(top.get(0).getFranchiseId()).isEqualTo(1);
         assertThat(top.get(0).getVictories()).isEqualTo(2);
     }
 
@@ -48,7 +48,7 @@ public class FranchiseStatsMapperTest {
         List<FranchiseWins> top = franchiseStatsMapper.getTopFranchiseByVictories(2);
         assertThat(top.size()).isEqualTo(2);
 
-        assertThat(top.get(1).getFranchise()).isEqualTo(2);
+        assertThat(top.get(1).getFranchiseId()).isEqualTo(2);
         assertThat(top.get(1).getVictories()).isEqualTo(1);
     }
 
@@ -56,7 +56,7 @@ public class FranchiseStatsMapperTest {
     public void getFranchiseWinsOnSeason() {
         FranchiseWins franchiseWins = franchiseStatsMapper.getFranchiseWinsBySeason(1, 2019);
 
-        assertThat(franchiseWins.getFranchise()).isEqualTo(1);
+        assertThat(franchiseWins.getFranchiseId()).isEqualTo(1);
         assertThat(franchiseWins.getVictories()).isEqualTo(1);
     }
 
@@ -65,10 +65,10 @@ public class FranchiseStatsMapperTest {
         List<FranchiseWins> top = franchiseStatsMapper.getTopFranchiseByVictoriesOnSeason(2, 2019);
         assertThat(top.size()).isEqualTo(2);
 
-        assertThat(top.get(0).getFranchise()).isEqualTo(1);
+        assertThat(top.get(0).getFranchiseId()).isEqualTo(1);
         assertThat(top.get(0).getVictories()).isEqualTo(1);
 
-        assertThat(top.get(1).getFranchise()).isEqualTo(2);
+        assertThat(top.get(1).getFranchiseId()).isEqualTo(2);
         assertThat(top.get(1).getVictories()).isEqualTo(1);
     }
 
