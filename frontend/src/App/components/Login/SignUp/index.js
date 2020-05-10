@@ -106,7 +106,7 @@ const SignUp = props => {
           isRequired
           fieldId="form-username"
           helperTextInvalid={data.isTakenUsername ? 'Username is already in use 😣' : 'Username is not valid 🧐'}
-          isValid={data.isValidUsername || data.isTakenUsername}
+          isValid={data.isTakenUsername ? false : data.isValidUsername}
         >
           <TextInput
             value={data.usernameValue}
@@ -115,7 +115,7 @@ const SignUp = props => {
             type="text"
             id="form-username"
             name="form-username"
-            isValid={data.isValidUsername || data.isTakenUsername}
+            isValid={data.isTakenUsername ? false : data.isValidUsername}
           />
         </FormGroup>
         <FormGroup
@@ -123,7 +123,7 @@ const SignUp = props => {
           isRequired
           fieldId="form-email"
           helperTextInvalid={data.isTakenEmail ? 'Email is already in use 😣' : 'Email is not valid 🧐'}
-          isValid={data.isValidEmail || data.isTakenEmail}
+          isValid={data.isTakenEmail ? false : data.isValidEmail}
         >
           <TextInput
             value={data.emailValue}
@@ -132,7 +132,7 @@ const SignUp = props => {
             type="email"
             id="form-email"
             name="form-email"
-            isValid={data.isValidEmail || data.isTakenEmail}
+            isValid={data.isTakenEmail ? false : data.isValidEmail}
           />
         </FormGroup>
         <FormGroup
