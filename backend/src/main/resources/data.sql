@@ -21,7 +21,7 @@ VALUES
 
 INSERT INTO Player
 VALUES
-(6, 'Shaquille O''Neal', parseDateTime('19720306000000','yyyyMMddHHmmss'), 'F', '7.2', 324, NULL);
+    (6, 'Shaquille O''Neal', parseDateTime('19720306000000','yyyyMMddHHmmss'), 'F', '7.2', 324, NULL);
 
 INSERT INTO Games
 VALUES
@@ -62,3 +62,7 @@ VALUES
 INSERT INTO Franchise
 VALUES
     (2, 'LAL', 'Lakers', 1948, 'Los Angeles', 'Staples Center');
+
+INSERT INTO User
+VALUES
+    ('zhe', 'email', 'password');

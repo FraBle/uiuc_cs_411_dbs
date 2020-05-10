@@ -15,11 +15,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("dev")
 @ContextConfiguration(classes = DevPersistenceConfig.class)
-public class FavoritesPlayerMapperTest{
+public class FavoritesPlayerMapperTest {
 
     @Autowired
     FavoritesPlayerMapper favoritesPlayerMapper;

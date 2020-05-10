@@ -249,7 +249,7 @@ const Dashboard = props => {
       <NavList>
         <NavExpandable title="Overview" groupId="overview" isActive={data.activeGroup === 'overview'} isExpanded>
           <NavItem groupId="overview" itemId="overview-dashboard" isActive={data.activeItem === 'overview-dashboard'}>
-            Overview
+            Dashboard
           </NavItem>
           <NavItem groupId="overview" itemId="overview-search" isActive={data.activeItem === 'overview-search'}>
             Search
