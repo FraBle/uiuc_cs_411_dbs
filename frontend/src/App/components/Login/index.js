@@ -171,7 +171,7 @@ const Login = props => {
       backgroundImgSrc={Background}
       backgroundImgAlt="Images"
       footerListItems={listItem}
-      textContent="Our project aims to make the consumption of NBA statistics interactive, easy and fun by combining multiple data sets from Kaggle with public information (e.g. from Wikidata) to create a holistic search interface that visualizes the insights a user might ask about NBA franchises, games, and players through natural language and filter selections."
+      textContent="Our project aims to make the consumption of NBA statistics interactive, easy and fun by combining multiple data sets from Kaggle with public information to create a holistic search interface that visualizes the insights a user might ask about NBA franchises, games, and players through natural language and filter selections."
       loginTitle="Log in to your account"
       loginSubtitle="Let The Game Begin!"
       signUpForAccountMessage={signUpForAccountMessage}

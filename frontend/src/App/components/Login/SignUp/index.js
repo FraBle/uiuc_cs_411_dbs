@@ -76,6 +76,11 @@ const SignUp = props => {
             ...data,
             isTakenEmail: true
           });
+        } else if (resText === 'username has to be alphanumeric, with length between 3 to 20.') {
+          setData({
+            ...data,
+            isValidUsername: false
+          });
         }
       })
       .catch(error => {
@@ -105,7 +110,11 @@ const SignUp = props => {
           label="Username"
           isRequired
           fieldId="form-username"
-          helperTextInvalid={data.isTakenUsername ? 'Username is already in use 😣' : 'Username is not valid 🧐'}
+          helperTextInvalid={
+            data.isTakenUsername
+              ? 'Username is already in use 😣'
+              : 'Username is not valid (alphanumeric with 3-20 characters) 🧐'
+          }
           isValid={data.isTakenUsername ? false : data.isValidUsername}
         >
           <TextInput
